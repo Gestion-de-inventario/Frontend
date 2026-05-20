@@ -61,9 +61,4 @@ export class LoginPage {
       },
     });
   }
-
-  logout(): void {
-    this.authState.logout();
-    this.router.navigateByUrl('/login');
-  }
 }
