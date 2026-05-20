@@ -1,0 +1,45 @@
+.accessibility-text-large {
+  --font-size-md: 1.2rem;
+  --font-size-lg: 1.4rem;
+  --font-size-xl: 1.8rem;
+}
+
+.accessibility-high-contrast {
+  --color-background: #000000;
+  --color-surface: #121212;
+
+  --color-text: #ffffff;
+  --color-text-secondary: #f1f1f1;
+
+  --color-primary: #4da3ff;
+  --color-secondary: #ffd54f;
+
+  --color-border: #ffffff;
+}
+
+.accessibility-dyslexia {
+  --font-family-base: var(--font-family-dyslexia);
+  --letter-spacing-normal: 0.08em;
+  --line-height-normal: 1.8;
+}
+
+.accessibility-line-spacing {
+  --line-height-normal: 2;
+}
+
+.accessibility-letter-spacing {
+  --letter-spacing-normal: 0.12em;
+}
+
+.reading-mask {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.6);
+
+  mask: linear-gradient(to bottom, transparent 40%, black 45%, black 55%, transparent 60%);
+}
+
+.accessibility-big-cursor {
+  cursor: url('/assets/cursors/big-cursor.png'), auto;
+}
