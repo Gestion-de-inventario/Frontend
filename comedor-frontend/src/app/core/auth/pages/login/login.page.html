@@ -1,0 +1,60 @@
+<div class="container min-vh-100 d-flex justify-content-center align-items-center">
+  <div class="row w-100 justify-content-center">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+          <h3 class="text-center mb-4">Ingresa tus datos</h3>
+
+          <form [formGroup]="form" (ngSubmit)="login()">
+            <!-- DNI -->
+            <div class="mb-3">
+              <label class="form-label">Ingresa tu DNI:</label>
+
+              <input
+                type="text"
+                class="form-control"
+                formControlName="username"
+                placeholder="Ingrese su DNI"
+              />
+
+              @if (form.controls.username.touched && form.controls.username.invalid) {
+                <small class="text-danger"> DNI inválido (8 dígitos) </small>
+              }
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="mb-3">
+              <label class="form-label">Ingresa tu contraseña:</label>
+
+              <input
+                type="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="Ingrese su contraseña"
+              />
+
+              @if (form.controls.password.touched && form.controls.password.invalid) {
+                <small class="text-danger"> Password requerida </small>
+              }
+            </div>
+
+            <!-- BUTTON -->
+            <div class="d-grid mt-4">
+              <app-button
+                type="submit"
+                [disabled]="form.invalid || isLoading"
+                ariaLabel="Iniciar sesión"
+              >
+                @if (isLoading) {
+                  Cargando...
+                } @else {
+                  Ingresar
+                }
+              </app-button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
