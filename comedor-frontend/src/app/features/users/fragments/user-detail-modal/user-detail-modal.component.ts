@@ -43,6 +43,8 @@ export class UserDetailModalComponent {
 
   mode: 'view' | 'edit' = 'view';
 
+  loading = false;
+
   constructor() {
     this.roleService.listMinRolesByStatus('ACTIVO').subscribe((roles) => {
       this.roles = roles;
@@ -102,9 +104,11 @@ export class UserDetailModalComponent {
   save(): void {
     const user = this.user();
 
-    if (!user || this.form.invalid) {
+    if (!user || this.form.invalid || this.loading) {
       return;
     }
+
+    this.loading = true;
 
     this.userService
       .editUser(user.user_id, {
@@ -122,15 +126,27 @@ export class UserDetailModalComponent {
         error: (error) => {
           this.toastService.show('No se pudo actualizar : ' + error.error.message, 'danger');
         },
+
+        complete: () => {
+          this.loading = false;
+        },
       });
   }
 
   activate(): void {
     const user = this.user();
 
-    if (!user) {
+    if (!user || this.loading) {
       return;
     }
+
+    if (user.status === 'ACTIVO') {
+      this.toastService.show('El usuario ya está activo', 'warning');
+
+      return;
+    }
+
+    this.loading = true;
 
     this.userService.activateUser(user.user_id).subscribe({
       next: (updatedUser) => {
@@ -140,7 +156,10 @@ export class UserDetailModalComponent {
       },
 
       error: (error) => {
-        this.toastService.show('No se pudo activar : ' + error.error.message, 'danger');
+        this.toastService.show('No se pudo activar: ' + error.error.message, 'danger');
+      },
+      complete: () => {
+        this.loading = false;
       },
     });
   }
@@ -152,6 +171,14 @@ export class UserDetailModalComponent {
       return;
     }
 
+    if (user.status === 'INACTIVO') {
+      this.toastService.show('El usuario ya está inactivo', 'warning');
+
+      return;
+    }
+
+    this.loading = true;
+
     this.userService.deactivateUser(user.user_id).subscribe({
       next: (updatedUser) => {
         this.userState.updateUser(updatedUser);
@@ -160,7 +187,10 @@ export class UserDetailModalComponent {
       },
 
       error: (error) => {
-        this.toastService.show('No se pudo desactivar : ' + error.error.message, 'danger');
+        this.toastService.show('No se pudo desactivar: ' + error.error.message, 'danger');
+      },
+      complete: () => {
+        this.loading = false;
       },
     });
   }

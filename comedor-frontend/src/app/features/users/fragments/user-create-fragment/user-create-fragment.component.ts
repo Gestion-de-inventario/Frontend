@@ -37,7 +37,7 @@ export class UserCreateFragmentComponent {
   private readonly roleService = inject(RoleService);
 
   roles: MinRoleResponse[] = [];
-
+  loading = false;
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
@@ -59,8 +59,7 @@ export class UserCreateFragmentComponent {
       validators: [Validators.required],
     }),
 
-    role_id: new FormControl(0, {
-      nonNullable: true,
+    role_id: new FormControl<number | null>(null, {
       validators: [Validators.required],
     }),
   });
@@ -84,9 +83,11 @@ export class UserCreateFragmentComponent {
   }
 
   create(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.loading) {
       return;
     }
+
+    this.loading = true;
 
     this.userService.createUser(this.form.getRawValue()).subscribe({
       next: (createdUser) => {
@@ -99,7 +100,7 @@ export class UserCreateFragmentComponent {
           lastname: '',
           dni: '',
           password: '',
-          role_id: 0,
+          role_id: null,
         });
 
         bootstrap.Modal.getInstance(document.getElementById('createUserModal')!)?.hide();
@@ -107,6 +108,9 @@ export class UserCreateFragmentComponent {
 
       error: (error) => {
         this.toastService.show('No se pudo crear el usuario :' + error.error.message, 'danger');
+      },
+      complete: () => {
+        this.loading = false;
       },
     });
   }

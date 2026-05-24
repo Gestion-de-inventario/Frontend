@@ -55,8 +55,16 @@
               </div>
 
               <div>
-                <strong>Estado:</strong>
-                {{ user.status }}
+                <div>
+                  <strong>Estado: </strong>
+
+                  <span
+                    class="badge"
+                    [class]="user.status === 'INACTIVO' ? 'bg-danger' : 'bg-success'"
+                  >
+                    {{ user.status }}
+                  </span>
+                </div>
               </div>
             </div>
           } @else {
@@ -66,25 +74,61 @@
               <div>
                 <label class="form-label"> Nombre </label>
 
-                <input type="text" class="form-control" formControlName="name" />
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="name"
+                  [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+                />
+                @if (form.controls.name.touched && form.controls.name.invalid) {
+                  <small class="text-danger"> Este campo es obligatorio </small>
+                }
               </div>
 
               <div>
                 <label class="form-label"> Apellido </label>
 
-                <input type="text" class="form-control" formControlName="lastname" />
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="lastname"
+                  [class.is-invalid]="
+                    form.controls.lastname.touched && form.controls.lastname.invalid
+                  "
+                />
+                @if (form.controls.lastname.touched && form.controls.lastname.invalid) {
+                  <small class="text-danger"> Este campo es obligatorio </small>
+                }
               </div>
 
               <div>
                 <label class="form-label"> DNI </label>
 
-                <input type="text" class="form-control" formControlName="dni" />
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="dni"
+                  [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
+                />
+                @if (form.controls.dni.touched && form.controls.dni.invalid) {
+                  <small class="text-danger"> Este campo es obligatorio </small>
+                }
               </div>
 
               <div>
                 <label class="form-label"> Password </label>
 
-                <input type="password" class="form-control" formControlName="password" />
+                <input
+                  type="password"
+                  class="form-control"
+                  formControlName="password"
+                  [class.is-invalid]="
+                    form.controls.password.touched && form.controls.password.invalid
+                  "
+                />
+                @if (form.controls.password.touched && form.controls.password.invalid) {
+                  <small class="text-danger"> Este campo es obligatorio </small>
+                }
               </div>
 
               <div>
@@ -110,15 +154,32 @@
       <div class="modal-footer">
         @if (mode === 'view') {
           @if (authState.hasPermission('USER_EDIT')) {
-            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
+            <button class="btn btn-primary" (click)="openEdit()">
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm"></span>
+              }
+              Editar
+            </button>
           }
 
           @if (authState.hasPermission('USER_ACTIVATE')) {
-            <button class="btn btn-success" (click)="activate()">Activar</button>
+            <button class="btn btn-success" (click)="activate()">
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm"></span>
+              }
+
+              Activar
+            </button>
           }
 
           @if (authState.hasPermission('USER_DEACTIVATE')) {
-            <button class="btn btn-danger" (click)="deactivate()">Desactivar</button>
+            <button class="btn btn-danger" (click)="deactivate()">
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm"></span>
+              }
+
+              Desactivar
+            </button>
           }
         } @else {
           <button class="btn btn-primary" [disabled]="form.invalid" (click)="save()">
