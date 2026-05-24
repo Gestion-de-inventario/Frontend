@@ -1,0 +1,81 @@
+<div class="mt-4">
+  <button class="btn btn-primary" (click)="openModal()">Crear usuario</button>
+</div>
+
+<!-- MODAL -->
+
+<div class="modal fade" id="createUserModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- HEADER -->
+
+      <div class="modal-header">
+        <h5 class="modal-title">Crear usuario</h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- BODY -->
+
+      <div class="modal-body">
+        <div class="alert alert-info">El nombre de usuario será el DNI</div>
+
+        <form [formGroup]="form" class="d-flex flex-column gap-3">
+          <!-- NOMBRE -->
+
+          <div>
+            <label class="form-label"> Nombre </label>
+
+            <input type="text" class="form-control" formControlName="name" />
+          </div>
+
+          <!-- APELLIDO -->
+
+          <div>
+            <label class="form-label"> Apellido </label>
+
+            <input type="text" class="form-control" formControlName="lastname" />
+          </div>
+
+          <!-- DNI -->
+
+          <div>
+            <label class="form-label"> DNI </label>
+
+            <input type="text" class="form-control" formControlName="dni" />
+          </div>
+
+          <!-- PASSWORD -->
+
+          <div>
+            <label class="form-label"> Password </label>
+
+            <input type="password" class="form-control" formControlName="password" />
+          </div>
+
+          <!-- ROLE -->
+
+          <div>
+            <label class="form-label"> Rol </label>
+
+            <select class="form-select" formControlName="role_id">
+              <option [value]="0" disabled>Seleccione un rol</option>
+
+              @for (role of roles; track role.role_id) {
+                <option [value]="role.role_id">
+                  {{ role.name }}
+                </option>
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="form.invalid" (click)="create()">Crear</button>
+      </div>
+    </div>
+  </div>
+</div>

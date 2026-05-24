@@ -1,0 +1,33 @@
+<div
+  #sidebarElement
+  class="offcanvas offcanvas-start"
+  tabindex="-1"
+  id="appSidebar"
+  aria-labelledby="appSidebarLabel"
+>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title text-white" id="appSidebarLabel">Menú</h5>
+    <button
+      type="button"
+      class="btn-close btn-close-white"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+
+  <div class="offcanvas-body d-flex flex-column gap-2">
+    <p>________________________________________________</p>
+
+    <h6 class="offcanvas-title" id="appSidebarLabel">Modulos:</h6>
+
+    <a class="btn btn-outline" routerLink="/dashboard" data-bs-dismiss="offcanvas"> Dashboard </a>
+
+    @if (authState.hasPermission('USER_LIST_ALL')) {
+      <a class="btn btn-outline" routerLink="/users" data-bs-dismiss="offcanvas"> Usuarios </a>
+    }
+
+    <button class="logout-btn btn mt-auto" (click)="logout()" data-bs-dismiss="offcanvas">
+      Cerrar sesión
+    </button>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/guards/auth.guard';
 
 import { guestGuard } from './core/auth/guards/guest.guard';
+import { AppShellPage } from './layout/pages/app-shell/app-shell.page';
 
 export const routes: Routes = [
   {
@@ -14,25 +15,40 @@ export const routes: Routes = [
   },
 
   {
-    path: 'dashboard',
+    path: '',
+
+    component: AppShellPage,
 
     canActivate: [authGuard],
 
-    loadComponent: () =>
-      import('@features/dashboard/pages/dashboard.page').then((m) => m.DashboardPage),
-  },
+    children: [
+      {
+        path: 'dashboard',
 
-  {
-    path: '',
+        title: 'Dashboard',
 
-    pathMatch: 'full',
+        loadComponent: () =>
+          import('@features/dashboard/pages/dashboard.page').then((m) => m.DashboardPage),
+      },
 
-    redirectTo: 'dashboard',
-  },
+      {
+        path: 'users',
 
-  {
-    path: '**',
+        title: 'Usuarios',
 
-    redirectTo: 'dashboard',
+        loadComponent: () =>
+          import('@features/users/pages/user_principal/user_principal').then(
+            (m) => m.UserPrincipal,
+          ),
+      },
+
+      {
+        path: '',
+
+        redirectTo: 'dashboard',
+
+        pathMatch: 'full',
+      },
+    ],
   },
 ];

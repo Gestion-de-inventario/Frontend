@@ -1,0 +1,131 @@
+<div class="modal fade" id="userDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- HEADER -->
+
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-2">
+          @if (mode === 'edit') {
+            <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">←</button>
+          }
+
+          <h5 class="modal-title">
+            @if (mode === 'view') {
+              Detalle usuario
+            } @else {
+              Editar usuario
+            }
+          </h5>
+        </div>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="close()"></button>
+      </div>
+
+      <!-- BODY -->
+
+      <div class="modal-body">
+        @if (user(); as user) {
+          <!-- VIEW MODE -->
+
+          @if (mode === 'view') {
+            <div class="d-flex flex-column gap-3">
+              <div>
+                <strong>Username:</strong>
+                {{ user.dni }}
+              </div>
+
+              <div>
+                <strong>Nombre:</strong>
+                {{ user.name }}
+              </div>
+
+              <div>
+                <strong>Apellido:</strong>
+                {{ user.lastname }}
+              </div>
+
+              <div>
+                <strong>DNI:</strong>
+                {{ user.dni }}
+              </div>
+
+              <div>
+                <strong>Rol:</strong>
+                {{ user.role }}
+              </div>
+
+              <div>
+                <strong>Estado:</strong>
+                {{ user.status }}
+              </div>
+            </div>
+          } @else {
+            <!-- EDIT MODE -->
+
+            <form [formGroup]="form" class="d-flex flex-column gap-3">
+              <div>
+                <label class="form-label"> Nombre </label>
+
+                <input type="text" class="form-control" formControlName="name" />
+              </div>
+
+              <div>
+                <label class="form-label"> Apellido </label>
+
+                <input type="text" class="form-control" formControlName="lastname" />
+              </div>
+
+              <div>
+                <label class="form-label"> DNI </label>
+
+                <input type="text" class="form-control" formControlName="dni" />
+              </div>
+
+              <div>
+                <label class="form-label"> Password </label>
+
+                <input type="password" class="form-control" formControlName="password" />
+              </div>
+
+              <div>
+                <label class="form-label"> Rol </label>
+
+                <select class="form-select" formControlName="role_id">
+                  <option [value]="0" disabled>Seleccione un rol</option>
+
+                  @for (role of roles; track role.role_id) {
+                    <option [value]="role.role_id">
+                      {{ role.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </form>
+          }
+        }
+      </div>
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+        @if (mode === 'view') {
+          @if (authState.hasPermission('USER_EDIT')) {
+            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
+          }
+
+          @if (authState.hasPermission('USER_ACTIVATE')) {
+            <button class="btn btn-success" (click)="activate()">Activar</button>
+          }
+
+          @if (authState.hasPermission('USER_DEACTIVATE')) {
+            <button class="btn btn-danger" (click)="deactivate()">Desactivar</button>
+          }
+        } @else {
+          <button class="btn btn-primary" [disabled]="form.invalid" (click)="save()">
+            Guardar
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

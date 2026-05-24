@@ -22,6 +22,10 @@ export class AuthStateService {
 
   readonly session = this._session.asReadonly();
 
+  readonly permissions = computed(() => this._session()?.permissions ?? []);
+
+  readonly role = computed(() => this._session()?.role ?? null);
+
   readonly isAuthenticated = computed(() => !!this._session());
 
   login(request: AuthRequest) {
@@ -51,6 +55,10 @@ export class AuthStateService {
         this._session.set(response);
       }),
     );
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.permissions().includes(permission);
   }
 }
 
