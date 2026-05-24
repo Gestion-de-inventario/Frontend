@@ -119,8 +119,8 @@ export class UserDetailModalComponent {
           this.mode = 'view';
         },
 
-        error: () => {
-          this.toastService.show('No se pudo actualizar', 'danger');
+        error: (error) => {
+          this.toastService.show('No se pudo actualizar : ' + error.error.message, 'danger');
         },
       });
   }
@@ -139,8 +139,8 @@ export class UserDetailModalComponent {
         this.toastService.show('Usuario activado', 'success');
       },
 
-      error: () => {
-        this.toastService.show('No se pudo activar', 'danger');
+      error: (error) => {
+        this.toastService.show('No se pudo activar : ' + error.error.message, 'danger');
       },
     });
   }
@@ -159,8 +159,8 @@ export class UserDetailModalComponent {
         this.toastService.show('Usuario desactivado', 'warning');
       },
 
-      error: () => {
-        this.toastService.show('No se pudo desactivar', 'danger');
+      error: (error) => {
+        this.toastService.show('No se pudo desactivar : ' + error.error.message, 'danger');
       },
     });
   }
