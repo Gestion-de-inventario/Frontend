@@ -26,10 +26,20 @@ export class UserStateService {
     this._selectedUser.set(null);
   }
 
-  updateUser(updated: UserResponse): void {
+  updateUser(updatedUser: UserResponse): void {
+    // LISTA
+
     this._users.update((users) =>
-      users.map((user) => (user.user_id === updated.user_id ? updated : user)),
+      users.map((user) => (user.user_id === updatedUser.user_id ? updatedUser : user)),
     );
+
+    // MODAL
+
+    const selectedUser = this._selectedUser();
+
+    if (selectedUser && selectedUser.user_id === updatedUser.user_id) {
+      this._selectedUser.set(updatedUser);
+    }
   }
 
   addUser(user: UserResponse): void {

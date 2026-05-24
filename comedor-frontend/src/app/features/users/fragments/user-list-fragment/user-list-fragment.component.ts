@@ -39,7 +39,7 @@ export class UserListFragmentComponent {
     let users = this.users();
 
     if (this.onlyActive()) {
-      users = users.filter((user) => user.status === 'ACTIVE');
+      users = users.filter((user) => user.status === 'ACTIVO');
     }
 
     return users.filter((user) => {

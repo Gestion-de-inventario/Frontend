@@ -1,5 +1,6 @@
-<div class="mt-4">
-  <button class="btn btn-primary" (click)="openModal()">Crear usuario</button>
+<div class="mb-4">
+  <h4>Crear usuarios:</h4>
+  <button class="btn btn-outline" (click)="openModal()">Crear usuario</button>
 </div>
 
 <!-- MODAL -->
@@ -19,47 +20,81 @@
 
       <div class="modal-body">
         <div class="alert alert-info">El nombre de usuario será el DNI</div>
-
+        <div class="alert alert-warning">
+          Los campos marcados con <span class="text-danger">*</span> son obligatorios
+        </div>
         <form [formGroup]="form" class="d-flex flex-column gap-3">
           <!-- NOMBRE -->
 
           <div>
-            <label class="form-label"> Nombre </label>
+            <label class="form-label"> Nombre <span class="text-danger">*</span></label>
 
-            <input type="text" class="form-control" formControlName="name" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+            />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
           </div>
 
           <!-- APELLIDO -->
 
           <div>
-            <label class="form-label"> Apellido </label>
+            <label class="form-label"> Apellido <span class="text-danger">*</span></label>
 
-            <input type="text" class="form-control" formControlName="lastname" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="lastname"
+              [class.is-invalid]="form.controls.lastname.touched && form.controls.lastname.invalid"
+            />
+            @if (form.controls.lastname.touched && form.controls.lastname.invalid) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
           </div>
 
           <!-- DNI -->
 
           <div>
-            <label class="form-label"> DNI </label>
+            <label class="form-label"> DNI <span class="text-danger">*</span></label>
 
-            <input type="text" class="form-control" formControlName="dni" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="dni"
+              [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
+            />
+            @if (form.controls.dni.touched && form.controls.dni.invalid) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
           </div>
 
           <!-- PASSWORD -->
 
           <div>
-            <label class="form-label"> Password </label>
+            <label class="form-label"> Password <span class="text-danger">*</span></label>
 
-            <input type="password" class="form-control" formControlName="password" />
+            <input
+              type="password"
+              class="form-control"
+              formControlName="password"
+              [class.is-invalid]="form.controls.password.touched && form.controls.password.invalid"
+            />
+            @if (form.controls.password.touched && form.controls.password.invalid) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
           </div>
 
           <!-- ROLE -->
 
           <div>
-            <label class="form-label"> Rol </label>
+            <label class="form-label"> Rol <span class="text-danger">*</span></label>
 
             <select class="form-select" formControlName="role_id">
-              <option [value]="0" disabled>Seleccione un rol</option>
+              <option [ngValue]="null" disabled>Seleccione un rol</option>
 
               @for (role of roles; track role.role_id) {
                 <option [value]="role.role_id">
@@ -74,7 +109,19 @@
       <!-- FOOTER -->
 
       <div class="modal-footer">
-        <button class="btn btn-primary" [disabled]="form.invalid" (click)="create()">Crear</button>
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          [disabled]="form.invalid || loading"
+          (click)="create()"
+        >
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm"></span>
+
+            Creando...
+          } @else {
+            Crear
+          }
+        </button>
       </div>
     </div>
   </div>

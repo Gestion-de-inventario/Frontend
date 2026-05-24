@@ -6,12 +6,11 @@
       <a routerLink="/dashboard" class="btn btn-primary mt-3"> Volver al dashboard </a>
     </div>
   } @else {
-    @if (canList) {
-      <app-user-list-fragment />
-    }
-
     @if (canCreate) {
       <app-user-create-fragment />
+    }
+    @if (canList) {
+      <app-user-list-fragment />
     }
   }
 </div>

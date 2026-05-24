@@ -25,10 +25,15 @@
     @for (user of filteredUsers(); track user.user_id) {
       <div class="card p-3 user-item" (click)="openUser(user)">
         <div class="fw-bold">👤 {{ user.name }} {{ user.lastname }}</div>
+        <div class="d-flex flex-column">
+          <small>
+            {{ user.role }}
+          </small>
 
-        <small>
-          {{ user.role }}
-        </small>
+          <span class="badge" [class]="user.status === 'INACTIVO' ? 'bg-danger' : 'bg-success'">
+            {{ user.status }}
+          </span>
+        </div>
       </div>
     }
   </div>
