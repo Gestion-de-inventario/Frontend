@@ -101,6 +101,14 @@ export const routes: Routes = [
             (m) => m.TransactionsModificationsPrincipalComponent,
           ),
       },
+      {
+        path: 'menu-report',
+        title: 'Control Menú',
+        loadComponent: () =>
+          import('@features/menu-report/pages/menu_report_principal/menu_report_principal').then(
+            (m) => m.MenuReportPrincipal,
+          ),
+      },
     ],
   },
 ];

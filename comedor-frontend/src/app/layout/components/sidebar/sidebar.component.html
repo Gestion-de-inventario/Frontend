@@ -16,12 +16,11 @@
   </div>
 
   <div class="offcanvas-body d-flex flex-column gap-2">
-    <!-- PERFIL -->
     <h6 class="offcanvas-title" id="appSidebarLabel">Perfil:</h6>
     <a
       class="perfil-card d-flex align-items-center gap-2 p-2 rounded text-decoration-none"
-      routerLink="/profile"
-      data-bs-dismiss="offcanvas"
+      (click)="navigateAndClose('/profile')"
+      style="cursor: pointer;"
     >
       <div
         class="perfil-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
@@ -40,18 +39,18 @@
 
     <h6 class="offcanvas-title" id="appSidebarLabel">Modulos:</h6>
 
-    <a class="btn btn-outline" routerLink="/dashboard" data-bs-dismiss="offcanvas"> Dashboard </a>
+    <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/dashboard')"> Dashboard </a>
 
     @if (authState.hasPermission('USER_LIST_ALL')) {
-      <a class="btn btn-outline" routerLink="/users" data-bs-dismiss="offcanvas"> Usuarios </a>
+      <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/users')"> Usuarios </a>
     }
 
     @if (authState.hasPermission('PRODUCT_LIST_BY_STATUS')) {
-      <a class="btn btn-outline" routerLink="/products" data-bs-dismiss="offcanvas"> Productos </a>
+      <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/products')"> Productos </a>
     }
 
     @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
-      <a class="btn btn-outline" routerLink="/beneficiaries" data-bs-dismiss="offcanvas">
+      <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/beneficiaries')">
         Beneficiarios
       </a>
     }
@@ -60,13 +59,13 @@
       authState.hasPermission('CATEGORY_LIST_BY_STATUS') ||
       authState.hasPermission('TAG_LIST_BY_STATUS')
     ) {
-      <a class="btn btn-outline" routerLink="/categories" data-bs-dismiss="offcanvas">
+      <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/categories')">
         Categorías y Etiquetas
       </a>
     }
 
     @if (authState.hasPermission('ROLE_LIST_BY_STATUS')) {
-      <a class="btn btn-outline" routerLink="/roles" data-bs-dismiss="offcanvas"> Roles </a>
+      <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/roles')"> Roles </a>
     }
 
     @if (
@@ -74,15 +73,18 @@
       authState.hasPermission('TRANSACTION_LIST_ALL')
     ) {
       <a
-        class="btn btn-outline"
-        routerLink="/transactions-modifications"
-        data-bs-dismiss="offcanvas"
+        class="btn btn-outline" style="cursor: pointer;"
+        (click)="navigateAndClose('/transactions-modifications')"
       >
         Transacciones y Modificaciones
       </a>
     }
 
-    <button class="logout-btn btn mt-auto" (click)="logout()" data-bs-dismiss="offcanvas">
+    @if (authState.hasPermission('MENU_REPORT_CREATE_REPORT') || authState.hasPermission('MENU_REPORT_GET_BY_DATE')) {
+      <a class="btn btn-outline" style="cursor: pointer;" (click)="navigateAndClose('/menu-report')"> Control Menú </a>
+    }
+
+    <button class="logout-btn btn mt-auto" (click)="logout()">
       Cerrar sesión
     </button>
   </div>
