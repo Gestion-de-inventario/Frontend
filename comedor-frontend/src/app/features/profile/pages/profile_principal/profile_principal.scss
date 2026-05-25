@@ -1,0 +1,19 @@
+.perfil-avatar {
+  width: 64px;
+  height: 64px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.perfil-rol {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.form-control-plaintext {
+  background: var(--color-background);
+  color: var(--color-text);
+}

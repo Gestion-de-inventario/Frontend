@@ -1,0 +1,93 @@
+<div class="mb-4">
+  <h4>Crear producto:</h4>
+  <button class="btn btn-outline" (click)="openModal()">Crear producto</button>
+</div>
+
+<div class="modal fade" id="createProductModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          Los campos marcados con <span class="text-danger">*</span> son obligatorios
+        </div>
+        <form [formGroup]="form" class="d-flex flex-column gap-3">
+
+          <div>
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="name"
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <small class="text-danger">Este campo es obligatorio</small>
+            }
+          </div>
+
+          <div>
+            <label class="form-label">Categoría <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="categoryId">
+              <option [ngValue]="null" disabled>Seleccione una categoría</option>
+              @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">Etiqueta <small class="text-muted">(opcional)</small></label>
+            <select class="form-select" formControlName="tagId">
+              <option [ngValue]="null">Sin etiqueta</option>
+              @for (tag of tags; track tag.id) {
+                <option [value]="tag.id">{{ tag.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">Unidad <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="unit">
+              <option [ngValue]="null" disabled>Seleccione una unidad</option>
+              <option value="KG">Kilogramos</option>
+              <option value="LITROS">Litros</option>
+              <option value="UNIDADES">Unidades</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">Stock inicial <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" formControlName="stock"
+              [class.is-invalid]="form.controls.stock.touched && form.controls.stock.invalid" />
+            @if (form.controls.stock.touched && form.controls.stock.invalid) {
+              <small class="text-danger">Este campo es obligatorio</small>
+            }
+          </div>
+
+          <div>
+            <label class="form-label">Punto de reorden (Stock de Seguridad - Emitira Alerta) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" formControlName="reorderPoint"
+              [class.is-invalid]="form.controls.reorderPoint.touched && form.controls.reorderPoint.invalid" />
+            @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.invalid) {
+              <small class="text-danger">Este campo es obligatorio</small>
+            }
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary d-flex align-items-center gap-2"
+          [disabled]="form.invalid || loading" (click)="create()">
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm"></span>
+            Creando...
+          } @else {
+            Crear
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

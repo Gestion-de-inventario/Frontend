@@ -1,0 +1,40 @@
+<div class="modal fade" id="categoryDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalle categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="close()"></button>
+      </div>
+
+      <div class="modal-body">
+        @if (category(); as category) {
+          <div class="d-flex flex-column gap-3">
+            <div><strong>Nombre:</strong> {{ category.name }}</div>
+            <div>
+              <strong>Estado: </strong>
+              <span class="badge" [class]="category.status === 'INACTIVO' ? 'bg-danger' : 'bg-success'">
+                {{ category.status }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        @if (authState.hasPermission('CATEGORY_CHANGE_STATUS')) {
+          @if (category()?.status === 'INACTIVO') {
+            <button class="btn btn-success" (click)="changeStatus('ACTIVO')" [disabled]="loading">
+              @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
+              Activar
+            </button>
+          } @else {
+            <button class="btn btn-danger" (click)="changeStatus('INACTIVO')" [disabled]="loading">
+              @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
+              Desactivar
+            </button>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

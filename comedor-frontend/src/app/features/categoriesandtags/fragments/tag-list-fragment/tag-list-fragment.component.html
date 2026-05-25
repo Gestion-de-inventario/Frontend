@@ -1,0 +1,33 @@
+<div class="card p-3">
+  <h4>Etiquetas</h4>
+
+  <input
+    class="form-control mt-3"
+    placeholder="Buscar etiqueta"
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event)"
+  />
+
+  <div class="form-check mt-3">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      [checked]="onlyActive()"
+      (change)="onlyActive.set($any($event.target).checked)"
+    />
+    <label class="form-check-label"> Solo activos </label>
+  </div>
+
+  <div class="mt-4 d-flex flex-column gap-2">
+    @for (tag of filteredTags(); track tag.id) {
+      <div class="card p-3 tag-item" (click)="openTag(tag)">
+        <div class="fw-bold">🔖 {{ tag.name }}</div>
+        <span class="badge" [class]="tag.status === 'INACTIVO' ? 'bg-danger' : 'bg-success'">
+          {{ tag.status }}
+        </span>
+      </div>
+    }
+  </div>
+</div>
+
+<app-tag-detail-modal />

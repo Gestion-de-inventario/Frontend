@@ -1,0 +1,30 @@
+<div class="container py-3">
+  <div class="card p-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div class="perfil-avatar rounded-circle d-flex align-items-center justify-content-center">
+        👤
+      </div>
+      <div>
+        <h5 class="mb-0 fw-bold">{{ authState.session()?.name }} {{ authState.session()?.lastname }}</h5>
+        <span class="perfil-rol">{{ authState.session()?.role }}</span>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="d-flex flex-column gap-3">
+      <div>
+        <label class="form-label fw-bold">Nombre</label>
+        <p class="form-control-plaintext border rounded px-3 py-2">{{ authState.session()?.name }}</p>
+      </div>
+      <div>
+        <label class="form-label fw-bold">Apellido</label>
+        <p class="form-control-plaintext border rounded px-3 py-2">{{ authState.session()?.lastname }}</p>
+      </div>
+      <div>
+        <label class="form-label fw-bold">Rol</label>
+        <p class="form-control-plaintext border rounded px-3 py-2">{{ authState.session()?.role }}</p>
+      </div>
+    </div>
+  </div>
+</div>
