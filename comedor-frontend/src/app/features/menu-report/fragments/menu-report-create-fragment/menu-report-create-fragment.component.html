@@ -1,0 +1,98 @@
+<div class="card p-2 border-0 shadow-sm">
+  <div class="d-flex flex-column mb-2">
+    <h4 class="mb-0 text-primary">Control Menú</h4>
+    <small class="text-muted">{{ today }}</small>
+  </div>
+
+  <hr class="mt-1 mb-3" />
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center py-4">
+      <span class="spinner-border text-primary"></span>
+    </div>
+  } @else if (report()) {
+    <div class="alert alert-success d-flex flex-column gap-1 p-2 text-center">
+      <span class="fs-4">✅</span>
+      <strong>Reporte del día:</strong>
+      <span>{{ report()!.menu }}</span>
+    </div>
+
+    <div class="d-flex flex-column gap-3">
+      <app-menu-report-products-fragment />
+      <app-menu-report-beneficiaries-fragment />
+
+      @if (authState.hasPermission('MENU_REPORT_GET_SUMMARY')) {
+        <app-menu-report-summary-fragment />
+      }
+    </div>
+
+  } @else {
+    @if (authState.hasPermission('MENU_REPORT_CREATE_REPORT')) {
+      <div class="d-flex flex-column gap-4">
+        <div>
+          <label class="form-label fw-bold mb-1">Menú del día <span class="text-danger">*</span></label>
+          <input
+            type="text"
+            class="form-control form-control-lg fs-6"
+            placeholder="Ej: Arroz con pollo"
+            [ngModel]="menu()"
+            (ngModelChange)="menu.set($event)"
+          />
+        </div>
+
+        <div>
+          <label class="form-label fw-bold mb-1">Cocineras</label>
+          <input
+            type="text"
+            class="form-control form-control-lg fs-6"
+            placeholder="Buscar por nombre..."
+            [ngModel]="cookSearch()"
+            (ngModelChange)="cookSearch.set($event)"
+          />
+
+          @if (filteredCooks().length > 0 && cookSearch().length > 0) {
+            <div class="card mt-2 shadow-sm border-0 bg-light p-1">
+              @for (cook of filteredCooks(); track cook.user_id) {
+                <div class="d-flex flex-column p-2 mb-1 bg-white rounded border"
+                  style="cursor: pointer;"
+                  (click)="addCook(cook)">
+                  <span class="fw-semibold">👤 {{ cook.name }} {{ cook.lastname }}</span>
+                  <small class="text-muted">DNI: {{ cook.dni }}</small>
+                </div>
+              }
+            </div>
+          }
+
+          @if (selectedCooks().length > 0) {
+            <div class="d-flex flex-column gap-2 mt-3">
+              <span class="text-muted small">Seleccionadas:</span>
+              @for (cook of selectedCooks(); track cook.user_id) {
+                <div class="d-flex justify-content-between align-items-center p-2 rounded border bg-white shadow-sm">
+                  <span class="text-truncate me-2" style="max-width: 80%;">
+                    👤 {{ cook.name }} {{ cook.lastname }}
+                  </span>
+                  <button class="btn btn-outline-danger btn-sm px-3" (click)="removeCook(cook)">✕</button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <button
+          class="btn btn-primary btn-lg w-100 d-flex align-items-center justify-content-center gap-2 mt-2"
+          [disabled]="menu().trim().length === 0 || creating()"
+          (click)="createReport()"
+        >
+          @if (creating()) {
+            <span class="spinner-border spinner-border-sm"></span>
+            Creando...
+          } @else {
+            Crear reporte
+          }
+        </button>
+      </div>
+    } @else {
+      <div class="alert alert-warning p-2 text-center">No hay reporte creado para hoy.</div>
+    }
+  }
+</div>

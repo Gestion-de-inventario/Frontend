@@ -27,26 +27,19 @@ export const API_ENDPOINTS = {
     CHANGE_STATUS: '/category/changeStatus/{id}',
   },
 
-  MENU_REPORT: {
-    CREATE: '/menu-report/create',
-
-    GET_BY_DATE: '/menu-report/date/{fecha}',
-
-    GET_SUMMARY: '/menu-report/{id}/summary',
+    MENU_REPORT: {
+    CREATE: '/menu_report/create',
+    GET_BY_DATE: '/menu_report/date/{fecha}',
+    GET_SUMMARY: '/menu_report/{id}/summary',
   },
 
   MENU_RECORD: {
-    ADD_PRODUCT: '/menu-report/{id}/records',
-
-    EDIT_PRODUCT: '/menu-report/{reporteId}/records/{registroId}',
-
-    REMOVE_PRODUCT: '/menu-report/{reporteId}/records/{registroId}',
-
-    ADD_BENEFICIARY: '/menu-report/{id}/beneficiaries',
-
-    EDIT_BENEFICIARY: '/menu-report/{reporteId}/beneficiaries/{controlId}',
-
-    REMOVE_BENEFICIARY: '/menu-report/{reporteId}/beneficiaries/{controlId}',
+    ADD_PRODUCT: '/menu_report/{id}/records',
+    EDIT_PRODUCT: '/menu_report/{reporteId}/records/{registroId}',
+    REMOVE_PRODUCT: '/menu_report/{reporteId}/records/{registroId}',
+    ADD_BENEFICIARY: '/menu_report/{id}/beneficiaries',
+    EDIT_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
+    REMOVE_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
   },
 
   PRODUCT: {
