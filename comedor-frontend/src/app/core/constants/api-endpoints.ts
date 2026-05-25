@@ -98,7 +98,7 @@ export const API_ENDPOINTS = {
   },
 
   MODIFICATION: {
-    LIST_ALL: '/modifications/list',
+    LIST_ALL: '/modifications',
   },
 
   PERMISSION: {

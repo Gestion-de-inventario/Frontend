@@ -16,11 +16,15 @@
   </div>
 
   <div class="offcanvas-body d-flex flex-column gap-2">
-
     <!-- PERFIL -->
-    <a class="perfil-card d-flex align-items-center gap-2 p-2 rounded text-decoration-none"
-      routerLink="/profile" data-bs-dismiss="offcanvas">
-      <div class="perfil-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+    <a
+      class="perfil-card d-flex align-items-center gap-2 p-2 rounded text-decoration-none"
+      routerLink="/profile"
+      data-bs-dismiss="offcanvas"
+    >
+      <div
+        class="perfil-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+      >
         👤
       </div>
       <div class="d-flex flex-column overflow-hidden">
@@ -46,15 +50,35 @@
     }
 
     @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
-      <a class="btn btn-outline" routerLink="/beneficiaries" data-bs-dismiss="offcanvas"> Beneficiarios </a>
+      <a class="btn btn-outline" routerLink="/beneficiaries" data-bs-dismiss="offcanvas">
+        Beneficiarios
+      </a>
     }
 
-    @if (authState.hasPermission('CATEGORY_LIST_BY_STATUS') || authState.hasPermission('TAG_LIST_BY_STATUS')) {
-      <a class="btn btn-outline" routerLink="/categories" data-bs-dismiss="offcanvas"> Categorías y Etiquetas </a>
+    @if (
+      authState.hasPermission('CATEGORY_LIST_BY_STATUS') ||
+      authState.hasPermission('TAG_LIST_BY_STATUS')
+    ) {
+      <a class="btn btn-outline" routerLink="/categories" data-bs-dismiss="offcanvas">
+        Categorías y Etiquetas
+      </a>
+    }
 
     @if (authState.hasPermission('ROLE_LIST_BY_STATUS')) {
       <a class="btn btn-outline" routerLink="/roles" data-bs-dismiss="offcanvas"> Roles </a>
+    }
 
+    @if (
+      authState.hasPermission('MODIFICATION_LIST_ALL') ||
+      authState.hasPermission('TRANSACTION_LIST_ALL')
+    ) {
+      <a
+        class="btn btn-outline"
+        routerLink="/transactions-modifications"
+        data-bs-dismiss="offcanvas"
+      >
+        Transacciones y Modificaciones
+      </a>
     }
 
     <button class="logout-btn btn mt-auto" (click)="logout()" data-bs-dismiss="offcanvas">
