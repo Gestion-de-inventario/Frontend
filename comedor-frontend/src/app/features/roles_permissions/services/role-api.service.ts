@@ -21,7 +21,6 @@ export class RoleService {
       `${this.apiUrl}${API_ENDPOINTS.ROLE.LIST_BY_STATUS}?status=${status}`,
     );
   }
-
   listMinRolesByStatus(status: string) {
     return this.http.get<MinRoleResponse[]>(
       `${this.apiUrl}${API_ENDPOINTS.ROLE.LIST_BY_STATUS}?status=${status}`,
@@ -39,6 +38,6 @@ export class RoleService {
 
   editRole(id: number, request: RoleEditRequest) {
     const endpoint = buildEndpoint(API_ENDPOINTS.ROLE.EDIT, { id });
-    return this.http.post<RoleResponse>(`${this.apiUrl}${endpoint}`, request);
+    return this.http.put<RoleResponse>(`${this.apiUrl}${endpoint}`, request);
   }
 }

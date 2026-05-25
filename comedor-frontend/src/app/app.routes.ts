@@ -41,6 +41,16 @@ export const routes: Routes = [
             (m) => m.UserPrincipal,
           ),
       },
+      {
+        path: 'roles',
+
+        title: 'Roles',
+
+        loadComponent: () =>
+          import('@features/roles_permissions/pages/roles-permissions_principal/roles-permissions_principal').then(
+            (m) => m.RolesPermissionsPrincipalComponent,
+          ),
+      },
 
       {
         path: '',

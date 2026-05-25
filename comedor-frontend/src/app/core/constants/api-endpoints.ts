@@ -100,4 +100,8 @@ export const API_ENDPOINTS = {
   MODIFICATION: {
     LIST_ALL: '/modifications/list',
   },
+
+  PERMISSION: {
+    LIST_ALL: '/permissions/all',
+  },
 };

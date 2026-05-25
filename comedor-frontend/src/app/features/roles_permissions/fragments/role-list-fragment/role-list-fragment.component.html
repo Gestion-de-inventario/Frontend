@@ -1,0 +1,54 @@
+<div class="mt-4">
+  <h4>Roles registrados</h4>
+
+  <!-- FILTERS -->
+
+  <div class="d-flex gap-2 mt-3 flex-wrap">
+    <!-- SEARCH -->
+
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Buscar rol..."
+      (input)="onSearch($event)"
+    />
+
+    <!-- STATUS -->
+
+    <select class="form-select" (change)="onStatusChange($event)">
+      <option value="TODOS">Todos</option>
+
+      <option value="ACTIVO">Activos</option>
+
+      <option value="INACTIVO">Inactivos</option>
+    </select>
+  </div>
+
+  <!-- LOADING -->
+
+  @if (loading) {
+    <div class="text-center mt-4">
+      <div class="spinner-border"></div>
+    </div>
+  }
+
+  <!-- LIST -->
+
+  <div class="mt-4 d-flex flex-column gap-2">
+    @for (role of roles(); track role.role_id) {
+      <div class="card p-3 role-item" (click)="openRole(role)">
+        <div class="fw-bold">🛡️ {{ role.name }}</div>
+
+        <small>
+          <span class="badge" [class]="role.status === 'ACTIVO' ? 'bg-success' : 'bg-danger'">
+            {{ role.status }}
+          </span>
+        </small>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<app-role-detail-modal />

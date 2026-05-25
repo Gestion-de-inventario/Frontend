@@ -1,0 +1,112 @@
+<div class="mb-4">
+  <h4>Crear rol:</h4>
+
+  <button class="btn btn-outline" (click)="openModal()">Crear rol</button>
+</div>
+
+<!-- MODAL -->
+
+<div class="modal fade" id="createRoleModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <!-- HEADER -->
+
+      <div class="modal-header">
+        <h5 class="modal-title">Crear rol</h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- BODY -->
+
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          Los campos marcados con
+          <span class="text-danger"> * </span>
+          son obligatorios
+        </div>
+
+        <form [formGroup]="form" class="d-flex flex-column gap-4">
+          <!-- NAME -->
+
+          <div>
+            <label class="form-label">
+              Nombre
+              <span class="text-danger"> * </span>
+            </label>
+
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+            />
+
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
+          </div>
+
+          <!-- PERMISSIONS -->
+
+          <div>
+            <label class="form-label"> Permisos </label>
+
+            <div class="permissions-container">
+              @for (permission of permissions; track permission.code) {
+                <div class="permission-card">
+                  <!-- CHECK -->
+
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'permission-' + permission.code"
+                      (change)="onPermissionChange($event, permission.code)"
+                    />
+
+                    <label class="form-check-label fw-bold" [for]="'permission-' + permission.code">
+                      {{ permission.code }}
+                    </label>
+                  </div>
+
+                  <!-- MODULE -->
+
+                  <div class="mt-2">
+                    <span class="badge bg-primary">
+                      {{ permission.module }}
+                    </span>
+                  </div>
+
+                  <!-- DESCRIPTION -->
+
+                  <small class="text-muted d-block mt-2">
+                    {{ permission.description }}
+                  </small>
+                </div>
+              }
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+        <button
+          class="btn btn-success d-flex align-items-center gap-2"
+          [disabled]="form.invalid || loading"
+          (click)="create()"
+        >
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm"></span>
+
+            Creando...
+          } @else {
+            Crear
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
