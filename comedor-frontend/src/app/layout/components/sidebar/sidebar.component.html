@@ -26,6 +26,10 @@
       <a class="btn btn-outline" routerLink="/users" data-bs-dismiss="offcanvas"> Usuarios </a>
     }
 
+    @if (authState.hasPermission('ROLE_LIST_BY_STATUS')) {
+      <a class="btn btn-outline" routerLink="/roles" data-bs-dismiss="offcanvas"> Roles </a>
+    }
+
     <button class="logout-btn btn mt-auto" (click)="logout()" data-bs-dismiss="offcanvas">
       Cerrar sesión
     </button>

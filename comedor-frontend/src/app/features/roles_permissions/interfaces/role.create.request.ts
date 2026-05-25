@@ -1,4 +1,4 @@
 export interface CreateRoleRequest {
   name: string;
-  permissions: string[];
+  permissions: string[] | null;
 }

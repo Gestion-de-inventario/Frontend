@@ -5,6 +5,7 @@ import { environment } from '@env/environment';
 import { API_ENDPOINTS } from '@core/constants/api-endpoints';
 import { UserResponse } from '../interfaces/user.response';
 import { UserRequest } from '../interfaces/user.request';
+import { buildEndpoint } from '@shared/utils/api.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -27,23 +28,17 @@ export class UserService {
   }
 
   editUser(id: number, request: UserRequest) {
-    return this.http.post<UserResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.USER.EDIT.replace('{id}', id.toString())}`,
-      request,
-    );
+    const endpoint = buildEndpoint(API_ENDPOINTS.USER.EDIT, { id });
+    return this.http.post<UserResponse>(`${this.apiUrl}${endpoint}`, request);
   }
 
   deactivateUser(id: number) {
-    return this.http.post<UserResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.USER.DEACTIVATE.replace('{id}', id.toString())}`,
-      {},
-    );
+    const endpoint = buildEndpoint(API_ENDPOINTS.USER.DEACTIVATE, { id });
+    return this.http.post<UserResponse>(`${this.apiUrl}${endpoint}`, {});
   }
 
   activateUser(id: number) {
-    return this.http.post<UserResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.USER.ACTIVATE.replace('{id}', id.toString())}`,
-      {},
-    );
+    const endpoint = buildEndpoint(API_ENDPOINTS.USER.ACTIVATE, { id });
+    return this.http.post<UserResponse>(`${this.apiUrl}${endpoint}`, {});
   }
 }

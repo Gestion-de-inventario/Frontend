@@ -1,0 +1,287 @@
+<div class="modal fade" id="roleDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      @if (role(); as role) {
+        <!-- ===================================== -->
+        <!-- HEADER -->
+        <!-- ===================================== -->
+
+        <div class="modal-header">
+          <div class="d-flex align-items-center gap-2">
+            <!-- BACK -->
+
+            @if (mode !== 'view') {
+              <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">←</button>
+            }
+
+            <h5 class="modal-title">
+              @if (mode === 'view') {
+                Detalle del rol
+              }
+
+              @if (mode === 'edit') {
+                Editar rol
+              }
+
+              @if (mode === 'permissions') {
+                Gestionar permisos
+              }
+            </h5>
+          </div>
+
+          <!-- CLOSE -->
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            (click)="close()"
+          ></button>
+        </div>
+
+        <!-- ===================================== -->
+        <!-- BODY -->
+        <!-- ===================================== -->
+
+        <div class="modal-body">
+          <!-- =============================== -->
+          <!-- VIEW MODE -->
+          <!-- =============================== -->
+
+          @if (mode === 'view') {
+            <!-- NAME -->
+
+            <div class="mb-3">
+              <strong> Nombre: </strong>
+
+              <div>
+                {{ role.name }}
+              </div>
+            </div>
+
+            <!-- STATUS -->
+
+            <div class="mb-3">
+              <strong> Estado: </strong>
+
+              <div>
+                <span class="badge" [class]="role.status === 'ACTIVO' ? 'bg-success' : 'bg-danger'">
+                  {{ role.status }}
+                </span>
+              </div>
+            </div>
+
+            <!-- PERMISSIONS -->
+
+            <div>
+              <strong> Permisos: </strong>
+
+              <div class="d-flex flex-wrap gap-2 mt-2">
+                @for (permission of role.permissions; track permission) {
+                  <span
+                    class="badge"
+                    [class]="
+                      permission.includes('CREATE')
+                        ? 'bg-primary'
+                        : permission.includes('EDIT')
+                          ? 'bg-success'
+                          : permission.includes('DELETE')
+                            ? 'bg-danger'
+                            : 'bg-secondary'
+                    "
+                  >
+                    {{ permission }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- =============================== -->
+          <!-- EDIT MODE -->
+          <!-- =============================== -->
+
+          @if (mode === 'edit') {
+            <form [formGroup]="form" class="d-flex flex-column gap-3">
+              <!-- NAME -->
+
+              <div>
+                <label class="form-label"> Nombre </label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="name"
+                  [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+                />
+
+                @if (form.controls.name.touched && form.controls.name.invalid) {
+                  <small class="text-danger"> Este campo es obligatorio </small>
+                }
+              </div>
+
+              <!-- STATUS -->
+
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [checked]="form.controls.status.value === 'ACTIVO'"
+                  (change)="
+                    form.controls.status.setValue(
+                      $any($event.target).checked ? 'ACTIVO' : 'INACTIVO'
+                    )
+                  "
+                />
+
+                <label class="form-check-label">
+                  {{ form.controls.status.value }}
+                </label>
+              </div>
+            </form>
+          }
+          <!-- =============================== -->
+          <!-- PERMISSIONS MODE -->
+          <!-- =============================== -->
+          @if (mode === 'permissions') {
+            <!-- SEARCH -->
+
+            <div class="mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Buscar permisos..."
+                [(ngModel)]="permissionSearch"
+              />
+            </div>
+            @if (loading) {
+              <div class="d-flex justify-content-center py-5">
+                <div class="spinner-border text-primary"></div>
+              </div>
+            }
+
+            <!-- ACCORDION -->
+            @if (!loading) {
+              <div class="accordion" id="permissionsAccordion">
+                @for (group of permissionGroups; track group.module; let i = $index) {
+                  <div class="accordion-item">
+                    <!-- HEADER -->
+
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        [attr.data-bs-target]="'#collapse-' + i"
+                      >
+                        <div class="d-flex align-items-center gap-3">
+                          <!-- MODULE CHECK -->
+
+                          <input
+                            type="checkbox"
+                            class="form-check-input"
+                            [checked]="isModuleSelected(group.permissions)"
+                            (click)="$event.stopPropagation()"
+                            (change)="toggleModule(group.permissions, $any($event.target).checked)"
+                          />
+
+                          <strong>
+                            {{ group.module }}
+                          </strong>
+                        </div>
+                      </button>
+                    </h2>
+
+                    <!-- BODY -->
+
+                    <div class="accordion-collapse collapse" [id]="'collapse-' + i">
+                      <div class="accordion-body d-flex flex-column gap-3">
+                        @for (permission of group.permissions; track permission.code) {
+                          @if (
+                            permission.code.toLowerCase().includes(permissionSearch.toLowerCase())
+                          ) {
+                            <div class="permission-item">
+                              <div class="form-check">
+                                <input
+                                  type="checkbox"
+                                  class="form-check-input"
+                                  [checked]="selectedPermissions.includes(permission.code)"
+                                  (change)="togglePermission(permission.code)"
+                                />
+
+                                <label class="form-check-label fw-bold">
+                                  {{ permission.code }}
+                                </label>
+                              </div>
+
+                              <small class="text-muted">
+                                {{ permission.description }}
+                              </small>
+                            </div>
+                          }
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+
+        <!-- ===================================== -->
+        <!-- FOOTER -->
+        <!-- ===================================== -->
+
+        <div class="modal-footer">
+          <!-- VIEW MODE -->
+
+          @if (mode === 'view' && authState.hasPermission('ROLE_EDIT')) {
+            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
+          }
+
+          @if (mode === 'view' && authState.hasPermission('ROLE_ASSIGN_PERMISSIONS')) {
+            <button class="btn btn-primary" (click)="openAssignPermissions()">
+              Gestionar permisos
+            </button>
+          }
+
+          <!-- EDIT MODE -->
+
+          @if (mode === 'edit') {
+            <button
+              class="btn btn-success d-flex align-items-center gap-2"
+              [disabled]="form.invalid || loading"
+              (click)="save()"
+            >
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm"></span>
+
+                Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          }
+
+          <!-- PERMISSIONS MODE -->
+          @if (mode === 'permissions') {
+            <button
+              class="btn btn-success d-flex align-items-center gap-2"
+              [disabled]="loading"
+              (click)="savePermissions()"
+            >
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm"></span>
+
+                Guardando...
+              } @else {
+                Guardar permisos
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
