@@ -1,0 +1,71 @@
+<div class="card p-3">
+  <h4>Productos</h4>
+
+  <input
+    class="form-control mt-3"
+    placeholder="Buscar producto"
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event); currentPage.set(1)"
+  />
+
+  <div class="form-check mt-3">
+    <input
+      type="checkbox"
+      class="form-check-input"
+      [checked]="onlyActive()"
+      (change)="onlyActive.set($any($event.target).checked); currentPage.set(1)"
+    />
+    <label class="form-check-label"> Solo activos </label>
+  </div>
+
+  <div class="mt-4 d-flex flex-column gap-2">
+    @for (product of pagedProducts(); track product.id) {
+      <div class="card p-3 product-item" (click)="openProduct(product)">
+        <div class="fw-bold">📦 {{ product.name }}</div>
+        <div class="d-flex flex-column">
+          <small>{{ product.categoryName }} {{ product.tagName ? '· ' + product.tagName : '' }}</small>
+          <small>Stock: {{ product.stock }} {{ product.unit }}</small>
+          <span class="badge" [class]="product.status === 'INACTIVO' ? 'bg-danger' : 'bg-success'">
+            {{ product.status }}
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- PAGINACIÓN -->
+  @if (totalPages() > 1) {
+    <div class="d-flex justify-content-center align-items-center gap-2 mt-3 flex-wrap">
+      <button
+        class="btn btn-sm btn-outline-primary"
+        [disabled]="currentPage() === 1"
+        (click)="goToPage(currentPage() - 1)"
+      >
+        ‹
+      </button>
+
+      @for (page of pages(); track page) {
+        <button
+          class="btn btn-sm"
+          [class]="currentPage() === page ? 'btn-primary' : 'btn-outline-primary'"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      }
+
+      <button
+        class="btn btn-sm btn-outline-primary"
+        [disabled]="currentPage() === totalPages()"
+        (click)="goToPage(currentPage() + 1)"
+      >
+        ›
+      </button>
+    </div>
+    <small class="text-center text-muted mt-1">
+      {{ (currentPage() - 1) * pageSize + 1 }}–{{ currentPage() * pageSize > filteredProducts().length ? filteredProducts().length : currentPage() * pageSize }} de {{ filteredProducts().length }}
+    </small>
+  }
+</div>
+
+<app-product-detail-modal />

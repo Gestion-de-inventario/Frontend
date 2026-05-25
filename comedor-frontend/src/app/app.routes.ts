@@ -49,6 +49,40 @@ export const routes: Routes = [
 
         pathMatch: 'full',
       },
+      {
+        path: 'products',
+
+        title: 'Productos',
+
+        loadComponent: () =>
+          import('@features/products/pages/product_principal/product_principal').then(
+            (m) => m.ProductPrincipal,
+          ),
+      },
+      {
+        path: 'beneficiaries',
+        title: 'Beneficiarios',
+        loadComponent: () =>
+          import('@features/beneficiaries/pages/beneficiary_principal/beneficiary_principal').then(
+            (m) => m.BeneficiaryPrincipal,
+          ),
+      },
+      {
+        path: 'categories',
+        title: 'Categorías y Etiquetas',
+        loadComponent: () =>
+          import('@features/categoriesandtags/pages/category_principal/category_principal').then(
+            (m) => m.CategoryPrincipal,
+          ),
+      },
+      {
+        path: 'profile',
+        title: 'Mi perfil',
+        loadComponent: () =>
+          import('@features/profile/pages/profile_principal/profile_principal').then(
+            (m) => m.ProfilePrincipal,
+          ),
+      },
     ],
   },
 ];
