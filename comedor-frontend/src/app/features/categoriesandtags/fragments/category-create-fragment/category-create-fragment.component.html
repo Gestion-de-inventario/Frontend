@@ -1,0 +1,47 @@
+<div class="mb-4">
+  <h4>Crear categoría:</h4>
+  <button class="btn btn-outline" (click)="openModal()">Crear categoría</button>
+</div>
+
+<div class="modal fade" id="createCategoryModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="form" class="d-flex flex-column gap-3">
+          <div>
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+            />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <small class="text-danger">Este campo es obligatorio</small>
+            }
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          [disabled]="form.invalid || loading"
+          (click)="create()"
+        >
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm"></span>
+            Creando...
+          } @else {
+            Crear
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

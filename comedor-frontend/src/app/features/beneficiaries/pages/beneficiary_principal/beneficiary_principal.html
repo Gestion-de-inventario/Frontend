@@ -1,0 +1,15 @@
+<div class="container py-3">
+  @if (!canList && !canCreate) {
+    <div class="text-center mt-5">
+      <h4>No tienes permisos para este módulo</h4>
+      <a routerLink="/dashboard" class="btn btn-primary mt-3"> Volver al dashboard </a>
+    </div>
+  } @else {
+    @if (canCreate) {
+      <app-beneficiary-create-fragment />
+    }
+    @if (canList) {
+      <app-beneficiary-list-fragment />
+    }
+  }
+</div>
