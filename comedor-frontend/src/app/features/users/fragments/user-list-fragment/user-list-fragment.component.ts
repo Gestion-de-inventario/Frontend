@@ -9,7 +9,7 @@ import { UserService } from '@features/users/services/user-api.service';
 import { UserStateService } from '../../services/user-state.service';
 
 import { AuthStateService } from '@core/auth/services/auth-state.service';
-import { UserDetailModalComponent } from '../user-detail-modal/user-detail-modal.component';
+import { UserDetailModalComponent } from '@features/users/modals/user-detail-modal/user-detail-modal.component';
 
 declare const bootstrap: any;
 
