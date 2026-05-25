@@ -120,7 +120,7 @@ export class RoleDetailModalComponent {
           },
           {} as Record<string, PermissionResponse[]>,
         );
-
+        this.cdr.detectChanges();
         this.permissionGroups = Object.entries(grouped).map(([module, permissions]) => ({
           module,
           permissions,

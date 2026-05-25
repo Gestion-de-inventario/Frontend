@@ -1,0 +1,84 @@
+<div class="card p-3">
+  <h5>Transacciones</h5>
+
+  @if (loading) {
+    <div class="text-center py-4">
+      <div class="spinner-border"></div>
+    </div>
+  } @else if (transactions().length === 0) {
+    <div class="text-muted text-center py-3">No hay transacciones</div>
+  } @else {
+    @for (t of transactions(); track t.id) {
+      <div class="border-bottom py-2">
+        <div class="fw-bold">{{ t.productName }} - {{ t.amount }}</div>
+
+        <small>
+          {{ t.dateTime }}
+          |
+          {{ t.userName }}
+          |
+          {{ t.personaName }}
+          {{ t.personaLastName }}
+        </small>
+
+        <div class="mt-1">
+          @if (t.type === 'SALIDA') {
+            <span class="badge bg-danger">
+              {{ t.type }}
+            </span>
+          } @else {
+            <span class="badge bg-success">
+              {{ t.type }}
+            </span>
+          }
+          <span class="ms-2">
+            Stock actual: {{ t.currentStock }} - Stock final: {{ t.finalStock }}
+          </span>
+        </div>
+      </div>
+    }
+    <button class="btn btn-outline-primary mt-3" (click)="openModal()">Ver más</button>
+  }
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="transactionsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Todas las transacciones</h5>
+        <button class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        @for (t of modalTransactions; track t.id) {
+          <div class="border-bottom py-2">
+            <div class="fw-bold">{{ $index + 1 }} | {{ t.productName }} - {{ t.amount }}</div>
+
+            <small>
+              {{ t.dateTime | date: 'short' }} | {{ t.userName }} | {{ t.personaName }}
+              {{ t.personaLastName }}
+            </small>
+
+            <div class="mt-1">
+              <span class="badge bg-secondary">{{ t.type }}</span>
+              <span class="ms-2">
+                Stock actual: {{ t.currentStock }} Stock final: {{ t.finalStock }}
+              </span>
+            </div>
+          </div>
+        }
+
+        @if (loading) {
+          <div class="text-center py-3">
+            <div class="spinner-border"></div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="nextPage()" [disabled]="loading">Ver más</button>
+      </div>
+    </div>
+  </div>
+</div>

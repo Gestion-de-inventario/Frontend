@@ -93,6 +93,14 @@ export const routes: Routes = [
             (m) => m.ProfilePrincipal,
           ),
       },
+      {
+        path: 'transactions-modifications',
+        title: 'Transacciones y Modificaciones',
+        loadComponent: () =>
+          import('@features/transactions_modifications/pages/transactions-modifications_principal/transactions-modifications-principal.component').then(
+            (m) => m.TransactionsModificationsPrincipalComponent,
+          ),
+      },
     ],
   },
 ];
