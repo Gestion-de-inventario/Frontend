@@ -1,0 +1,33 @@
+<div class="container py-3">
+  <!-- ===================================== -->
+  <!-- SIN PERMISOS -->
+  <!-- ===================================== -->
+
+  @if (!canViewTransactions && !canViewModifications) {
+    <div class="text-center mt-5">
+      <h4>No tienes permisos para este módulo</h4>
+
+      <a routerLink="/dashboard" class="btn btn-primary mt-3"> Volver al dashboard </a>
+    </div>
+  }
+
+  <!-- ===================================== -->
+  <!-- TRANSACTIONS -->
+  <!-- ===================================== -->
+
+  @if (canViewTransactions) {
+    <div class="mb-4">
+      <app-transactions-fragment />
+    </div>
+  }
+
+  <!-- ===================================== -->
+  <!-- MODIFICATIONS -->
+  <!-- ===================================== -->
+
+  @if (canViewModifications) {
+    <div class="mb-4">
+      <app-modifications-fragment />
+    </div>
+  }
+</div>
