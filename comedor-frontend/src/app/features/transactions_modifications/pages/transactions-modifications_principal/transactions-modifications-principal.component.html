@@ -16,18 +16,32 @@
   <!-- ===================================== -->
 
   @if (canViewTransactions) {
-    <div class="mb-4">
-      <app-transactions-fragment />
-    </div>
+    @defer (on timer(0ms)) {
+      <div class="mb-4">
+        <app-transactions-fragment />
+      </div>
+    } @placeholder {
+      <div class="card p-3 mb-4 shadow-sm">
+        <div class="placeholder-glow">
+          <h5 class="placeholder col-4"></h5>
+          <div class="placeholder col-12 py-4"></div>
+        </div>
+      </div>
+    }
   }
 
-  <!-- ===================================== -->
-  <!-- MODIFICATIONS -->
-  <!-- ===================================== -->
-
   @if (canViewModifications) {
-    <div class="mb-4">
-      <app-modifications-fragment />
-    </div>
+    @defer (on timer(0ms)) {
+      <div class="mb-4">
+        <app-modifications-fragment />
+      </div>
+    } @placeholder {
+      <div class="card p-3 mb-4 shadow-sm">
+        <div class="placeholder-glow">
+          <h5 class="placeholder col-4"></h5>
+          <div class="placeholder col-12 py-4"></div>
+        </div>
+      </div>
+    }
   }
 </div>

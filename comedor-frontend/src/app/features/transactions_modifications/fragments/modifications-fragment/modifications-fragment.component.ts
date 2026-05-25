@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModificationsService } from '@features/transactions_modifications/services/modification/modifications-api.service';
+import { ModificationsStateService } from '@features/transactions_modifications/services/modification/modifications-state.service';
 import { ModificationsResponse } from '@features/transactions_modifications/interfaces/modifications/modifications.response';
 
 declare const bootstrap: any;
@@ -11,54 +12,74 @@ declare const bootstrap: any;
   imports: [CommonModule],
   templateUrl: './modifications-fragment.component.html',
 })
-export class ModificationsFragmentComponent {
+export class ModificationsFragmentComponent implements OnInit {
   private readonly modificationsService = inject(ModificationsService);
+  private readonly modificationsState = inject(ModificationsStateService);
+  private readonly cdr = inject(ChangeDetectorRef); // 2. Inyectamos el detector
 
-  modificationsPreview: ModificationsResponse[] = [];
+  readonly modifications = computed(() => this.modificationsState.modifications());
   modalModifications: ModificationsResponse[] = [];
-
   loading = false;
+  modalPage = 0;
+  modalSize = 10;
 
-  page = 0;
-  size = 10;
-
-  constructor() {
+  ngOnInit(): void {
     this.loadPreview();
   }
 
   loadPreview(): void {
-    this.modificationsService.list(0, 5).subscribe({
-      next: (data) => (this.modificationsPreview = data.content ?? data),
+    this.loading = true;
+    this.modificationsService.list(0, 3).subscribe({
+      next: (data) => {
+        this.modificationsState.set(data.content);
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
   openModal(): void {
-    this.page = 0;
+    this.modalPage = 0;
     this.modalModifications = [];
-
     this.loadPage();
 
-    const modal = new bootstrap.Modal(document.getElementById('modificationsModal'));
-    modal.show();
+    const modalElement = document.getElementById('modificationsModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }
+  closeModal(): void {
+    this.loading = false;
+    this.modalModifications = [];
+    this.modalPage = 0;
   }
 
   loadPage(): void {
-    this.loading = true;
+    if (this.modalPage === 0) this.loading = true;
 
-    this.modificationsService.list(this.page, this.size).subscribe({
+    this.modificationsService.list(this.modalPage, this.modalSize).subscribe({
       next: (data: any) => {
-        this.modalModifications = [...this.modalModifications, ...(data.content ?? data)];
-      },
-      complete: () => {
+        const content = data.content ?? data;
+        this.modalModifications = [...this.modalModifications, ...content];
         this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
   nextPage(): void {
     if (this.loading) return;
-
-    this.page++;
+    this.modalPage++;
+    this.loading = true;
     this.loadPage();
   }
 }

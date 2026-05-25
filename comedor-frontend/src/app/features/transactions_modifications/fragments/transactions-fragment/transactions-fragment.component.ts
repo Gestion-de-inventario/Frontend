@@ -1,10 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectorRef } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 
-import { TransactionService } from '@features/transactions_modifications/services/transactions/transaction-api.service';
-import { TransactionsResponse } from '@features/transactions_modifications/interfaces/transactions/transactions.response';
+import { OnInit } from '@angular/core';
 
-import { ToastService } from '@shared/services/toast.service';
+import { TransactionService } from '@features/transactions_modifications/services/transactions/transaction-api.service';
+
+import { TransactionStateService } from '@features/transactions_modifications/services/transactions/transaction-state.service';
+
+import { TransactionsResponse } from '@features/transactions_modifications/interfaces/transactions/transactions.response';
 
 declare const bootstrap: any;
 
@@ -16,48 +20,53 @@ declare const bootstrap: any;
   imports: [CommonModule],
 
   templateUrl: './transactions-fragment.component.html',
-  styleUrls: ['./transactions-fragment.component.scss'],
 })
-export class TransactionsFragmentComponent {
+export class TransactionsFragmentComponent implements OnInit {
   private readonly transactionService = inject(TransactionService);
-  private readonly toastService = inject(ToastService);
 
-  transactions: TransactionsResponse[] = [];
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  // modal pagination
+  private readonly transactionState = inject(TransactionStateService);
+
+  readonly transactions = computed(() => this.transactionState.transactions());
+
   modalTransactions: TransactionsResponse[] = [];
-
-  page = 0;
-  size = 5;
-
-  modalPage = 0;
-  modalSize = 10;
-
-  totalPages = 0;
 
   loading = false;
 
-  constructor() {
-    this.loadInitial();
-  }
+  modalPage = 0;
 
+  modalSize = 10;
+
+  ngOnInit(): void {
+    this.loadPreview();
+  }
   // =========================
-  // LISTADO PRINCIPAL (5)
+  // PREVIEW
   // =========================
-  loadInitial(): void {
-    this.transactionService.list(this.page, this.size).subscribe({
-      next: (res: any) => {
-        this.transactions = res.content;
-        this.totalPages = res.totalPages;
+
+  loadPreview(): void {
+    this.loading = true;
+    this.transactionService.list(0, 3).subscribe({
+      next: (data) => {
+        this.transactionState.set(data.content);
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
   // =========================
-  // ABRIR MODAL
+  // MODAL
   // =========================
+
   openModal(): void {
     this.modalPage = 0;
+
     this.modalTransactions = [];
 
     this.loadModalPage();
@@ -66,25 +75,34 @@ export class TransactionsFragmentComponent {
 
     modal.show();
   }
+  closeModal(): void {
+    this.loading = false;
+    this.modalTransactions = [];
+    this.modalPage = 0;
+  }
 
-  // =========================
-  // CARGAR PAGINA MODAL (10)
-  // =========================
   loadModalPage(): void {
     this.loading = true;
-
     this.transactionService.list(this.modalPage, this.modalSize).subscribe({
-      next: (res: any) => {
-        this.modalTransactions = [...this.modalTransactions, ...res.content];
-      },
-      complete: () => {
+      next: (data) => {
+        this.modalTransactions = [...this.modalTransactions, ...data.content];
         this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.loading = false;
+        this.cdr.detectChanges();
       },
     });
   }
 
   nextPage(): void {
+    if (this.loading) {
+      return;
+    }
+
     this.modalPage++;
+
     this.loadModalPage();
   }
 
