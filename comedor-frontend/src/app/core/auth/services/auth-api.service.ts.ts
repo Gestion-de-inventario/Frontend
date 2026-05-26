@@ -34,4 +34,10 @@ export class AuthService {
       { withCredentials: true },
     );
   }
+
+  me() {
+    return this.http.get<AuthResponse>(`${this.apiUrl}${API_ENDPOINTS.AUTH.ME}`, {
+      withCredentials: true,
+    });
+  }
 }
