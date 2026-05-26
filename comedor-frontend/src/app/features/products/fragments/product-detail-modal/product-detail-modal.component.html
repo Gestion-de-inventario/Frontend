@@ -1,7 +1,6 @@
 <div class="modal fade" id="productDetailModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <!-- HEADER -->
       <div class="modal-header">
         <div class="d-flex align-items-center gap-2">
           @if (mode === 'edit') {
@@ -14,14 +13,17 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="close()"></button>
       </div>
 
-      <!-- BODY -->
       <div class="modal-body">
         @if (product(); as product) {
           @if (mode === 'view') {
             <div class="d-flex flex-column gap-3">
               <div><strong>Nombre:</strong> {{ product.name }}</div>
-              <div><strong>Categoría:</strong> {{ product.categoryName }}</div>
-              <div><strong>Etiqueta:</strong> {{ product.tagName ?? 'Sin etiqueta' }}</div>
+              <div><strong>Categoría:</strong> {{ product.categoryName || 'Sin categoría' }}</div>
+              
+              @if (product.tagName) {
+                <div><strong>Etiqueta:</strong> {{ product.tagName }}</div>
+              }
+              
               <div><strong>Unidad:</strong> {{ product.unit }}</div>
               <div><strong>Stock:</strong> {{ product.stock }}</div>
               <div><strong>Punto de reorden(Stock de Seguridad - Emitira Alerta):</strong> {{ product.reorderPoint }}</div>
@@ -45,7 +47,7 @@
                   <select class="form-select" formControlName="categoryId">
                     <option [ngValue]="null" disabled>Seleccione una categoría</option>
                     @for (category of categories; track category.id) {
-                      <option [value]="category.id">{{ category.name }}</option>
+                      <option [ngValue]="category.id">{{ category.name }}</option>
                     }
                   </select>
                 </div>
@@ -55,7 +57,7 @@
                   <select class="form-select" formControlName="tagId">
                     <option [ngValue]="null">Sin etiqueta</option>
                     @for (tag of tags; track tag.id) {
-                      <option [value]="tag.id">{{ tag.name }}</option>
+                      <option [ngValue]="tag.id">{{ tag.name }}</option>
                     }
                   </select>
                 </div>
@@ -84,7 +86,6 @@
         }
       </div>
 
-      <!-- FOOTER -->
       <div class="modal-footer">
         @if (mode === 'view') {
           @if (authState.hasPermission('PRODUCT_EDIT')) {
