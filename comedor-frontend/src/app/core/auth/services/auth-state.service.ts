@@ -60,6 +60,17 @@ export class AuthStateService {
   hasPermission(permission: string): boolean {
     return this.permissions().includes(permission);
   }
+
+  refreshSession() {
+    return this.authApi.me().pipe(
+      tap((response) => {
+        this._session.update((current) => ({
+          ...response,
+          token: current?.token ?? '',
+        }));
+      }),
+    );
+  }
 }
 
 export function initAuth(authState: AuthStateService) {

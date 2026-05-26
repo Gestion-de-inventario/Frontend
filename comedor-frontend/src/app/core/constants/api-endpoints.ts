@@ -3,6 +3,7 @@ export const API_ENDPOINTS = {
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
+    ME: '/auth/me',
   },
 
   BENEFICIARY: {
@@ -27,7 +28,7 @@ export const API_ENDPOINTS = {
     CHANGE_STATUS: '/category/changeStatus/{id}',
   },
 
-    MENU_REPORT: {
+  MENU_REPORT: {
     CREATE: '/menu_report/create',
     GET_BY_DATE: '/menu_report/date/{fecha}',
     GET_SUMMARY: '/menu_report/{id}/summary',
