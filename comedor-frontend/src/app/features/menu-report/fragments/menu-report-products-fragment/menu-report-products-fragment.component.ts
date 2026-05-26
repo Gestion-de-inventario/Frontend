@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuReportApiService } from '@features/menu-report/services/menu-report-api.service';
@@ -18,7 +18,7 @@ declare const bootstrap: any;
   imports: [CommonModule, FormsModule],
   templateUrl: './menu-report-products-fragment.component.html',
 })
-export class MenuReportProductsFragmentComponent {
+export class MenuReportProductsFragmentComponent implements OnInit {
   private readonly menuReportService = inject(MenuReportApiService);
   private readonly menuReportState = inject(MenuReportStateService);
   private readonly productService = inject(ProductApiService);
@@ -46,10 +46,17 @@ export class MenuReportProductsFragmentComponent {
     );
   });
 
-  constructor() {
-    this.productService.listByStatus('ACTIVO').subscribe((products) => {
-      this.productState.setProducts(products);
-    });
+  // detecta si el reporte tiene productos de donación (vino de plantilla)
+  readonly hasTemplateProducts = computed(() =>
+    (this.report()?.registro ?? []).some((r) => r.sourceProduct === 'DONACION')
+  );
+
+  ngOnInit(): void {
+    if (this.productState.products().length === 0) {
+      this.productService.listByStatus('ACTIVO').subscribe((products) => {
+        this.productState.setProducts(products);
+      });
+    }
   }
 
   openAddModal(): void {
@@ -75,7 +82,6 @@ export class MenuReportProductsFragmentComponent {
   saveProduct(): void {
     const report = this.report();
     if (!report || this.loading) return;
-
     if (!this.editingRecord && !this.selectedProduct) return;
     if (!this.amount()) return;
 
@@ -100,7 +106,7 @@ export class MenuReportProductsFragmentComponent {
           this.editingRecord ? 'Producto actualizado' : 'Producto agregado',
           'success'
         );
-        this.reloadReport(report.id);
+        this.reloadReport();
         bootstrap.Modal.getInstance(document.getElementById('productRecordModal')!)?.hide();
         this.resetForm();
       },
@@ -121,7 +127,7 @@ export class MenuReportProductsFragmentComponent {
     this.menuReportService.removeProduct(report.id, record.productoId).subscribe({
       next: () => {
         this.toastService.show('Producto eliminado', 'warning');
-        this.reloadReport(report.id);
+        this.reloadReport();
       },
       error: (error) => {
         this.toastService.show('Error: ' + error.error.message, 'danger');
@@ -129,7 +135,7 @@ export class MenuReportProductsFragmentComponent {
     });
   }
 
-  reloadReport(id: number): void {
+  reloadReport(): void {
     const date = this.report()!.date;
     this.menuReportService.getByDate(date).subscribe({
       next: (report) => this.menuReportState.setReport(report),

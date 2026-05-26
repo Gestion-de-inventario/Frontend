@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuReportApiService } from '@features/menu-report/services/menu-report-api.service';
 import { MenuReportStateService } from '@features/menu-report/services/menu-report-state.service';
@@ -10,26 +10,30 @@ import { MenuReportSummaryResponse } from '@features/menu-report/interfaces/menu
   imports: [CommonModule],
   templateUrl: './menu-report-summary-fragment.component.html',
 })
-export class MenuReportSummaryFragmentComponent {
+export class MenuReportSummaryFragmentComponent implements OnInit {
   private readonly menuReportService = inject(MenuReportApiService);
   private readonly menuReportState = inject(MenuReportStateService);
 
   readonly report = this.menuReportState.report;
   summary = signal<MenuReportSummaryResponse | null>(null);
-  loadingSummary = false;
+  loadingSummary = signal(false);
+
+  ngOnInit(): void {
+    this.loadSummary();
+  }
 
   loadSummary(): void {
     const report = this.report();
     if (!report) return;
-    this.loadingSummary = true;
+    this.loadingSummary.set(true);
 
     this.menuReportService.getSummary(report.id).subscribe({
       next: (summary) => {
         this.summary.set(summary);
-        this.loadingSummary = false;
+        this.loadingSummary.set(false);
       },
       error: () => {
-        this.loadingSummary = false;
+        this.loadingSummary.set(false);
       },
     });
   }

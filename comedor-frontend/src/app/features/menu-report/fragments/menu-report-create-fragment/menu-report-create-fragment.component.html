@@ -10,25 +10,68 @@
     <div class="d-flex justify-content-center py-4">
       <span class="spinner-border text-primary"></span>
     </div>
+
   } @else if (report()) {
-    <div class="alert alert-success d-flex flex-column gap-1 p-2 text-center">
-      <span class="fs-4">✅</span>
-      <strong>Reporte del día:</strong>
-      <span>{{ report()!.menu }}</span>
+    <!-- REPORTE YA EXISTE — FLUJO DE PASOS -->
+    <div class="d-flex flex-column gap-1 mb-3">
+      <div class="d-flex gap-2">
+        @for (step of steps; track step.id) {
+          <button
+            class="btn btn-sm flex-fill"
+            [class]="currentStep() === step.id ? 'btn-primary' : 'btn-outline-secondary'"
+            (click)="currentStep.set(step.id)"
+          >
+            {{ step.emoji }} {{ step.label }}
+          </button>
+        }
+      </div>
     </div>
 
-    <div class="d-flex flex-column gap-3">
-      <app-menu-report-products-fragment />
-      <app-menu-report-beneficiaries-fragment />
+    @if (currentStep() === 1) {
+      <div class="alert alert-success d-flex flex-column gap-1 p-2 text-center">
+        <span class="fs-4">✅</span>
+        <strong>Reporte del día:</strong>
+        <span>{{ report()!.menu }}</span>
+        @for (c of report()!.cocineras; track c.id) {
+          <small class="text-muted">👤 {{ c.name }} {{ c.lastname }}</small>
+        }
+      </div>
+      <button class="btn btn-outline-primary w-100 mt-2" (click)="currentStep.set(2)">
+        Ir a productos →
+      </button>
+    }
 
+    @if (currentStep() === 2) {
+      <app-menu-report-products-fragment />
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-outline-secondary flex-fill" (click)="currentStep.set(1)">← Atrás</button>
+        <button class="btn btn-primary flex-fill" (click)="currentStep.set(3)">Siguiente →</button>
+      </div>
+    }
+
+    @if (currentStep() === 3) {
+      <app-menu-report-beneficiaries-fragment />
+      <div class="d-flex gap-2 mt-2">
+        <button class="btn btn-outline-secondary flex-fill" (click)="currentStep.set(2)">← Atrás</button>
+        @if (authState.hasPermission('MENU_REPORT_GET_SUMMARY')) {
+          <button class="btn btn-primary flex-fill" (click)="currentStep.set(4)">Ver resumen →</button>
+        }
+      </div>
+    }
+
+    @if (currentStep() === 4) {
       @if (authState.hasPermission('MENU_REPORT_GET_SUMMARY')) {
         <app-menu-report-summary-fragment />
+        <button class="btn btn-outline-secondary w-100 mt-2" (click)="currentStep.set(3)">← Atrás</button>
       }
-    </div>
+    }
 
   } @else {
+    <!-- NO EXISTE REPORTE — CREAR -->
     @if (authState.hasPermission('MENU_REPORT_CREATE_REPORT')) {
       <div class="d-flex flex-column gap-4">
+
+        <!-- NOMBRE DEL MENU -->
         <div>
           <label class="form-label fw-bold mb-1">Menú del día <span class="text-danger">*</span></label>
           <input
@@ -40,6 +83,49 @@
           />
         </div>
 
+        <!-- PLANTILLAS -->
+        <div>
+          <label class="form-label fw-bold mb-2">O elige una plantilla:</label>
+          <div class="d-flex flex-wrap gap-2">
+            @for (template of templates; track template.name) {
+              <button
+                class="btn btn-sm"
+                [class]="selectedTemplate()?.name === template.name ? 'btn-primary' : 'btn-outline-primary'"
+                (click)="selectTemplate(template)"
+              >
+                {{ template.emoji }} {{ template.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- PREVIEW DE INGREDIENTES DE LA PLANTILLA -->
+        @if (selectedTemplate()) {
+          <div class="card p-3 border-primary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold">Ingredientes sugeridos para 50 personas:</span>
+              <small class="text-muted">(edita las cantidades)</small>
+            </div>
+            <div class="d-flex flex-column gap-2">
+              @for (item of templateItems(); track item.productName) {
+                <div class="d-flex align-items-center gap-2">
+                  <span class="flex-fill">{{ item.productName }}</span>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    style="width: 80px;"
+                    [ngModel]="item.amount"
+                    (ngModelChange)="updateTemplateItemAmount(item.productName, $event)"
+                  />
+                  <small class="text-muted" style="width: 30px;">{{ item.unit }}</small>
+                  <button class="btn btn-sm btn-outline-danger" (click)="removeTemplateItem(item.productName)">✕</button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- COCINERAS -->
         <div>
           <label class="form-label fw-bold mb-1">Cocineras</label>
           <input
