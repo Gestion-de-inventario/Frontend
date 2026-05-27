@@ -66,10 +66,6 @@ export class RoleDetailModalComponent {
       nonNullable: true,
       validators: [Validators.required],
     }),
-
-    status: new FormControl('ACTIVO', {
-      nonNullable: true,
-    }),
   });
 
   openEdit(): void {
@@ -81,8 +77,6 @@ export class RoleDetailModalComponent {
 
     this.form.patchValue({
       name: role.name,
-
-      status: role.status,
     });
 
     this.mode = 'edit';
@@ -167,6 +161,35 @@ export class RoleDetailModalComponent {
     );
   }
 
+  changeStatus(status: 'ACTIVAR' | 'DESACTIVAR'): void {
+    const role = this.role();
+
+    if (!role || this.loading) {
+      return;
+    }
+
+    this.loading = true;
+
+    this.roleService.changeStatus(role.role_id, status).subscribe({
+      next: (updated) => {
+        this.roleState.updateRole(updated);
+
+        this.toastService.show(
+          status === 'ACTIVAR' ? 'Rol activado' : 'Rol desactivado',
+          status === 'ACTIVAR' ? 'success' : 'warning',
+        );
+      },
+
+      error: (error) => {
+        this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+      },
+
+      complete: () => {
+        this.loading = false;
+      },
+    });
+  }
+
   savePermissions(): void {
     const role = this.role();
 
@@ -177,11 +200,7 @@ export class RoleDetailModalComponent {
     this.loading = true;
 
     this.roleService
-      .editRole(role.role_id, {
-        name: role.name,
-
-        status: role.status,
-
+      .assignPermissions(role.role_id, {
         permissions: this.selectedPermissions,
       } as any)
       .subscribe({
