@@ -8,6 +8,7 @@ import { CreateRoleRequest } from '../interfaces/role.create.request';
 import { MinRoleResponse } from '../interfaces/min.role.response';
 import { RoleEditRequest } from '../interfaces/role.edit.request';
 import { buildEndpoint } from '@shared/utils/api.utils';
+import { PermissionsAssignmentRequest } from '../interfaces/permissions.asigment.request';
 @Injectable({
   providedIn: 'root',
 })
@@ -39,5 +40,16 @@ export class RoleService {
   editRole(id: number, request: RoleEditRequest) {
     const endpoint = buildEndpoint(API_ENDPOINTS.ROLE.EDIT, { id });
     return this.http.put<RoleResponse>(`${this.apiUrl}${endpoint}`, request);
+  }
+
+  assignPermissions(roleId: number, request: PermissionsAssignmentRequest) {
+    const endpoint = buildEndpoint(API_ENDPOINTS.ROLE.ASSIGN_PERMISSIONS, { id: roleId });
+    return this.http.put<RoleResponse>(`${this.apiUrl}${endpoint}`, request);
+  }
+
+  changeStatus(roleId: number, status: string) {
+    const endpoint = buildEndpoint(API_ENDPOINTS.ROLE.CHANGE_STATUS, { id: roleId });
+
+    return this.http.put<RoleResponse>(`${this.apiUrl}${endpoint}?status=${status}`, {});
   }
 }

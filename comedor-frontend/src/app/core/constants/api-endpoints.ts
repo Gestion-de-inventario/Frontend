@@ -56,18 +56,20 @@ export const API_ENDPOINTS = {
     LIST_ALL: '/user/all',
     LIST_ACTIVE: '/user/actived',
     CREATE: '/user/register',
-    EDIT: '/user/edit/{id}', // COINCIDE CON @PostMapping("/edit/{id}")
-    ACTIVATE: '/user/activate/{id}', // COINCIDE CON @PostMapping("activate/{id}")
-    DEACTIVATE: '/user/deactivate/{id}', // COINCIDE CON @PostMapping("deactivate/{id}")
+    EDIT: '/user/edit/{id}', 
+    ACTIVATE: '/user/activate/{id}', 
+    DEACTIVATE: '/user/deactivate/{id}', 
   },
 
   ROLE: {
     CREATE: '/roles',
-    EDIT: '/roles/edit/{id}', // CORREGIDO: El controlador usa /roles/edit/{id}
+    EDIT: '/roles/edit/{id}',
+    CHANGE_STATUS: '/roles/changeStatus/{id}',
     LIST_BY_STATUS: '/roles',
+    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
     GET_BY_ID: '/roles/{id}',
-    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}', // AGREGADO
-    CHANGE_STATUS: '/roles/changeStatus/{id}', // AGREGADO
+    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
+    CHANGE_STATUS: '/roles/changeStatus/{id}',
   },
 
   MODIFICATION: {
