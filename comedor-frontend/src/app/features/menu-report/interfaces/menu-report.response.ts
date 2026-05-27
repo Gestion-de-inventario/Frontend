@@ -1,27 +1,8 @@
-export interface MenuReportResponse {
+export interface DishMenuResponse {
   id: number;
-  date: string;
-  day: string;
-}
-
-export interface ProductRecordResponse {
-  productoId: number;
-  productName: string;
-  productCategory: string;
-  productUnit: string;
-  sourceProduct: 'DONACION' | 'COMPRA';
-  amount: number;
-  spentAmount: number;
-}
-
-export interface BeneficiaryRecordResponse {
   name: string;
-  lastName: string;
-  cantidad: number;
-  total: number;
-  metodoPago: 'EFECTIVO' | 'YAPE' | 'PLI';
-  pago: boolean;
-  entregado: boolean;
+  status: string;
+  supplies: any[]; 
 }
 
 export interface CookResponse {
@@ -31,15 +12,24 @@ export interface CookResponse {
   dni: string;
 }
 
-export interface MenuReportDetailResponse {
+export interface StockMovementResponse {
   id: number;
-  date: string;
-  day: string;
-  menu: string;
-  cocineras: CookResponse[];
-  registro: ProductRecordResponse[];
-  beneficiarios: BeneficiaryRecordResponse[];
-  resumenReporteMenu: MenuReportSummaryResponse;
+  productName: string;
+  quantityUsed: number;
+  unitCost: number;
+  totalCost: number;
+  movementDate: string;
+}
+
+export interface BeneficiaryRecordResponse {
+  id: number; 
+  name: string;
+  lastName: string;
+  cantidad: number;
+  total: number;
+  metodoPago: 'EFECTIVO' | 'YAPE' | 'PLI';
+  pago: boolean;
+  entregado: boolean;
 }
 
 export interface MenuReportSummaryResponse {
@@ -47,5 +37,29 @@ export interface MenuReportSummaryResponse {
   totalSpent: number;
   neto: number;
   beneficiariosCount: number;
-  mostUsedPaymentMethod: 'EFECTIVO' | 'YAPE' | 'PLIN';
+  mostUsedPaymentMethod: 'EFECTIVO' | 'YAPE' | 'PLIN' | 'PLI';
+}
+
+export interface MenuReportDetailResponse {
+  id: number;
+  date: string;
+  day: string;
+  menu: string; 
+  quantityPrepared: number;  
+  quantityRemaining: number; 
+  status: string;            
+  cocineras: CookResponse[];
+  registro: StockMovementResponse[]; 
+  beneficiarios: BeneficiaryRecordResponse[];
+  resumenReporteMenu: MenuReportSummaryResponse; 
+}
+
+export interface MenuReportResponse {
+  id: number;
+  date: string;
+  day: string;
+  dishName: string;
+  quantityPrepared: number;
+  quantityRemaining: number;
+  status: string;
 }

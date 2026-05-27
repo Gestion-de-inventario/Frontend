@@ -1,92 +1,55 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-import { API_ENDPOINTS } from '@core/constants/api-endpoints';
-import {
-  MenuReportRequest,
-  ProductRecordRequest,
-  BeneficiaryRecordRequest,
-} from '../interfaces/menu-report.request';
-import {
-  MenuReportResponse,
-  MenuReportDetailResponse,
-  ProductRecordResponse,
-  BeneficiaryRecordResponse,
-  MenuReportSummaryResponse,
-} from '../interfaces/menu-report.response';
+import { Observable } from 'rxjs';
+import { MenuReportRequest } from '../interfaces/menu-report.request';
+import { MenuReportResponse } from '../interfaces/menu-report.response';
+import { MenuReportDetailResponse } from '../interfaces/menu-report.response';
+import { BeneficiaryRecordRequest } from '../interfaces/menu-report.request';
+import { BeneficiaryRecordResponse } from '../interfaces/menu-report.response';
+import { DishMenuResponse } from '../interfaces/menu-report.response';
+import { MenuReportSummaryResponse } from '../interfaces/menu-report.response';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class MenuReportApiService {
-  private apiUrl = environment.apiUrl;
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/menu_report`;
+  private readonly dishMenuUrl = `${environment.apiUrl}/dish-menus`;
 
-  constructor(private http: HttpClient) {}
-
-  create(request: MenuReportRequest) {
-    return this.http.post<MenuReportResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_REPORT.CREATE}`,
-      request
-    );
+  // Listar los platos disponibles
+  getDishMenus(): Observable<DishMenuResponse[]> {
+    return this.http.get<DishMenuResponse[]>(this.dishMenuUrl);
   }
 
-  getByDate(date: string) {
-    return this.http.get<MenuReportDetailResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_REPORT.GET_BY_DATE.replace('{fecha}', date)}`
-    );
+  // Crear reporte enviando dishMenuId y quantityPrepared
+  create(request: MenuReportRequest): Observable<MenuReportResponse> {
+    return this.http.post<MenuReportResponse>(`${this.apiUrl}/create`, request);
   }
 
-  getSummary(id: number) {
-    return this.http.get<MenuReportSummaryResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_REPORT.GET_SUMMARY.replace('{id}', id.toString())}`
-    );
+  // Buscar el reporte por fecha
+  getByDate(fecha: string): Observable<MenuReportDetailResponse> {
+    return this.http.get<MenuReportDetailResponse>(`${this.apiUrl}/date/${fecha}`);
   }
 
-  addProduct(id: number, request: ProductRecordRequest) {
-    return this.http.post<ProductRecordResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_RECORD.ADD_PRODUCT.replace('{id}', id.toString())}`,
-      request
-    );
+  // Agregar beneficiario
+  addBeneficiary(reporteId: number, dto: BeneficiaryRecordRequest): Observable<BeneficiaryRecordResponse> {
+    return this.http.post<BeneficiaryRecordResponse>(`${this.apiUrl}/${reporteId}/beneficiaries`, dto);
   }
 
-  editProduct(reporteId: number, registroId: number, request: ProductRecordRequest) {
-    return this.http.patch<ProductRecordResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_RECORD.EDIT_PRODUCT
-        .replace('{reporteId}', reporteId.toString())
-        .replace('{registroId}', registroId.toString())}`,
-      request
-    );
+  // Editar beneficiario usando controlId (PATCH)
+  editBeneficiary(reporteId: number, controlId: number, dto: BeneficiaryRecordRequest): Observable<BeneficiaryRecordResponse> {
+    return this.http.patch<BeneficiaryRecordResponse>(`${this.apiUrl}/${reporteId}/beneficiaries/${controlId}`, dto);
   }
 
-  removeProduct(reporteId: number, registroId: number) {
-    return this.http.delete<void>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_RECORD.REMOVE_PRODUCT
-        .replace('{reporteId}', reporteId.toString())
-        .replace('{registroId}', registroId.toString())}`
-    );
+  // Eliminar beneficiario usando controlId (DELETE)
+  removeBeneficiary(reporteId: number, controlId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${reporteId}/beneficiaries/${controlId}`);
   }
 
-  addBeneficiary(id: number, request: BeneficiaryRecordRequest) {
-    return this.http.post<BeneficiaryRecordResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_RECORD.ADD_BENEFICIARY.replace('{id}', id.toString())}`,
-      request
-    );
-  }
-
-  editBeneficiary(reporteId: number, controlId: number, request: BeneficiaryRecordRequest) {
-    return this.http.patch<BeneficiaryRecordResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_RECORD.EDIT_BENEFICIARY
-        .replace('{reporteId}', reporteId.toString())
-        .replace('{controlId}', controlId.toString())}`,
-      request
-    );
-  }
-
-  removeBeneficiary(reporteId: number, controlId: number) {
-    return this.http.delete<void>(
-      `${this.apiUrl}${API_ENDPOINTS.MENU_RECORD.REMOVE_BENEFICIARY
-        .replace('{reporteId}', reporteId.toString())
-        .replace('{controlId}', controlId.toString())}`
-    );
+  // Resumen final
+  getSummary(reporteId: number): Observable<MenuReportSummaryResponse> {
+    return this.http.get<MenuReportSummaryResponse>(`${this.apiUrl}/${reporteId}/summary`);
   }
 }

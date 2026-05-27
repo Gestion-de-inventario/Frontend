@@ -1,122 +1,25 @@
-<div class="card p-3">
-  <div class="d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">📦 Productos del reporte</h5>
-    @if (authState.hasPermission('MENU_REPORT_ADD_PRODUCT')) {
-      <button class="btn btn-sm btn-primary" (click)="openAddModal()">+ Agregar</button>
-    }
+<div class="card mt-3">
+  <div class="card-header bg-light">
+    <h6 class="mb-0">Productos utilizados (Automático)</h6>
   </div>
-
-  @if (hasTemplateProducts()) {
-    <div class="alert alert-info mt-2 p-2 mb-0">
-      <small>✅ Productos cargados desde plantilla. Puedes editar cantidades o agregar compras extras.</small>
-    </div>
-  }
-
-  <div class="mt-3 d-flex flex-column gap-2">
-    @for (record of report()!.registro; track record.productoId) {
-      <div class="card p-2">
-        <div class="d-flex justify-content-between align-items-start">
-          <div class="flex-fill">
-            <div class="fw-bold">📦 {{ record.productName }}</div>
-            <small class="text-muted">{{ record.productCategory }} · {{ record.productUnit }}</small>
-            <div class="d-flex gap-2 mt-1 flex-wrap">
-              <small>Cantidad: <strong>{{ record.amount }}</strong></small>
-              @if (record.sourceProduct === 'COMPRA') {
-                <small>Gasto: <strong class="text-danger">S/. {{ record.spentAmount }}</strong></small>
-              }
-              <span class="badge" [class]="record.sourceProduct === 'COMPRA' ? 'bg-warning text-dark' : 'bg-info text-dark'">
-                {{ record.sourceProduct === 'COMPRA' ? '🛒 Compra' : '🏛️ Almacén' }}
-              </span>
+  <div class="card-body p-0">
+    <ul class="list-group list-group-flush">
+      @for (record of report()?.registro; track record.id) {
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ record.productName }}</strong><br>
+              <small class="text-muted">Fecha: {{ record.movementDate | date:'short' }}</small>
+            </div>
+            <div class="text-end">
+              <div>Uso: {{ record.quantityUsed }}</div>
+              <div class="text-primary fw-bold">S/. {{ record.totalCost }}</div>
             </div>
           </div>
-          <div class="d-flex gap-1 ms-2">
-            @if (authState.hasPermission('MENU_REPORT_EDIT_PRODUCT')) {
-              <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(record)">✏️</button>
-            }
-            @if (authState.hasPermission('MENU_REPORT_REMOVE_PRODUCT')) {
-              <button class="btn btn-sm btn-outline-danger" (click)="removeProduct(record)">🗑️</button>
-            }
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (report()!.registro.length === 0) {
-      <p class="text-muted text-center mt-2">Sin productos registrados</p>
-    }
-  </div>
-</div>
-
-<!-- MODAL AGREGAR/EDITAR PRODUCTO -->
-<div class="modal fade" id="productRecordModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ editingRecord ? 'Editar producto' : 'Agregar producto' }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="resetForm()"></button>
-      </div>
-
-      <div class="modal-body d-flex flex-column gap-3">
-        @if (!editingRecord) {
-          <div>
-            <label class="form-label">Buscar producto</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Nombre del producto"
-              [ngModel]="productSearch()"
-              (ngModelChange)="productSearch.set($event)"
-            />
-            @if (filteredProducts().length > 0 && productSearch().length > 0) {
-              <div class="card mt-1 p-2 d-flex flex-column gap-1">
-                @for (p of filteredProducts(); track p.id) {
-                  <div class="p-1 rounded" style="cursor:pointer" (click)="selectProduct(p)">
-                    📦 {{ p.name }} — {{ p.categoryName }} ({{ p.unit }})
-                  </div>
-                }
-              </div>
-            }
-            @if (selectedProduct) {
-              <div class="alert alert-info mt-2 mb-0">
-                Seleccionado: <strong>{{ selectedProduct.name }}</strong>
-              </div>
-            }
-          </div>
-        }
-
-        <div>
-          <label class="form-label">Fuente <span class="text-danger">*</span></label>
-          <select class="form-select" [ngModel]="productSource()" (ngModelChange)="productSource.set($event)">
-            <option value="DONACION">🏛️ Almacén (Donación)</option>
-            <option value="COMPRA">🛒 Compra (Mercado)</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="form-label">Cantidad <span class="text-danger">*</span></label>
-          <input type="number" class="form-control"
-            [ngModel]="amount()" (ngModelChange)="amount.set($event)" min="0" />
-        </div>
-
-        @if (productSource() === 'COMPRA') {
-          <div>
-            <label class="form-label">Precio unitario S/. <span class="text-danger">*</span></label>
-            <input type="number" class="form-control"
-              [ngModel]="unitPrice()" (ngModelChange)="unitPrice.set($event)" min="0" />
-          </div>
-        }
-      </div>
-
-      <div class="modal-footer">
-        <button
-          class="btn btn-primary d-flex align-items-center gap-2"
-          [disabled]="loading || (!editingRecord && !selectedProduct) || !amount()"
-          (click)="saveProduct()"
-        >
-          @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
-          {{ editingRecord ? 'Guardar' : 'Agregar' }}
-        </button>
-      </div>
-    </div>
+        </li>
+      } @empty {
+        <li class="list-group-item text-center text-muted">No hay movimientos registrados.</li>
+      }
+    </ul>
   </div>
 </div>

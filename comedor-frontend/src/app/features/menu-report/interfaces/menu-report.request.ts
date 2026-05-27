@@ -1,13 +1,7 @@
 export interface MenuReportRequest {
-  menu: string;
+  dishMenuId: number;         
+  quantityPrepared: number;   
   cooks: number[];
-}
-
-export interface ProductRecordRequest {
-  productoId: number;
-  amount: number;
-  productSource: 'DONACION' | 'COMPRA';
-  unitPrice: number;
 }
 
 export interface BeneficiaryRecordRequest {

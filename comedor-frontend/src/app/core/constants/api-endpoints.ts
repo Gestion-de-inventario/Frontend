@@ -8,38 +8,28 @@ export const API_ENDPOINTS = {
 
   BENEFICIARY: {
     CREATE: '/beneficiary/create',
-
     SEARCH_BY_DNI_RENIEC: '/beneficiary/reniec/{dni}',
-
     SEARCH_BY_DNI: '/beneficiary/{dni}',
-
     CREATE_BY_DNI: '/beneficiary/reniec/{dni}',
-
     EDIT: '/beneficiary/edit/{id}',
-
     LIST_BY_STATUS: '/beneficiary/list',
-
     CHANGE_STATUS: '/beneficiary/changeStatus/{id}',
   },
 
   CATEGORY: {
     LIST_BY_STATUS: '/category/list',
-
     CREATE: '/category/create',
-
     CHANGE_STATUS: '/category/changeStatus/{id}',
+  },
+
+  DISH_MENU: {
+    LIST_ALL: '/dish-menus',
   },
 
   MENU_REPORT: {
     CREATE: '/menu_report/create',
     GET_BY_DATE: '/menu_report/date/{fecha}',
     GET_SUMMARY: '/menu_report/{id}/summary',
-  },
-
-  MENU_RECORD: {
-    ADD_PRODUCT: '/menu_report/{id}/records',
-    EDIT_PRODUCT: '/menu_report/{reporteId}/records/{registroId}',
-    REMOVE_PRODUCT: '/menu_report/{reporteId}/records/{registroId}',
     ADD_BENEFICIARY: '/menu_report/{id}/beneficiaries',
     EDIT_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     REMOVE_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
@@ -47,21 +37,14 @@ export const API_ENDPOINTS = {
 
   PRODUCT: {
     LIST_BY_STATUS: '/product/list',
-
     CREATE: '/product/create',
-
     EDIT: '/product/edit/{id}',
-
     CHANGE_STATUS: '/product/changeStatus/{id}',
-
-    ALERT: '/alerts/stock-min',
   },
 
   TAG: {
     LIST_BY_STATUS: '/tag/list',
-
     CREATE: '/tag/create',
-
     CHANGE_STATUS: '/tag/changeStatus/{id}',
   },
 
@@ -71,30 +54,22 @@ export const API_ENDPOINTS = {
 
   USER: {
     LIST_ALL: '/user/all',
-
     LIST_ACTIVE: '/user/actived',
-
     CREATE: '/user/register',
-
-    EDIT: '/user/edit/{id}',
-
-    ACTIVATE: '/user/activate/{id}',
-
-    DEACTIVATE: '/user/deactivate/{id}',
+    EDIT: '/user/edit/{id}', 
+    ACTIVATE: '/user/activate/{id}', 
+    DEACTIVATE: '/user/deactivate/{id}', 
   },
 
   ROLE: {
     CREATE: '/roles',
-
     EDIT: '/roles/edit/{id}',
-
     CHANGE_STATUS: '/roles/changeStatus/{id}',
-
     LIST_BY_STATUS: '/roles',
-
     ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
-
     GET_BY_ID: '/roles/{id}',
+    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
+    CHANGE_STATUS: '/roles/changeStatus/{id}',
   },
 
   MODIFICATION: {
@@ -104,4 +79,8 @@ export const API_ENDPOINTS = {
   PERMISSION: {
     LIST_ALL: '/permissions/all',
   },
+  
+  ALERT: {
+    STOCK_MIN: '/alerts/stock-min',
+  }
 };
