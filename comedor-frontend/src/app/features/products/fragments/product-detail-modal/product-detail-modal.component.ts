@@ -75,45 +75,24 @@ export class ProductDetailModalComponent {
 
     this.loading = true;
 
-    const rawCategoryId = this.form.value.categoryId;
-    const rawTagId = this.form.value.tagId;
-    const rawReorder = this.form.value.reorderPoint;
-
-    const requestPayload = {
+    this.productService.edit(product.id, {
       name: this.form.value.name ?? undefined,
+      categoryId: this.form.value.categoryId ?? undefined,
+      tagId: this.form.value.tagId ?? undefined,
       unit: this.form.value.unit ?? undefined,
-      reorderPoint: rawReorder ? Number(rawReorder) : undefined,
-      category: rawCategoryId ? { id: Number(rawCategoryId) } : undefined,
-      tag: rawTagId ? { id: Number(rawTagId) } : undefined,
-    };
-
-    this.productService.edit(product.id, requestPayload).subscribe({
+      reorderPoint: this.form.value.reorderPoint ?? undefined,
+    }).subscribe({
       next: (updated) => {
-      
-        const chosenCategory = this.categories.find(c => c.id === Number(rawCategoryId));
-        const chosenTag = this.tags.find(t => t.id === Number(rawTagId));
-
-       
-        const productWithNames = {
-          ...updated,
-          categoryName: chosenCategory ? chosenCategory.name : 'Sin categoría',
-          tagName: chosenTag ? chosenTag.name : null,
-          categoryId: rawCategoryId ? Number(rawCategoryId) : updated.categoryId,
-          tagId: rawTagId ? Number(rawTagId) : updated.tagId
-        };
-
-  
-        this.productState.updateProduct(productWithNames);
-        
-        this.toastService.show('Producto actualizado correctamente', 'success');
+        this.productState.updateProduct(updated);
+        this.toastService.show('Producto actualizado', 'success');
         this.mode = 'view';
-        this.loading = false; 
       },
-      error: (err) => {
-        const errorMessage = err.error?.message || 'Error desconocido al actualizar';
-        this.toastService.show(errorMessage, 'danger');
+      error: (error) => {
+        this.toastService.show('No se pudo actualizar: ' + error.error.message, 'danger');
+      },
+      complete: () => {
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -130,13 +109,13 @@ export class ProductDetailModalComponent {
           status === 'ACTIVO' ? 'Producto activado' : 'Producto desactivado',
           status === 'ACTIVO' ? 'success' : 'warning'
         );
+      },
+      error: (error) => {
+        this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+      },
+      complete: () => {
         this.loading = false;
       },
-      error: (err) => {
-        const errorMessage = err.error?.message || 'Error desconocido al cambiar estado';
-        this.toastService.show(errorMessage, 'danger');
-        this.loading = false;
-      }
     });
   }
 

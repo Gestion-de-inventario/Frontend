@@ -81,4 +81,27 @@ export class BeneficiaryDetailModalComponent {
     this.mode = 'view';
     this.beneficiaryState.clearSelectedBeneficiary();
   }
+
+  changeStatus(status: string): void {
+    const beneficiary = this.beneficiary();
+    if (!beneficiary || this.loading) return;
+
+    this.loading = true;
+
+    this.beneficiaryService.changeStatus(beneficiary.id, status).subscribe({
+      next: (updated) => {
+        this.beneficiaryState.updateBeneficiary(updated);
+        this.toastService.show(
+          status === 'ACTIVO' ? 'Beneficiario activado' : 'Beneficiario desactivado',
+          status === 'ACTIVO' ? 'success' : 'warning'
+        );
+      },
+      error: (error) => {
+        this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+      },
+      complete: () => {
+        this.loading = false;
+      },
+    });
+  }
 }

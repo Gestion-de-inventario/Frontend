@@ -68,6 +68,19 @@
           @if (authState.hasPermission('BENEFICIARY_EDIT')) {
             <button class="btn btn-primary" (click)="openEdit()">Editar</button>
           }
+          @if (authState.hasPermission('BENEFICIARY_CHANGE_STATUS')) {
+            @if (beneficiary()?.status === 'INACTIVO') {
+              <button class="btn btn-success" (click)="changeStatus('ACTIVO')" [disabled]="loading">
+                @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
+                Activar
+              </button>
+            } @else {
+              <button class="btn btn-danger" (click)="changeStatus('INACTIVO')" [disabled]="loading">
+                @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
+                Desactivar
+              </button>
+            }
+          }
         } @else {
           <button class="btn btn-primary" [disabled]="loading" (click)="save()">
             @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
