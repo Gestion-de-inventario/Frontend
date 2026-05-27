@@ -54,4 +54,13 @@ export class BeneficiaryApiService {
       request
     );
   }
+
+  changeStatus(id: number, status: string) {
+    return this.http.post<BeneficiaryResponse>(
+      `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.CHANGE_STATUS.replace('{id}', id.toString())}`,
+      null,
+      { params: new HttpParams().set('estado', status) }
+    );
+  }
+
 }
