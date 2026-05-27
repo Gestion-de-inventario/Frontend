@@ -86,9 +86,13 @@ export const API_ENDPOINTS = {
   ROLE: {
     CREATE: '/roles',
 
-    EDIT: '/roles/{id}',
+    EDIT: '/roles/edit/{id}',
+
+    CHANGE_STATUS: '/roles/changeStatus/{id}',
 
     LIST_BY_STATUS: '/roles',
+
+    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
 
     GET_BY_ID: '/roles/{id}',
   },
