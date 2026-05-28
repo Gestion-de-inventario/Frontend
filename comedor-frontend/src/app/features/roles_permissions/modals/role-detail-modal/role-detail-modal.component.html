@@ -53,12 +53,6 @@
                   <small class="text-danger">Este campo es obligatorio</small>
                 }
               </div>
-              <div class="form-check form-switch d-flex align-items-center gap-2">
-                <input class="form-check-input mt-0 custom-switch" type="checkbox"
-                  [checked]="form.controls.status.value === 'ACTIVO'"
-                  (change)="form.controls.status.setValue($any($event.target).checked ? 'ACTIVO' : 'INACTIVO')" />
-                <label class="form-check-label fw-medium">{{ form.controls.status.value }}</label>
-              </div>
             </form>
           }
 
@@ -127,6 +121,53 @@
               }
             </div>
           }
+        <!-- ===================================== -->
+        <!-- FOOTER -->
+        <!-- ===================================== -->
+
+        <div class="modal-footer">
+          <!-- VIEW MODE -->
+
+          @if (mode === 'view' && authState.hasPermission('ROLE_EDIT')) {
+            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
+          }
+
+          @if (mode === 'view' && authState.hasPermission('ROLE_CHANGE_STATUS')) {
+            @if (role.status === 'ACTIVO') {
+              <button
+                class="btn btn-warning"
+                [disabled]="loading"
+                (click)="changeStatus('DESACTIVAR')"
+              >
+                @if (loading) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                }
+
+                Desactivar
+              </button>
+            } @else {
+              <button
+                class="btn btn-success"
+                [disabled]="loading"
+                (click)="changeStatus('ACTIVAR')"
+              >
+                @if (loading) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                }
+
+                Activar
+              </button>
+            }
+          }
+
+          @if (mode === 'view' && authState.hasPermission('ROLE_ASSIGN_PERMISSIONS')) {
+            <button class="btn btn-primary" (click)="openAssignPermissions()">
+              Gestionar permisos
+            </button>
+          }
+
+          <!-- EDIT MODE -->
+
           @if (mode === 'edit') {
             <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-medium" (click)="goBack()">Cancelar</button>
             <button class="btn btn-primary rounded-pill px-4 fw-medium" [disabled]="form.invalid || loading" (click)="save()">
