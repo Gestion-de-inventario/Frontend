@@ -1,59 +1,92 @@
-<div class="container min-vh-100 d-flex justify-content-center align-items-center">
-  <div class="row w-100 justify-content-center">
-    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
-      <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-body p-4">
-          <h3 class="text-center mb-4">Ingresa tus datos</h3>
-
-          <form [formGroup]="form" (ngSubmit)="login()">
-            <!-- DNI -->
-            <div class="mb-3">
-              <label class="form-label">Ingresa tu DNI:</label>
-
-              <input
-                type="text"
-                class="form-control"
-                formControlName="username"
-                placeholder="Ingrese su DNI"
-              />
-
-              @if (form.controls.username.touched && form.controls.username.invalid) {
-                <small class="text-danger"> DNI inválido (8 dígitos) </small>
-              }
+<div class="login-wrapper min-vh-100 d-flex justify-content-center align-items-center p-3">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+        
+        <div class="card login-card border-0">
+          <div class="card-body p-4 p-md-5">
+            
+            <div class="text-center mb-4 pb-2">
+              <div class="brand-icon mx-auto mb-3 shadow-sm">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="32" height="32">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path>
+                </svg>
+              </div>
+              <h3 class="fw-bold mb-1 title-text">Bienvenido</h3>
+              <p class="text-muted small">Ingresa tus credenciales para continuar</p>
             </div>
 
-            <!-- PASSWORD -->
-            <div class="mb-3">
-              <label class="form-label">Ingresa tu contraseña:</label>
-
-              <input
-                type="password"
-                class="form-control"
-                formControlName="password"
-                placeholder="Ingrese su contraseña"
-              />
-
-              @if (form.controls.password.touched && form.controls.password.invalid) {
-                <small class="text-danger"> Password requerida </small>
-              }
-            </div>
-
-            <!-- BUTTON -->
-            <div class="d-grid mt-4">
-              <app-button
-                type="submit"
-                [disabled]="form.invalid || isLoading"
-                ariaLabel="Iniciar sesión"
-              >
-                @if (isLoading) {
-                  Cargando...
-                } @else {
-                  Ingresar
+            <form [formGroup]="form" (ngSubmit)="login()">
+              
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Número de DNI</label>
+                <div class="input-wrapper">
+                  <div class="input-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    class="form-control custom-input"
+                    formControlName="username"
+                    placeholder="Ej. 12345678"
+                    maxlength="8"
+                  />
+                </div>
+                
+                @if (form.controls.username.touched && form.controls.username.invalid) {
+                  <div class="error-message mt-2 d-flex align-items-center gap-1">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>DNI inválido (debe tener 8 dígitos numéricos)</span>
+                  </div>
                 }
-              </app-button>
-            </div>
-          </form>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Contraseña</label>
+                <div class="input-wrapper">
+                  <div class="input-icon">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    class="form-control custom-input"
+                    formControlName="password"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                @if (form.controls.password.touched && form.controls.password.invalid) {
+                  <div class="error-message mt-2 d-flex align-items-center gap-1">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>La contraseña es requerida</span>
+                  </div>
+                }
+              </div>
+
+              <div class="d-grid mt-5">
+                <app-button
+                  type="submit"
+                  [disabled]="form.invalid || isLoading"
+                  ariaLabel="Iniciar sesión"
+                  class="btn-block"
+                >
+                  @if (isLoading) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Autenticando...
+                  } @else {
+                    Ingresar al Sistema
+                  }
+                </app-button>
+              </div>
+
+            </form>
+          </div>
         </div>
+
       </div>
     </div>
   </div>

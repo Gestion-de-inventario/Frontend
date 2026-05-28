@@ -1,41 +1,50 @@
-<div class="card p-3 mt-3">
-  <h5>📊 Resumen del día</h5>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"></path></svg>
+      </div>
+      <h5 class="fw-bold text-dark mb-0">Resumen del día</h5>
+    </div>
+  </div>
 
-  @if (loadingSummary()) {
-    <div class="text-center py-3">
-      <span class="spinner-border text-primary"></span>
-    </div>
-  } @else if (summary()) {
-    <div class="d-flex flex-column gap-2 mt-2">
-      <div class="d-flex justify-content-between">
-        <span>💰 Ingresos</span>
-        <strong class="text-success">S/. {{ summary()!.totalEarned }}</strong>
+  <div class="card-body px-4 pb-4">
+    @if (loadingSummary()) {
+      <div class="text-center py-5">
+        <span class="spinner-border text-primary"></span>
       </div>
-      <div class="d-flex justify-content-between">
-        <span>🛒 Egresos</span>
-        <strong class="text-danger">S/. {{ summary()!.totalSpent }}</strong>
+    } @else if (summary()) {
+      <div class="d-flex flex-column gap-3 mt-2">
+        <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
+          <span class="text-muted small fw-medium">💰 Ingresos</span>
+          <strong class="text-success">S/. {{ summary()!.totalEarned }}</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
+          <span class="text-muted small fw-medium">🛒 Egresos</span>
+          <strong class="text-danger">S/. {{ summary()!.totalSpent }}</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2"
+          [class]="summary()!.neto >= 0 ? 'border-success border-opacity-50' : 'border-danger border-opacity-50'">
+          <span class="text-muted small fw-medium">📈 Balance neto</span>
+          <strong [class]="summary()!.neto >= 0 ? 'text-success' : 'text-danger'">S/. {{ summary()!.neto }}</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
+          <span class="text-muted small fw-medium">👥 Total beneficiarios</span>
+          <strong>{{ summary()!.beneficiariosCount }}</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
+          <span class="text-muted small fw-medium">💳 Método más usado</span>
+          <span class="badge bg-primary bg-opacity-10 text-primary border fw-normal px-3 py-2">{{ summary()!.mostUsedPaymentMethod }}</span>
+        </div>
       </div>
-      <hr class="my-1" />
-      <div class="d-flex justify-content-between">
-        <span>📈 Balance neto</span>
-        <strong [class]="summary()!.neto >= 0 ? 'text-success' : 'text-danger'">
-          S/. {{ summary()!.neto }}
-        </strong>
+      <button class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm" (click)="loadSummary()">
+        🔄 Actualizar resumen
+      </button>
+    } @else {
+      <div class="text-center py-4">
+        <p class="text-muted mb-3">No se pudo cargar el resumen.</p>
+        <button class="btn btn-outline-primary rounded-pill px-4 fw-medium" (click)="loadSummary()">Reintentar</button>
       </div>
-      <div class="d-flex justify-content-between">
-        <span>👥 Total beneficiarios</span>
-        <strong>{{ summary()!.beneficiariosCount }}</strong>
-      </div>
-      <div class="d-flex justify-content-between">
-        <span>💳 Método más usado</span>
-        <strong>{{ summary()!.mostUsedPaymentMethod }}</strong>
-      </div>
-    </div>
-    <button class="btn btn-outline-secondary btn-sm w-100 mt-3" (click)="loadSummary()">
-      🔄 Actualizar
-    </button>
-  } @else {
-    <p class="text-muted text-center">No se pudo cargar el resumen.</p>
-    <button class="btn btn-outline-primary w-100 mt-2" (click)="loadSummary()">Reintentar</button>
-  }
+    }
+  </div>
 </div>

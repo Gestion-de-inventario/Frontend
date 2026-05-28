@@ -1,0 +1,92 @@
+/* Fondo general sutil para que las tarjetas blancas resalten */
+:host {
+  display: block;
+  background-color: #f8f9fa;
+  min-height: 100%;
+  padding-bottom: 2rem;
+}
+
+/* Tarjetas de KPIs (Indicadores) */
+.kpi-card {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #ffffff;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+/* Tarjetas de Tablas/Listas */
+.content-card {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  background: #ffffff;
+  overflow: hidden;
+
+  .card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  }
+}
+
+/* Timeline personalizado para la actividad */
+.timeline-item {
+  position: relative;
+  padding-left: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-left: 2px solid #e9ecef;
+  margin-left: 1rem;
+
+  &:last-child {
+    border-left-color: transparent;
+    padding-bottom: 0;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -9px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  }
+}
+
+/* Barras de progreso más modernas */
+.progress {
+  border-radius: 10px;
+  background-color: #e9ecef;
+  overflow: visible;
+  
+  .progress-bar {
+    border-radius: 10px;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 100%);
+      border-radius: 10px;
+    }
+  }
+}

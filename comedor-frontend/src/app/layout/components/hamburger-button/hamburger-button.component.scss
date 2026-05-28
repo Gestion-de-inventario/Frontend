@@ -1,14 +1,21 @@
 .hamburger-button {
   border: none;
-
-  background: solid;
-  background-color: var(--color-primary);
-  color: var(--color-background);
-  font-size: 24px;
-  width: 40px;
-  height: 40px;
-
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  width: 42px;
+  height: 42px;
   cursor: pointer;
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: var(--transition-normal);
 
-  border-radius: 5.9px;
+  &:hover {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
 }
