@@ -1,128 +1,91 @@
-<div class="mb-4">
-  <h4>Crear usuarios:</h4>
-  <button class="btn btn-outline" (click)="openModal()">Crear usuario</button>
+<div>
+  <button class="btn btn-primary shadow-sm rounded-pill px-4 py-2 d-flex align-items-center gap-2 fw-medium" (click)="openModal()">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+    Crear Usuario
+  </button>
 </div>
 
-<!-- MODAL -->
-
-<div class="modal fade" id="createUserModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <!-- HEADER -->
-
-      <div class="modal-header">
-        <h5 class="modal-title">Crear usuario</h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="createUserModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      
+      <div class="modal-header bg-light border-bottom-0 pb-0 pt-4 px-4 px-md-5">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.66-1.548c0 .693-.09 1.36-.26 1.986L10.5 19.5h-6.5z"></path></svg>
+          </div>
+          <h4 class="modal-title fw-bold text-dark">Nuevo Usuario</h4>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
       </div>
 
-      <!-- BODY -->
-
-      <div class="modal-body">
-        <div class="alert alert-info">El nombre de usuario será el DNI</div>
-        <div class="alert alert-warning">
-          Los campos marcados con <span class="text-danger">*</span> son obligatorios
+      <div class="modal-body px-4 px-md-5 py-4">
+        
+        <div class="alert alert-info bg-primary bg-opacity-10 border-0 text-primary d-flex align-items-center gap-2 mb-4 p-3 rounded-3" role="alert">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20" class="flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"></path></svg>
+          <small class="fw-medium">El nombre de usuario para iniciar sesión será el número de DNI.</small>
         </div>
-        <form [formGroup]="form" class="d-flex flex-column gap-3">
-          <!-- NOMBRE -->
 
-          <div>
-            <label class="form-label"> Nombre <span class="text-danger">*</span></label>
-
-            <input
-              type="text"
-              class="form-control"
-              formControlName="name"
-              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
-            />
+        <form [formGroup]="form" class="row g-4">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control custom-input" formControlName="name" placeholder="Ej. Juan" [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
             @if (form.controls.name.touched && form.controls.name.invalid) {
-              <small class="text-danger"> Este campo es obligatorio </small>
+              <div class="invalid-feedback">El nombre es obligatorio</div>
             }
           </div>
 
-          <!-- APELLIDO -->
-
-          <div>
-            <label class="form-label"> Apellido <span class="text-danger">*</span></label>
-
-            <input
-              type="text"
-              class="form-control"
-              formControlName="lastname"
-              [class.is-invalid]="form.controls.lastname.touched && form.controls.lastname.invalid"
-            />
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small">Apellido <span class="text-danger">*</span></label>
+            <input type="text" class="form-control custom-input" formControlName="lastname" placeholder="Ej. Pérez" [class.is-invalid]="form.controls.lastname.touched && form.controls.lastname.invalid" />
             @if (form.controls.lastname.touched && form.controls.lastname.invalid) {
-              <small class="text-danger"> Este campo es obligatorio </small>
+              <div class="invalid-feedback">El apellido es obligatorio</div>
             }
           </div>
 
-          <!-- DNI -->
-
-          <div>
-            <label class="form-label"> DNI <span class="text-danger">*</span></label>
-
-            <input
-              type="text"
-              class="form-control"
-              formControlName="dni"
-              [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
-            />
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small">DNI <span class="text-danger">*</span></label>
+            <input type="text" class="form-control custom-input" formControlName="dni" placeholder="8 dígitos numéricos" maxlength="8" [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid" />
             @if (form.controls.dni.touched && form.controls.dni.invalid) {
-              <small class="text-danger"> Este campo es obligatorio </small>
+              <div class="invalid-feedback">DNI inválido (debe tener 8 dígitos)</div>
             }
           </div>
 
-          <!-- PASSWORD -->
-
-          <div>
-            <label class="form-label"> Password <span class="text-danger">*</span></label>
-
-            <input
-              type="password"
-              class="form-control"
-              formControlName="password"
-              [class.is-invalid]="form.controls.password.touched && form.controls.password.invalid"
-            />
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small">Contraseña Temporal <span class="text-danger">*</span></label>
+            <input type="password" class="form-control custom-input" formControlName="password" placeholder="••••••••" [class.is-invalid]="form.controls.password.touched && form.controls.password.invalid" />
             @if (form.controls.password.touched && form.controls.password.invalid) {
-              <small class="text-danger"> Este campo es obligatorio </small>
+              <div class="invalid-feedback">La contraseña es obligatoria</div>
             }
           </div>
 
-          <!-- ROLE -->
-
-          <div>
-            <label class="form-label"> Rol <span class="text-danger">*</span></label>
-
-            <select class="form-select" formControlName="role_id">
-              <option [ngValue]="null" disabled>Seleccione un rol</option>
-
+          <div class="col-12">
+            <label class="form-label fw-semibold text-dark small">Rol asignado <span class="text-danger">*</span></label>
+            <select class="form-select custom-input" formControlName="role_id" [class.is-invalid]="form.controls.role_id.touched && form.controls.role_id.invalid">
+              <option [ngValue]="null" disabled selected>Seleccione el rol del sistema</option>
               @for (role of roles; track role.role_id) {
-                <option [value]="role.role_id">
-                  {{ role.name }}
-                </option>
+                <option [value]="role.role_id">{{ role.name }}</option>
               }
             </select>
+            @if (form.controls.role_id.touched && form.controls.role_id.invalid) {
+              <div class="invalid-feedback">Debe seleccionar un rol</div>
+            }
           </div>
         </form>
+
       </div>
 
-      <!-- FOOTER -->
-
-      <div class="modal-footer">
-        <button
-          class="btn btn-primary d-flex align-items-center gap-2"
-          [disabled]="form.invalid || loading"
-          (click)="create()"
-        >
+      <div class="modal-footer bg-light border-top-0 px-4 px-md-5 py-3 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary fw-medium rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2" [disabled]="form.invalid || loading" (click)="create()">
           @if (loading) {
-            <span class="spinner-border spinner-border-sm"></span>
-
-            Creando...
+            <span class="spinner-border spinner-border-sm"></span> Guardando...
           } @else {
-            Crear
+            Confirmar y Crear
           }
         </button>
       </div>
+      
     </div>
   </div>
 </div>

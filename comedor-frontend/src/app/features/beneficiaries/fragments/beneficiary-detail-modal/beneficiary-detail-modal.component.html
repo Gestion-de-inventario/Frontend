@@ -1,93 +1,98 @@
-<div class="modal fade" id="beneficiaryDetailModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <!-- HEADER -->
-      <div class="modal-header">
-        <div class="d-flex align-items-center gap-2">
+<div class="modal fade" id="beneficiaryDetailModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+      <div class="modal-header bg-light border-bottom-0 pb-0 pt-4 px-4 px-md-5">
+        <div class="d-flex align-items-center gap-3">
           @if (mode === 'edit') {
-            <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">←</button>
+            <button class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width:32px; height:32px;" (click)="goBack()">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
           }
-          <h5 class="modal-title">
-            @if (mode === 'view') { Detalle beneficiario } @else { Editar beneficiario }
-          </h5>
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path></svg>
+          </div>
+          <h4 class="modal-title fw-bold text-dark">
+            @if (mode === 'view') { Ficha del Beneficiario } @else { Editar Beneficiario }
+          </h4>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="close()"></button>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" (click)="close()"></button>
       </div>
 
-      <!-- BODY -->
-      <div class="modal-body">
+      <div class="modal-body px-4 px-md-5 py-4">
         @if (beneficiary(); as beneficiary) {
+
           @if (mode === 'view') {
-            <div class="d-flex flex-column gap-3">
-              <div><strong>DNI:</strong> {{ beneficiary.dni }}</div>
-              <div><strong>Nombre:</strong> {{ beneficiary.name }}</div>
-              <div><strong>Apellido:</strong> {{ beneficiary.lastname }}</div>
+            <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
               <div>
-                <strong>Estado: </strong>
-                <span class="badge" [class]="beneficiary.status === 'INACTIVO' ? 'bg-danger' : 'bg-success'">
-                  {{ beneficiary.status }}
-                </span>
+                <h3 class="fw-bold text-dark mb-1">{{ beneficiary.name }} {{ beneficiary.lastname }}</h3>
+                <span class="text-muted small">DNI: {{ beneficiary.dni }}</span>
+              </div>
+              <span class="badge rounded-pill px-3 py-2" [class]="beneficiary.status === 'INACTIVO' ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success'">
+                {{ beneficiary.status }}
+              </span>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-6 col-md-4">
+                <small class="text-muted d-block mb-1">DNI</small>
+                <span class="fs-6 fw-bold text-dark">{{ beneficiary.dni }}</span>
+              </div>
+              <div class="col-6 col-md-4">
+                <small class="text-muted d-block mb-1">Nombre</small>
+                <span class="fs-6 fw-bold text-dark">{{ beneficiary.name }}</span>
+              </div>
+              <div class="col-6 col-md-4">
+                <small class="text-muted d-block mb-1">Apellido</small>
+                <span class="fs-6 fw-bold text-dark">{{ beneficiary.lastname }}</span>
               </div>
             </div>
+
           } @else {
-            <form [formGroup]="form" class="d-flex flex-column gap-3">
-              <div>
-                <label class="form-label">DNI</label>
-                <input type="text" class="form-control" formControlName="dni"
+            <form [formGroup]="form" class="row g-4">
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold text-dark small">DNI</label>
+                <input type="text" class="form-control custom-input" formControlName="dni"
                   [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid" />
                 @if (form.controls.dni.touched && form.controls.dni.invalid) {
                   <small class="text-danger">El DNI debe tener 8 dígitos</small>
                 }
               </div>
-
-              <div>
-                <label class="form-label">Nombre</label>
-                <input type="text" class="form-control" formControlName="name" />
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold text-dark small">Nombre</label>
+                <input type="text" class="form-control custom-input" formControlName="name" />
               </div>
-
-              <div>
-                <label class="form-label">Apellido</label>
-                <input type="text" class="form-control" formControlName="lastname" />
-              </div>
-
-              <div>
-                <label class="form-label">Estado</label>
-                <select class="form-select" formControlName="status">
-                  <option value="ACTIVO">Activo</option>
-                  <option value="INACTIVO">Inactivo</option>
-                </select>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold text-dark small">Apellido</label>
+                <input type="text" class="form-control custom-input" formControlName="lastname" />
               </div>
             </form>
           }
         }
       </div>
 
-      <!-- FOOTER -->
-      <div class="modal-footer">
+      <div class="modal-footer bg-light border-top-0 px-4 px-md-5 py-3 d-flex justify-content-between align-items-center">
         @if (mode === 'view') {
-          @if (authState.hasPermission('BENEFICIARY_EDIT')) {
-            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
-          }
-          @if (authState.hasPermission('BENEFICIARY_CHANGE_STATUS')) {
-            @if (beneficiary()?.status === 'INACTIVO') {
-              <button class="btn btn-success" (click)="changeStatus('ACTIVO')" [disabled]="loading">
-                @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
-                Activar
-              </button>
-            } @else {
-              <button class="btn btn-danger" (click)="changeStatus('INACTIVO')" [disabled]="loading">
-                @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
-                Desactivar
-              </button>
+          <div>
+            @if (authState.hasPermission('BENEFICIARY_CHANGE_STATUS')) {
+              @if (beneficiary()?.status === 'INACTIVO') {
+                <button class="btn btn-outline-success rounded-pill px-3 fw-medium" (click)="changeStatus('ACTIVO')" [disabled]="loading">Activar Beneficiario</button>
+              } @else {
+                <button class="btn btn-outline-danger rounded-pill px-3 fw-medium" (click)="changeStatus('INACTIVO')" [disabled]="loading">Desactivar Beneficiario</button>
+              }
             }
+          </div>
+          @if (authState.hasPermission('BENEFICIARY_EDIT')) {
+            <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="openEdit()">Editar Datos</button>
           }
         } @else {
-          <button class="btn btn-primary" [disabled]="loading" (click)="save()">
-            @if (loading) { <span class="spinner-border spinner-border-sm"></span> }
-            Guardar
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-medium" (click)="goBack()">Cancelar</button>
+          <button class="btn btn-primary rounded-pill px-4 fw-medium" [disabled]="loading" (click)="save()">
+            @if (loading) { <span class="spinner-border spinner-border-sm"></span> Guardando... } @else { Guardar Cambios }
           </button>
         }
       </div>
+
     </div>
   </div>
 </div>

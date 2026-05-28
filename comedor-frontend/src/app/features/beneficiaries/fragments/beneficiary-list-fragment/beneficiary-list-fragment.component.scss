@@ -1,0 +1,5 @@
+.beneficiary-card {
+  transition: var(--transition-fast); cursor: pointer; border-color: rgba(0,0,0,0.08) !important;
+  &:hover { border-color: var(--color-primary) !important; box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+  .avatar-circle { width: 48px; height: 48px; font-size: 1rem; }
+}

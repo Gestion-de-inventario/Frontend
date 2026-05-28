@@ -1,0 +1,50 @@
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .custom-search {
+    padding-left: 40px;
+    height: 44px;
+    border-radius: 50px;
+    background-color: var(--color-surface);
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: var(--transition-normal);
+    font-size: 0.95rem;
+
+    &:focus {
+      outline: none;
+      background-color: var(--color-background);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(45, 38, 146, 0.1);
+    }
+  }
+}
+
+.custom-switch {
+  width: 2.5em; height: 1.25em; cursor: pointer;
+  &:checked { background-color: var(--color-primary); border-color: var(--color-primary); }
+}
+
+.product-card {
+  
+  background-color: var(--color-background);
+  border-color: rgba(0,0,0,0.08) !important;
+  transition: var(--transition-fast);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important; 
+    transform: translateY(-4px);
+  }
+}
