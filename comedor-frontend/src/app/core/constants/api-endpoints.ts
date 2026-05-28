@@ -63,23 +63,14 @@ export const API_ENDPOINTS = {
 
   ROLE: {
     CREATE: '/roles',
-<<<<<<< HEAD
-    EDIT: '/roles/edit/{id}', // CORREGIDO: El controlador usa /roles/edit/{id}
     LIST_BY_STATUS: '/roles',
-=======
-
     EDIT: '/roles/edit/{id}',
-
     CHANGE_STATUS: '/roles/changeStatus/{id}',
-
     LIST_BY_STATUS: '/roles',
-
     ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
-
->>>>>>> develop
     GET_BY_ID: '/roles/{id}',
-    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}', // AGREGADO
-    CHANGE_STATUS: '/roles/changeStatus/{id}', // AGREGADO
+    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
+    CHANGE_STATUS: '/roles/changeStatus/{id}',
   },
 
   MODIFICATION: {
