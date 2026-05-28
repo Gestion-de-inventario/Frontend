@@ -66,11 +66,8 @@ export const API_ENDPOINTS = {
     LIST_BY_STATUS: '/roles',
     EDIT: '/roles/edit/{id}',
     CHANGE_STATUS: '/roles/changeStatus/{id}',
-    LIST_BY_STATUS: '/roles',
     ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
     GET_BY_ID: '/roles/{id}',
-    ASSIGN_PERMISSIONS: '/roles/assignPermissions/{id}',
-    CHANGE_STATUS: '/roles/changeStatus/{id}',
   },
 
   MODIFICATION: {
@@ -80,8 +77,8 @@ export const API_ENDPOINTS = {
   PERMISSION: {
     LIST_ALL: '/permissions/all',
   },
-  
+
   ALERT: {
     STOCK_MIN: '/alerts/stock-min',
-  }
+  },
 };
