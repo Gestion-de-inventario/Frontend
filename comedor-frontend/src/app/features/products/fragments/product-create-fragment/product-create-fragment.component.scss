@@ -1,0 +1,4 @@
+.custom-input {
+  padding: 10px 16px; border-radius: var(--border-radius-md); border: 1px solid rgba(0, 0, 0, 0.12);
+  &:focus { box-shadow: 0 0 0 3px rgba(45, 38, 146, 0.1); border-color: var(--color-primary); }
+}

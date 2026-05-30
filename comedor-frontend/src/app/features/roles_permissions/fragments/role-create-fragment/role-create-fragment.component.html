@@ -1,0 +1,65 @@
+<div class="mb-3">
+  <button class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2" (click)="openModal()">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+    Nuevo Rol
+  </button>
+</div>
+
+<div class="modal fade" id="createRoleModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path></svg>
+          </div>
+          <h5 class="modal-title fw-bold text-dark mb-0">Nuevo Rol</h5>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body px-4 py-4">
+        <form [formGroup]="form" class="d-flex flex-column gap-4">
+          <div>
+            <label class="form-label fw-semibold text-dark small">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control custom-input" formControlName="name"
+              placeholder="Ej: PRESIDENTA, SOCIA, COCINERA..."
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <small class="text-danger">Este campo es obligatorio</small>
+            }
+          </div>
+
+          <div>
+            <label class="form-label fw-semibold text-dark small">Permisos</label>
+            <div class="permissions-container">
+              @for (permission of permissions; track permission.code) {
+                <div class="permission-card border rounded-3 p-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                      [id]="'permission-' + permission.code"
+                      (change)="onPermissionChange($event, permission.code)" />
+                    <label class="form-check-label fw-semibold small" [for]="'permission-' + permission.code">
+                      {{ permission.code }}
+                    </label>
+                  </div>
+                  <div class="mt-1">
+                    <span class="badge bg-primary bg-opacity-10 text-primary border fw-normal">{{ permission.module }}</span>
+                  </div>
+                  <small class="text-muted d-block mt-1">{{ permission.description }}</small>
+                </div>
+              }
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-medium" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary rounded-pill px-4 fw-medium" [disabled]="form.invalid || loading" (click)="create()">
+          @if (loading) { <span class="spinner-border spinner-border-sm"></span> Creando... } @else { Crear }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

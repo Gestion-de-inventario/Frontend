@@ -1,0 +1,25 @@
+<div class="card mt-3">
+  <div class="card-header bg-light">
+    <h6 class="mb-0">Productos utilizados (Automático)</h6>
+  </div>
+  <div class="card-body p-0">
+    <ul class="list-group list-group-flush">
+      @for (record of report()?.registro; track record.id) {
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ record.productName }}</strong><br>
+              <small class="text-muted">Fecha: {{ record.movementDate | date:'short' }}</small>
+            </div>
+            <div class="text-end">
+              <div>Uso: {{ record.quantityUsed }}</div>
+              <div class="text-primary fw-bold">S/. {{ record.totalCost }}</div>
+            </div>
+          </div>
+        </li>
+      } @empty {
+        <li class="list-group-item text-center text-muted">No hay movimientos registrados.</li>
+      }
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div class="container py-4">
+  @if (!canListCategory && !canCreateCategory && !canListTag && !canCreateTag) {
+    <div class="text-center mt-5">
+      <h4>No tienes permisos para este módulo</h4>
+      <a routerLink="/dashboard" class="btn btn-primary mt-3">Volver al dashboard</a>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <div class="col-12 col-lg-6">
+        @if (canCreateCategory) { <app-category-create-fragment /> }
+        @if (canListCategory) { <app-category-list-fragment /> }
+      </div>
+      <div class="col-12 col-lg-6">
+        @if (canCreateTag) { <app-tag-create-fragment /> }
+        @if (canListTag) { <app-tag-list-fragment /> }
+      </div>
+    </div>
+  }
+</div>

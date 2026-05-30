@@ -1,0 +1,104 @@
+<div>
+  <button class="btn btn-primary shadow-sm rounded-pill px-4 py-2 d-flex align-items-center gap-2 fw-medium" (click)="openModal()">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+    Crear Producto
+  </button>
+</div>
+
+<div class="modal fade" id="createProductModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      
+      <div class="modal-header bg-light border-bottom-0 pb-0 pt-4 px-4 px-md-5">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+          </div>
+          <h4 class="modal-title fw-bold text-dark">Nuevo Producto</h4>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body px-4 px-md-5 py-4">
+        <form [formGroup]="form" class="row g-4">
+          
+          <div class="col-12">
+            <label class="form-label fw-semibold text-dark small">Nombre del Producto <span class="text-danger">*</span></label>
+            <input type="text" class="form-control custom-input" formControlName="name" placeholder="Ej. Arroz Costeño" 
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+            
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <div class="invalid-feedback d-block">
+                El nombre del producto es obligatorio.
+              </div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small">Categoría <span class="text-danger">*</span></label>
+            <select class="form-select custom-input" formControlName="categoryId" 
+              [class.is-invalid]="form.controls.categoryId.touched && form.controls.categoryId.invalid">
+              <option [ngValue]="null" disabled selected>Seleccione</option>
+              @for (category of categories; track category.id) { 
+                <option [value]="category.id">{{ category.name }}</option> 
+              }
+            </select>
+            
+            @if (form.controls.categoryId.touched && form.controls.categoryId.invalid) {
+              <div class="invalid-feedback d-block">
+                Seleccione una categoría válida.
+              </div>
+            }
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small">Etiqueta <span class="text-muted fw-normal">(Opcional)</span></label>
+            <select class="form-select custom-input" formControlName="tagId">
+              <option [ngValue]="null">Sin etiqueta</option>
+              @for (tag of tags; track tag.id) { <option [value]="tag.id">{{ tag.name }}</option> }
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold text-dark small">Unidad de Medida <span class="text-danger">*</span></label>
+            <select class="form-select custom-input" formControlName="unit" 
+              [class.is-invalid]="form.controls.unit.touched && form.controls.unit.invalid">
+              <option [ngValue]="null" disabled selected>Seleccione</option>
+              <option value="KILOGRAMOS">Kilogramos</option>
+              <option value="LITROS">Litros</option>
+              <option value="UNIDADES">Unidades</option>
+            </select>
+            @if (form.controls.unit.touched && form.controls.unit.invalid) {
+              <div class="invalid-feedback d-block">Seleccione una unidad.</div>
+            }
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold text-dark small">Stock Inicial <span class="text-danger">*</span></label>
+            <input type="number" class="form-control custom-input" formControlName="stock" placeholder="0" 
+              [class.is-invalid]="form.controls.stock.touched && form.controls.stock.invalid" />
+            @if (form.controls.stock.touched && form.controls.stock.invalid) {
+              <div class="invalid-feedback d-block">El stock inicial es obligatorio.</div>
+            }
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold text-dark small">Punto de Reorden <span class="text-danger">*</span></label>
+            <input type="number" class="form-control custom-input" formControlName="reorderPoint" placeholder="0" 
+              [class.is-invalid]="form.controls.reorderPoint.touched && form.controls.reorderPoint.invalid" />
+            @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.invalid) {
+              <div class="invalid-feedback d-block">Ingrese un valor de alerta.</div>
+            }
+</div>
+        </form>
+      </div>
+
+      <div class="modal-footer bg-light border-top-0 px-4 px-md-5 py-3 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary fw-medium rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2" [disabled]="form.invalid || loading" (click)="create()">
+          @if (loading) { <span class="spinner-border spinner-border-sm"></span> Guardando... } @else { Confirmar y Crear }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

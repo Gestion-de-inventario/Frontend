@@ -1,0 +1,35 @@
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+  <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center">
+    <div class="search-wrapper flex-grow-1" style="max-width: 400px;">
+      <div class="input-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path></svg></div>
+      <input class="form-control custom-search" placeholder="Buscar por DNI, nombre o apellido..." [ngModel]="search()" (ngModelChange)="search.set($event); currentPage.set(1)" />
+    </div>
+    @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
+      <div class="form-check form-switch d-flex align-items-center gap-2 m-0">
+        <input type="checkbox" class="form-check-input custom-switch" [checked]="onlyActive()" (change)="onlyActive.set($any($event.target).checked); currentPage.set(1)" />
+        <label class="form-check-label text-muted fw-medium mt-1" style="cursor: pointer;">Solo activos</label>
+      </div>
+    }
+  </div>
+
+  <div class="card-body px-4 pb-4">
+    <div class="row g-3">
+      @for (b of pagedBeneficiaries(); track b.id) {
+        <div class="col-12 col-md-6 col-xl-4">
+          <div class="beneficiary-card border rounded-3 p-3 d-flex align-items-center gap-3 h-100" (click)="openBeneficiary(b)">
+            <div class="avatar-circle bg-primary bg-opacity-10 text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center flex-shrink-0">
+              {{ b.name.charAt(0) | uppercase }}{{ b.lastname.charAt(0) | uppercase }}
+            </div>
+            <div class="flex-grow-1 overflow-hidden">
+              <span class="fw-bold text-dark d-block text-truncate">{{ b.name }} {{ b.lastname }}</span>
+              <small class="text-muted d-block">DNI: {{ b.dni }}</small>
+            </div>
+            <span class="badge rounded-pill" [class]="b.status === 'INACTIVO' ? 'bg-danger bg-opacity-10 text-danger border' : 'bg-success bg-opacity-10 text-success border'">{{ b.status }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<app-beneficiary-detail-modal/>

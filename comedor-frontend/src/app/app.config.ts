@@ -1,11 +1,33 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  provideAppInitializer,
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  inject,
+} from '@angular/core';
+
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 
+import { authInterceptor } from '@core/auth/interceptors/auth.interceptor';
+import { AuthStateService } from '@core/auth/services/auth-state.service';
+import { catchError, of } from 'rxjs';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor])),
+
+    provideAppInitializer(() => {
+      const authState = inject(AuthStateService);
+
+      return authState.initAuth().pipe(
+        catchError(() => {
+          return of(null);
+        }),
+      );
+    }),
+  ],
 };

@@ -1,0 +1,130 @@
+<div class="modal fade" id="productDetailModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      
+      <div class="modal-header bg-light border-bottom-0 pb-0 pt-4 px-4 px-md-5">
+        <div class="d-flex align-items-center gap-3">
+          @if (mode === 'edit') {
+            <button class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width:32px; height:32px;" (click)="goBack()">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+          }
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+          </div>
+          <h4 class="modal-title fw-bold text-dark">
+            @if (mode === 'view') { Ficha del Producto } @else { Editar Producto }
+          </h4>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" (click)="close()"></button>
+      </div>
+
+      <div class="modal-body px-4 px-md-5 py-4">
+        @if (product(); as product) {
+          
+          @if (mode === 'view') {
+            <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
+              <div>
+                <h3 class="fw-bold text-dark mb-1">{{ product.name }}</h3>
+                <div class="d-flex gap-2">
+                  <span class="badge bg-light text-dark border">{{ product.categoryName }}</span>
+                  @if (product.tagName) { <span class="badge bg-primary bg-opacity-10 text-primary border">{{ product.tagName }}</span> }
+                </div>
+              </div>
+              <span class="badge rounded-pill px-3 py-2" [class]="product.status === 'INACTIVO' ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success'">
+                {{ product.status }}
+              </span>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-6 col-md-4">
+                <small class="text-muted d-block mb-1">Stock Actual</small>
+                <span class="fs-5 fw-bold text-dark">{{ product.stock }} <span class="fs-6 fw-normal text-lowercase">{{ product.unit }}</span></span>
+              </div>
+              <div class="col-6 col-md-4">
+                <small class="text-muted d-block mb-1">Punto de Reorden</small>
+                <span class="fs-5 fw-bold text-dark">{{ product.reorderPoint }} <span class="fs-6 fw-normal text-lowercase">{{ product.unit }}</span></span>
+              </div>
+              <div class="col-12 col-md-4">
+                <small class="text-muted d-block mb-1">Estado de Alerta</small>
+                @if (product.stock <= product.reorderPoint) {
+                  <span class="text-danger fw-semibold d-flex align-items-center gap-1"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Stock Bajo</span>
+                } @else {
+                  <span class="text-success fw-semibold">Adecuado</span>
+                }
+              </div>
+            </div>
+          } 
+
+          @else {
+            <form [formGroup]="form" class="row g-4">
+              <div class="col-12">
+                <label class="form-label fw-semibold text-dark small">Nombre</label>
+                <input type="text" class="form-control custom-input" formControlName="name" />
+              </div>
+
+              @if (!tieneTransacciones) {
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold text-dark small">Categoría</label>
+                  <select class="form-select custom-input" formControlName="categoryId">
+                    @for (category of categories; track category.id) { <option [value]="category.id">{{ category.name }}</option> }
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold text-dark small">Etiqueta</label>
+                  <select class="form-select custom-input" formControlName="tagId">
+                    <option [ngValue]="null">Sin etiqueta</option>
+                    @for (tag of tags; track tag.id) { <option [value]="tag.id">{{ tag.name }}</option> }
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold text-dark small">Unidad</label>
+                  <select class="form-select custom-input" formControlName="unit">
+                    <option value="KILOGRAMOS">Kilogramos</option>
+                    <option value="LITROS">Litros</option>
+                    <option value="UNIDADES">Unidades</option>
+                  </select>
+                </div>
+              } @else {
+                <div class="col-12">
+                  <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-dark p-3 rounded-3 d-flex align-items-center gap-2">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <small>Este producto tiene transacciones vinculadas. Solo puedes modificar el punto de reorden.</small>
+                  </div>
+                </div>
+              }
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold text-dark small">Punto de reorden</label>
+                <input type="number" class="form-control custom-input" formControlName="reorderPoint" />
+              </div>
+            </form>
+          }
+        }
+      </div>
+
+      <div class="modal-footer bg-light border-top-0 px-4 px-md-5 py-3 d-flex justify-content-between align-items-center">
+        @if (mode === 'view') {
+          <div>
+            @if (authState.hasPermission('PRODUCT_CHANGE_STATUS')) {
+              @if (product()?.status === 'INACTIVO') {
+                <button class="btn btn-outline-success rounded-pill px-3 fw-medium" (click)="changeStatus('ACTIVO')" [disabled]="loading">Activar Producto</button>
+              } @else {
+                <button class="btn btn-outline-danger rounded-pill px-3 fw-medium" (click)="changeStatus('INACTIVO')" [disabled]="loading">Desactivar Producto</button>
+              }
+            }
+          </div>
+          @if (authState.hasPermission('PRODUCT_EDIT')) {
+            <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="openEdit()">Editar Datos</button>
+          }
+        } @else {
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-medium" (click)="goBack()">Cancelar</button>
+          <button class="btn btn-primary rounded-pill px-4 fw-medium" [disabled]="form.invalid || loading" (click)="save()">
+            @if (loading) { <span class="spinner-border spinner-border-sm"></span> Guardando... } @else { Guardar Cambios }
+          </button>
+        }
+      </div>
+      
+    </div>
+  </div>
+</div>

@@ -1,0 +1,106 @@
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+  <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+      </div>
+      <h5 class="fw-bold text-dark mb-0">Modificaciones recientes</h5>
+    </div>
+  </div>
+
+  <div class="card-body px-4 pb-4">
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+    } @else if (modifications().length === 0) {
+      <div class="text-center py-5 text-muted">No hay modificaciones registradas.</div>
+    } @else {
+      <div class="d-flex flex-column gap-2 mt-2">
+        @for (m of modifications(); track m.id) {
+          <div class="border rounded-3 px-3 py-3">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <span class="fw-semibold text-dark">{{ m.editedClass }}</span>
+                <span class="mx-1 text-muted">·</span>
+                <span class="text-muted small">{{ m.editedAttribute }}</span>
+              </div>
+              <small class="text-muted">{{ m.dateTime | date: 'short' }}</small>
+            </div>
+            <div class="d-flex gap-2 flex-wrap mb-2">
+              <div class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-danger bg-opacity-10">
+                <span class="badge bg-danger fw-normal">Antes</span>
+                <small class="text-dark">{{ m.previousValue }}</small>
+              </div>
+              <div class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-success bg-opacity-10">
+                <span class="badge bg-success fw-normal">Después</span>
+                <small class="text-dark">{{ m.newValue }}</small>
+              </div>
+            </div>
+            <small class="text-muted"><span class="fw-medium">Usuario:</span> {{ m.username }}</small>
+          </div>
+        }
+      </div>
+      <div class="text-center mt-4">
+        <button class="btn btn-outline-primary rounded-pill px-4 fw-medium" (click)="openModal()">Ver todas las modificaciones</button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="modificationsModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path></svg>
+          </div>
+          <h5 class="modal-title fw-bold text-dark mb-0">Historial de Modificaciones</h5>
+        </div>
+        <button class="btn-close shadow-none" data-bs-dismiss="modal" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body px-4 py-4">
+        <div class="d-flex flex-column gap-2">
+          @for (m of modalModifications; track m.id) {
+            <div class="border rounded-3 px-3 py-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <span class="fw-semibold text-dark">{{ $index + 1 }}. {{ m.editedClass }}</span>
+                  <span class="mx-1 text-muted">·</span>
+                  <span class="text-muted small">{{ m.editedAttribute }}</span>
+                </div>
+                <small class="text-muted">{{ m.dateTime | date: 'short' }}</small>
+              </div>
+              <div class="d-flex gap-2 flex-wrap mb-2">
+                <div class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-danger bg-opacity-10">
+                  <span class="badge bg-danger fw-normal">Antes</span>
+                  <small class="text-dark">{{ m.previousValue }}</small>
+                </div>
+                <div class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-success bg-opacity-10">
+                  <span class="badge bg-success fw-normal">Después</span>
+                  <small class="text-dark">{{ m.newValue }}</small>
+                </div>
+              </div>
+              <small class="text-muted"><span class="fw-medium">Usuario:</span> {{ m.username }}</small>
+            </div>
+          }
+          @if (loading) {
+            <div class="text-center py-3">
+              <div class="spinner-border text-primary"></div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between align-items-center">
+        <small class="text-muted">{{ modalModifications.length }} modificaciones cargadas</small>
+        <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="nextPage()" [disabled]="loading">
+          @if (loading) { <span class="spinner-border spinner-border-sm"></span> } Cargar más
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

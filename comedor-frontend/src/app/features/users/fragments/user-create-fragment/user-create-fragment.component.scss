@@ -1,0 +1,19 @@
+.custom-input {
+  padding: 10px 16px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  transition: var(--transition-fast);
+  font-size: 0.95rem;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(45, 38, 146, 0.1);
+  }
+}
+
+.invalid-feedback {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 6px;
+}

@@ -1,1 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+@use './styles/variables';
+@use './styles/accessibility';
+
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+
+  transition: var(--transition-normal);
+}

@@ -1,0 +1,39 @@
+<div class="container py-4">
+  @if (!canViewTransactions && !canViewModifications) {
+    <div class="text-center mt-5">
+      <h4>No tienes permisos para este módulo</h4>
+      <a routerLink="/dashboard" class="btn btn-primary mt-3">Volver al dashboard</a>
+    </div>
+  } @else {
+    <div class="row g-4">
+      @if (canViewTransactions) {
+        <div class="col-12">
+          @defer (on timer(0ms)) {
+            <app-transactions-fragment />
+          } @placeholder {
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+              <div class="placeholder-glow">
+                <h5 class="placeholder col-4 mb-3"></h5>
+                <div class="placeholder col-12 py-4 rounded-3"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+      @if (canViewModifications) {
+        <div class="col-12">
+          @defer (on timer(0ms)) {
+            <app-modifications-fragment />
+          } @placeholder {
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+              <div class="placeholder-glow">
+                <h5 class="placeholder col-4 mb-3"></h5>
+                <div class="placeholder col-12 py-4 rounded-3"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
