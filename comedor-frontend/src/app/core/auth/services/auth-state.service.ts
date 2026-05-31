@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 
-import { Observable, tap, map } from 'rxjs';
+import { Observable, tap, map, firstValueFrom, timeout, finalize, catchError, of } from 'rxjs';
 
 import { AuthService } from './auth-api.service.ts';
 
@@ -28,6 +28,10 @@ export class AuthStateService {
 
   readonly isAuthenticated = computed(() => !!this._session());
 
+  readonly initializing = signal(true);
+
+  readonly backendOffline = signal(false);
+
   login(request: AuthRequest) {
     return this.authApi.login(request).pipe(
       tap((response) => {
@@ -49,10 +53,25 @@ export class AuthStateService {
   }
 
   initAuth() {
+    this.backendOffline.set(false);
+
     return this.authApi.refresh().pipe(
+      timeout(5000),
       tap((response) => {
         this.tokenService.saveToken(response.token);
         this._session.set(response);
+      }),
+
+      catchError((error) => {
+        console.error('Error inicializando sesión', error);
+
+        this.backendOffline.set(true);
+
+        return of(null);
+      }),
+
+      finalize(() => {
+        this.initializing.set(false);
       }),
     );
   }
@@ -71,12 +90,10 @@ export class AuthStateService {
       }),
     );
   }
-}
 
-export function initAuth(authState: AuthStateService) {
-  return () =>
-    authState
-      .initAuth()
-      .toPromise()
-      .catch(() => {});
+  retryConnection() {
+    this.initializing.set(true);
+
+    this.initAuth().subscribe();
+  }
 }
