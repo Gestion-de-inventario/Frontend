@@ -11,7 +11,7 @@ import { DishMenuResponse } from '../interfaces/menu-report.response';
 import { MenuReportSummaryResponse } from '../interfaces/menu-report.response';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MenuReportApiService {
   private readonly http = inject(HttpClient);
@@ -34,13 +34,26 @@ export class MenuReportApiService {
   }
 
   // Agregar beneficiario
-  addBeneficiary(reporteId: number, dto: BeneficiaryRecordRequest): Observable<BeneficiaryRecordResponse> {
-    return this.http.post<BeneficiaryRecordResponse>(`${this.apiUrl}/${reporteId}/beneficiaries`, dto);
+  addBeneficiary(
+    reporteId: number,
+    dto: BeneficiaryRecordRequest,
+  ): Observable<BeneficiaryRecordResponse> {
+    return this.http.post<BeneficiaryRecordResponse>(
+      `${this.apiUrl}/${reporteId}/beneficiaries`,
+      dto,
+    );
   }
 
   // Editar beneficiario usando controlId (PATCH)
-  editBeneficiary(reporteId: number, controlId: number, dto: BeneficiaryRecordRequest): Observable<BeneficiaryRecordResponse> {
-    return this.http.patch<BeneficiaryRecordResponse>(`${this.apiUrl}/${reporteId}/beneficiaries/${controlId}`, dto);
+  editBeneficiary(
+    reporteId: number,
+    controlId: number,
+    dto: BeneficiaryRecordRequest,
+  ): Observable<BeneficiaryRecordResponse> {
+    return this.http.patch<BeneficiaryRecordResponse>(
+      `${this.apiUrl}/${reporteId}/beneficiaries/${controlId}`,
+      dto,
+    );
   }
 
   // Eliminar beneficiario usando controlId (DELETE)

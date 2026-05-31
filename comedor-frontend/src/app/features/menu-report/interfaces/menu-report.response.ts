@@ -2,7 +2,7 @@ export interface DishMenuResponse {
   id: number;
   name: string;
   status: string;
-  supplies: any[]; 
+  supplies: any[];
 }
 
 export interface CookResponse {
@@ -22,12 +22,12 @@ export interface StockMovementResponse {
 }
 
 export interface BeneficiaryRecordResponse {
-  id: number; 
+  id: number;
   name: string;
   lastName: string;
   cantidad: number;
   total: number;
-  metodoPago: 'EFECTIVO' | 'YAPE' | 'PLI';
+  metodoPago: 'EFECTIVO' | 'YAPE' | 'PLIN';
   pago: boolean;
   entregado: boolean;
 }
@@ -37,21 +37,21 @@ export interface MenuReportSummaryResponse {
   totalSpent: number;
   neto: number;
   beneficiariosCount: number;
-  mostUsedPaymentMethod: 'EFECTIVO' | 'YAPE' | 'PLIN' | 'PLI';
+  mostUsedPaymentMethod: 'EFECTIVO' | 'YAPE' | 'PLIN';
 }
 
 export interface MenuReportDetailResponse {
   id: number;
   date: string;
   day: string;
-  menu: string; 
-  quantityPrepared: number;  
-  quantityRemaining: number; 
-  status: string;            
+  menu: string;
+  quantityPrepared: number;
+  quantityRemaining: number;
+  status: string;
   cocineras: CookResponse[];
-  registro: StockMovementResponse[]; 
+  registro: StockMovementResponse[];
   beneficiarios: BeneficiaryRecordResponse[];
-  resumenReporteMenu: MenuReportSummaryResponse; 
+  resumenReporteMenu: MenuReportSummaryResponse;
 }
 
 export interface MenuReportResponse {

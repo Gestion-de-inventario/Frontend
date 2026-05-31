@@ -31,7 +31,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   beneficiarySearch = signal('');
   menusAmount = signal<number | null>(null);
   menuPrice = signal<number | null>(null);
-  payMethod = signal<'EFECTIVO' | 'YAPE' | 'PLI'>('EFECTIVO');
+  payMethod = signal<'EFECTIVO' | 'YAPE' | 'PLIN'>('EFECTIVO');
   pago = signal(false);
   entregado = signal(false);
   selectedBeneficiary: BeneficiaryResponse | null = null;
@@ -46,7 +46,7 @@ export class MenuReportBeneficiariesFragmentComponent {
     return this.allBeneficiaries().filter(
       (b) =>
         b.status === 'ACTIVO' &&
-        (`${b.name} ${b.lastname}`.toLowerCase().includes(term) || b.dni.includes(term))
+        (`${b.name} ${b.lastname}`.toLowerCase().includes(term) || b.dni.includes(term)),
     );
   });
 
@@ -105,7 +105,7 @@ export class MenuReportBeneficiariesFragmentComponent {
       next: () => {
         this.toastService.show(
           this.editingRecord ? 'Beneficiario actualizado' : 'Beneficiario agregado',
-          'success'
+          'success',
         );
         this.reloadReport();
         bootstrap.Modal.getInstance(document.getElementById('beneficiaryRecordModal')!)?.hide();
@@ -125,20 +125,23 @@ export class MenuReportBeneficiariesFragmentComponent {
     const report = this.report();
     if (!report) return;
 
-    this.menuReportService.removeBeneficiary(report.id, this.getBeneficiaryControlId(record)).subscribe({
-      next: () => {
-        this.toastService.show('Beneficiario eliminado', 'warning');
-        this.reloadReport();
-      },
-      error: (error) => {
-        this.toastService.show('Error: ' + error.error.message, 'danger');
-      },
-    });
+    this.menuReportService
+      .removeBeneficiary(report.id, this.getBeneficiaryControlId(record))
+      .subscribe({
+        next: () => {
+          this.toastService.show('Beneficiario eliminado', 'warning');
+          this.reloadReport();
+        },
+        error: (error) => {
+          this.toastService.show('Error: ' + error.error.message, 'danger');
+        },
+      });
   }
 
   getBeneficiaryControlId(record?: BeneficiaryRecordResponse): number {
-    // necesitamos el controlId — pásame si el RegistroBeneficiarioResponseDTO tiene un id
-    return 0;
+    const target = record || this.editingRecord;
+    if (!target) throw new Error('No se ha seleccionado un beneficiario');
+    return target.id;
   }
 
   reloadReport(): void {
