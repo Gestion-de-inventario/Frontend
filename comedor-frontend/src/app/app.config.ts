@@ -12,22 +12,11 @@ import { routes } from './app.routes';
 
 import { authInterceptor } from '@core/auth/interceptors/auth.interceptor';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
-import { catchError, of } from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
-
-    provideAppInitializer(() => {
-      const authState = inject(AuthStateService);
-
-      return authState.initAuth().pipe(
-        catchError(() => {
-          return of(null);
-        }),
-      );
-    }),
   ],
 };

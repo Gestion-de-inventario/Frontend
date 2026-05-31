@@ -1,0 +1,24 @@
+<div class="min-vh-100 d-flex justify-content-center align-items-center">
+  <div class="text-center">
+    @if (!authState.backendOffline()) {
+      <div class="spinner-border mb-3"></div>
+
+      <h5>Verificando sesión...</h5>
+
+      <p class="text-muted">Espere un momento.</p>
+    } @else {
+      <div class="alert alert-warning text-start">
+        <h5>Servidor iniciándose</h5>
+
+        <p class="mb-3">
+          El backend está despertando porque utiliza alojamiento gratuito. Esto puede tardar entre
+          30 y 60 segundos.
+        </p>
+
+        <button class="btn btn-primary" (click)="authState.retryConnection()">
+          Reintentar conexión
+        </button>
+      </div>
+    }
+  </div>
+</div>
