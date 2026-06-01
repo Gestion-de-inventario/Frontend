@@ -1,3 +1,6 @@
+import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
+import { MenuReportSummaryResponse } from '@features/menu-report-summary/interfaces/menu-report-summary-response';
+
 export interface DishMenuResponse {
   id: number;
   name: string;
@@ -15,29 +18,11 @@ export interface CookResponse {
 export interface StockMovementResponse {
   id: number;
   productName: string;
+  productUnit: string;
   quantityUsed: number;
   unitCost: number;
   totalCost: number;
   movementDate: string;
-}
-
-export interface BeneficiaryRecordResponse {
-  id: number;
-  name: string;
-  lastName: string;
-  cantidad: number;
-  total: number;
-  metodoPago: 'EFECTIVO' | 'YAPE' | 'PLIN';
-  pago: boolean;
-  entregado: boolean;
-}
-
-export interface MenuReportSummaryResponse {
-  totalEarned: number;
-  totalSpent: number;
-  neto: number;
-  beneficiariosCount: number;
-  mostUsedPaymentMethod: 'EFECTIVO' | 'YAPE' | 'PLIN';
 }
 
 export interface MenuReportDetailResponse {

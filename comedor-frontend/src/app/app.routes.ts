@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/auth/guards/auth.guard';
 
+import { appReadyGuard } from './core/auth/guards/appReadyGuard';
+
 import { guestGuard } from './core/auth/guards/guest.guard';
 import { AppShellPage } from './layout/pages/app-shell/app-shell.page';
 
@@ -19,7 +21,7 @@ export const routes: Routes = [
 
     component: AppShellPage,
 
-    canActivate: [authGuard],
+    canActivate: [appReadyGuard, authGuard],
 
     children: [
       {
@@ -107,6 +109,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('@features/menu-report/pages/menu_report_principal/menu_report_principal').then(
             (m) => m.MenuReportPrincipal,
+          ),
+      },
+
+      {
+        path: 'beneficiaries-control',
+        title: 'Control de recojo de menús',
+        loadComponent: () =>
+          import('@features/beneficiaries-control/pages/beneficiary-control/beneficiary-control').then(
+            (m) => m.BeneficiaryControl,
           ),
       },
     ],

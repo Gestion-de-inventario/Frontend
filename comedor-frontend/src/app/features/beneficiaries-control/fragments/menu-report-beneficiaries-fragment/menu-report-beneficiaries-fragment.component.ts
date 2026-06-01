@@ -2,15 +2,27 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MenuReportApiService } from '@features/menu-report/services/menu-report-api.service';
+import { BeneficiaryControlApiService } from '@features/beneficiaries-control/services/beneficiaries-control-api.service';
 import { MenuReportStateService } from '@features/menu-report/services/menu-report-state.service';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { BeneficiaryApiService } from '@features/beneficiaries/services/beneficiary-api.service';
 import { BeneficiaryStateService } from '@features/beneficiaries/services/beneficiary-state.service';
 import { BeneficiaryResponse } from '@features/beneficiaries/interfaces/beneficiary.response';
-import { BeneficiaryRecordResponse } from '@features/menu-report/interfaces/menu-report.response';
+import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
 import { ToastService } from '@shared/services/toast.service';
+import { Router } from '@angular/router';
+import { finalize } from 'rxjs/internal/operators/finalize';
 
 declare const bootstrap: any;
+
+const LocalToday = new Date();
+
+const localDate =
+  LocalToday.getFullYear() +
+  '-' +
+  String(LocalToday.getMonth() + 1).padStart(2, '0') +
+  '-' +
+  String(LocalToday.getDate()).padStart(2, '0');
 
 @Component({
   selector: 'app-menu-report-beneficiaries-fragment',
@@ -19,12 +31,14 @@ declare const bootstrap: any;
   templateUrl: './menu-report-beneficiaries-fragment.component.html',
 })
 export class MenuReportBeneficiariesFragmentComponent {
+  private readonly beneficiaryControlService = inject(BeneficiaryControlApiService);
   private readonly menuReportService = inject(MenuReportApiService);
   private readonly menuReportState = inject(MenuReportStateService);
   private readonly beneficiaryService = inject(BeneficiaryApiService);
   private readonly beneficiaryState = inject(BeneficiaryStateService);
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
+  private readonly router = inject(Router);
 
   readonly report = this.menuReportState.report;
 
@@ -36,7 +50,30 @@ export class MenuReportBeneficiariesFragmentComponent {
   entregado = signal(false);
   selectedBeneficiary: BeneficiaryResponse | null = null;
   editingRecord: BeneficiaryRecordResponse | null = null;
-  loading = false;
+  loading = signal(false);
+  loadingReport = signal(false);
+
+  ngOnInit(): void {
+    this.initReport();
+  }
+
+  initReport(): void {
+    const cached = this.report();
+
+    if (cached) return;
+
+    this.loadingReport.set(true);
+
+    this.menuReportState.getOrLoadTodayReport(localDate).subscribe({
+      next: () => {
+        this.loadingReport.set(false);
+      },
+      error: () => {
+        this.loadingReport.set(false);
+        this.toastService.show('No se pudo cargar el reporte del día', 'danger');
+      },
+    });
+  }
 
   readonly allBeneficiaries = this.beneficiaryState.beneficiaries;
 
@@ -80,11 +117,12 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   saveBeneficiary(): void {
     const report = this.report();
-    if (!report || this.loading) return;
+
+    if (!report || this.loading()) return;
     if (!this.editingRecord && !this.selectedBeneficiary) return;
     if (!this.menusAmount()) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     const request = {
       beneficiarioId: this.editingRecord
@@ -98,34 +136,45 @@ export class MenuReportBeneficiariesFragmentComponent {
     };
 
     const call = this.editingRecord
-      ? this.menuReportService.editBeneficiary(report.id, this.getBeneficiaryControlId(), request)
-      : this.menuReportService.addBeneficiary(report.id, request);
+      ? this.beneficiaryControlService.editBeneficiary(
+          report.id,
+          this.getBeneficiaryControlId(),
+          request,
+        )
+      : this.beneficiaryControlService.addBeneficiary(report.id, request);
 
-    call.subscribe({
-      next: () => {
-        this.toastService.show(
-          this.editingRecord ? 'Beneficiario actualizado' : 'Beneficiario agregado',
-          'success',
-        );
-        this.reloadReport();
-        bootstrap.Modal.getInstance(document.getElementById('beneficiaryRecordModal')!)?.hide();
-        this.resetForm();
-      },
-      error: (error) => {
-        this.toastService.show('Error: ' + error.error.message, 'danger');
-        this.loading = false;
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+    call
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.show(
+            this.editingRecord ? 'Beneficiario actualizado' : 'Beneficiario agregado',
+            'success',
+          );
+          this.reloadReport();
+          bootstrap.Modal.getInstance(document.getElementById('beneficiaryRecordModal')!)?.hide();
+          this.resetForm();
+          this.loading.set(false);
+        },
+        error: (error) => {
+          this.toastService.show('Error: ' + error.error.message, 'danger');
+          this.loading.set(false);
+        },
+        complete: () => {
+          this.loading.set(false);
+        },
+      });
   }
 
   removeBeneficiary(record: BeneficiaryRecordResponse): void {
     const report = this.report();
     if (!report) return;
 
-    this.menuReportService
+    this.beneficiaryControlService
       .removeBeneficiary(report.id, this.getBeneficiaryControlId(record))
       .subscribe({
         next: () => {

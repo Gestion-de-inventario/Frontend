@@ -108,6 +108,7 @@ export class UserCreateFragmentComponent {
 
       error: (error) => {
         this.toastService.show('No se pudo crear el usuario :' + error.error.message, 'danger');
+        this.loading = false;
       },
       complete: () => {
         this.loading = false;

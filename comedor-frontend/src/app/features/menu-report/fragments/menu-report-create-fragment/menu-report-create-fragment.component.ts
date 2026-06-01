@@ -7,20 +7,23 @@ import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { UserService } from '@features/users/services/user-api.service';
 import { UserResponse } from '@features/users/interfaces/user.response';
 import { ToastService } from '@shared/services/toast.service';
-import { MenuReportProductsFragmentComponent } from '../menu-report-products-fragment/menu-report-products-fragment.component';
-import { MenuReportBeneficiariesFragmentComponent } from '../menu-report-beneficiaries-fragment/menu-report-beneficiaries-fragment.component';
-import { MenuReportSummaryFragmentComponent } from '../menu-report-summary-fragment/menu-report-summary-fragment.component';
 import { DishMenuResponse } from '@features/menu-report/interfaces/menu-report.response';
+import { MenuReportProductsFragmentComponent } from '../menu-report-products-fragment/menu-report-products-fragment.component';
+import { Router } from '@angular/router';
+
+const LocalToday = new Date();
+
+const localDate =
+  LocalToday.getFullYear() +
+  '-' +
+  String(LocalToday.getMonth() + 1).padStart(2, '0') +
+  '-' +
+  String(LocalToday.getDate()).padStart(2, '0');
 
 @Component({
   selector: 'app-menu-report-create-fragment',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MenuReportProductsFragmentComponent,
-    MenuReportBeneficiariesFragmentComponent,
-    MenuReportSummaryFragmentComponent,
-  ],
+  imports: [CommonModule, FormsModule, MenuReportProductsFragmentComponent],
   templateUrl: './menu-report-create-fragment.component.html',
 })
 export class MenuReportCreateFragmentComponent implements OnInit {
@@ -29,11 +32,13 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
+  private readonly router = inject(Router);
+
+  goToBeneficiariesControl(): void {
+    this.router.navigate(['/beneficiaries-control']);
+  }
 
   readonly report = this.menuReportState.report;
-  
-  // Control de Pasos (1 al 4)
-  currentStep = signal(1);
 
   // Formulario de Creación
   selectedDishMenuId = signal<number | null>(null);
@@ -44,14 +49,16 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   cookSearch = signal('');
   selectedCooks = signal<UserResponse[]>([]);
   allCooks = signal<UserResponse[]>([]);
-  
+
   loading = signal(false);
   creating = signal(false);
 
   readonly today = new Date().toLocaleDateString('es-PE', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
-  readonly todayIso = new Date().toISOString().split('T')[0];
 
   ngOnInit(): void {
     this.loadTodayReport();
@@ -60,13 +67,13 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
 
   loadTodayReport(): void {
+    console.log('Cargando reporte de hoy');
     if (!this.authState.hasPermission('MENU_REPORT_GET_BY_DATE')) return;
     this.loading.set(true);
-    this.menuReportService.getByDate(this.todayIso).subscribe({
+    this.menuReportService.getByDate(localDate).subscribe({
       next: (report) => {
         this.menuReportState.setReport(report);
-        // Si ya existe reporte, saltamos al paso 2 (Productos)
-        this.currentStep.set(2);
+        console.log('Menu encontrado para hoy:', report);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -75,7 +82,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
 
   loadDishMenus(): void {
     this.menuReportService.getDishMenus().subscribe({
-      next: (menus) => this.dishMenus.set(menus)
+      next: (menus) => this.dishMenus.set(menus),
     });
   }
 
@@ -89,33 +96,46 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     if (!this.selectedDishMenuId() || !this.quantityPrepared() || this.creating()) return;
     this.creating.set(true);
 
-    this.menuReportService.create({
-      dishMenuId: this.selectedDishMenuId()!,
-      quantityPrepared: this.quantityPrepared()!,
-      cooks: this.selectedCooks().map((c) => c.user_id),
-    }).subscribe({
-      next: () => {
-        this.toastService.show('Reporte creado', 'success');
-        this.loadTodayReport(); // Esto disparará el set(2)
-        this.creating.set(false);
-      },
-      error: (err) => {
-        this.toastService.show(err.error?.message || 'Error al crear', 'danger');
-        this.creating.set(false);
-      }
-    });
+    this.menuReportService
+      .create({
+        dishMenuId: this.selectedDishMenuId()!,
+        quantityPrepared: this.quantityPrepared()!,
+        cooks: this.selectedCooks().map((c) => c.user_id),
+      })
+      .subscribe({
+        next: () => {
+          this.toastService.show('Reporte creado', 'success');
+          this.loadTodayReport(); // Esto disparará el set(2)
+          this.creating.set(false);
+        },
+        error: (err) => {
+          this.toastService.show(err.error?.message || 'Error al crear', 'danger');
+          this.creating.set(false);
+        },
+      });
   }
 
-  // Métodos de navegación
-  nextStep() { this.currentStep.update(s => s + 1); }
-  prevStep() { this.currentStep.update(s => s - 1); }
-
   // Helpers de cocineras
-  addCook(cook: UserResponse) { this.selectedCooks.update(l => [...l, cook]); this.cookSearch.set(''); }
-  removeCook(cook: UserResponse) { this.selectedCooks.update(l => l.filter(c => c.user_id !== cook.user_id)); }
-  filteredCooks = computed(() => {
-    const term = this.cookSearch().toLowerCase();
-    return this.allCooks().filter(c => !this.selectedCooks().some(s => s.user_id === c.user_id) && 
-           (`${c.name} ${c.lastname}`.toLowerCase().includes(term) || c.dni.includes(term)));
+  addCook(cook: UserResponse) {
+    this.selectedCooks.update((l) => [...l, cook]);
+    this.cookSearch.set('');
+  }
+
+  removeCook(cook: UserResponse) {
+    this.selectedCooks.update((l) => l.filter((c) => c.user_id !== cook.user_id));
+  }
+
+  readonly filteredCooks = computed(() => {
+    const term = this.cookSearch().trim().toLowerCase();
+
+    if (!term) return [];
+
+    return this.allCooks()
+      .filter(
+        (c) =>
+          !this.selectedCooks().some((s) => s.user_id === c.user_id) &&
+          (`${c.name} ${c.lastname}`.toLowerCase().includes(term) || c.dni.includes(term)),
+      )
+      .slice(0, 5);
   });
 }

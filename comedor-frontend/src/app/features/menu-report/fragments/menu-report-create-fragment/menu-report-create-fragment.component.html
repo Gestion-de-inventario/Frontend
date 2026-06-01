@@ -1,75 +1,143 @@
 <div class="card p-3 border-0 shadow-sm">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0 text-primary">Control Menú - Paso {{ currentStep() }} de 4</h4>
     <small class="text-muted">{{ today }}</small>
   </div>
 
-  <div class="progress mb-4" style="height: 5px">
-    <div class="progress-bar" [style.width.%]="currentStep() * 25"></div>
-  </div>
-
   @if (loading()) {
-    <div class="text-center py-5"><span class="spinner-border text-primary"></span></div>
+    <div class="text-center py-5">
+      <span class="spinner-border text-primary"></span>
+    </div>
   } @else {
-    @switch (currentStep()) {
-      @case (1) {
-        <div class="d-flex flex-column gap-3">
+    <div class="d-flex flex-column gap-3">
+      @if (!report()) {
+        <!-- Plato -->
+        <div>
           <label class="form-label fw-bold">Plato del día *</label>
+
           <select
             class="form-select"
             [ngModel]="selectedDishMenuId()"
             (ngModelChange)="selectedDishMenuId.set($event)"
+            [disabled]="!!report()"
           >
             <option [ngValue]="null" disabled>Seleccione un plato</option>
+
             @for (dish of dishMenus(); track dish.id) {
               @if (dish.status === 'ACTIVO') {
-                <option [ngValue]="dish.id">{{ dish.name }}</option>
+                <option [ngValue]="dish.id">
+                  {{ dish.name }}
+                </option>
               }
             }
           </select>
+        </div>
+
+        <!-- Cantidad -->
+        <div>
+          <label class="form-label fw-bold">Cantidad preparada *</label>
+
           <input
             type="number"
             class="form-control"
             placeholder="Cantidad"
             [ngModel]="quantityPrepared()"
             (ngModelChange)="quantityPrepared.set($event)"
+            [disabled]="!!report()"
           />
-          <button
-            class="btn btn-primary w-100 mt-2"
-            (click)="createReport()"
-            [disabled]="creating()"
-          >
-            @if (creating()) {
-              Creando...
-            } @else {
-              Crear Reporte y Avanzar
+        </div>
+
+        <!-- Cocineras -->
+        <div>
+          <label class="form-label fw-bold">Cocineras</label>
+
+          <div class="position-relative">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Buscar cocinera..."
+              [ngModel]="cookSearch()"
+              (ngModelChange)="cookSearch.set($event)"
+              [disabled]="!!report()"
+            />
+
+            @if (cookSearch() && filteredCooks().length > 0) {
+              <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000">
+                @for (cook of filteredCooks(); track cook.user_id) {
+                  <button
+                    type="button"
+                    class="list-group-item list-group-item-action"
+                    (click)="addCook(cook)"
+                  >
+                    <div class="fw-semibold">{{ cook.name }} {{ cook.lastname }}</div>
+
+                    <small class="text-muted"> DNI: {{ cook.dni }} </small>
+                  </button>
+                }
+              </div>
             }
+            <div class="mt-3 d-flex flex-wrap gap-2">
+              @for (cook of selectedCooks(); track cook.user_id) {
+                <div class="badge bg-primary p-2 d-flex align-items-center gap-2">
+                  <span>{{ cook.name }} {{ cook.lastname }}</span>
+
+                  <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    (click)="removeCook(cook)"
+                  ></button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Crear -->
+
+        <button class="btn btn-primary" (click)="createReport()" [disabled]="creating()">
+          @if (creating()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Creando...
+          } @else {
+            Crear reporte
+          }
+        </button>
+      }
+
+      <!-- Ya existe reporte -->
+      @if (report()) {
+        <div class="alert alert-success mb-3">El reporte del día ya fue creado correctamente</div>
+
+        <div class="card border-success p-3">
+          <!-- RESUMEN -->
+          <div class="mb-3">
+            <strong>Plato del día:</strong>
+            <div>{{ report()?.menu }}</div>
+          </div>
+
+          <div class="mb-3">
+            <strong>Cantidad preparada:</strong>
+            <div>{{ report()?.quantityPrepared }}</div>
+          </div>
+          <div class="mb-3">
+            <strong>Productos utilizados:</strong>
+            <div><app-menu-report-products-fragment></app-menu-report-products-fragment></div>
+          </div>
+
+          <div class="mb-3">
+            <strong>Cocineras:</strong>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              @for (cook of report()?.cocineras ?? []; track cook.id) {
+                <span class="badge bg-primary"> {{ cook.name }} {{ cook.lastname }} </span>
+              }
+            </div>
+          </div>
+
+          <!-- BOTÓN ACCIÓN -->
+          <button class="btn btn-success w-100" (click)="goToBeneficiariesControl()">
+            Continuar a Control de Beneficiarios
           </button>
         </div>
       }
-
-      @case (2) {
-        <app-menu-report-products-fragment />
-        <div class="d-flex justify-content-between mt-3">
-          <button class="btn btn-outline-secondary" (click)="prevStep()">Atrás</button>
-          <button class="btn btn-primary" (click)="nextStep()">Siguiente: Beneficiarios</button>
-        </div>
-      }
-
-      @case (3) {
-        <app-menu-report-beneficiaries-fragment />
-        <div class="d-flex justify-content-between mt-3">
-          <button class="btn btn-outline-secondary" (click)="prevStep()">Atrás</button>
-          <button class="btn btn-primary" (click)="nextStep()">Siguiente: Resumen</button>
-        </div>
-      }
-
-      @case (4) {
-        <app-menu-report-summary-fragment />
-        <div class="mt-3 text-end">
-          <button class="btn btn-outline-secondary" (click)="prevStep()">Atrás</button>
-        </div>
-      }
-    }
+    </div>
   }
 </div>

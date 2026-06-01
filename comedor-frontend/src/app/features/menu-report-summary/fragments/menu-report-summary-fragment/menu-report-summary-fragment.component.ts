@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuReportApiService } from '@features/menu-report/services/menu-report-api.service';
 import { MenuReportStateService } from '@features/menu-report/services/menu-report-state.service';
-import { MenuReportSummaryResponse } from '@features/menu-report/interfaces/menu-report.response';
+import { MenuReportSummaryResponse } from '@features/menu-report-summary/interfaces/menu-report-summary-response';
 
 @Component({
   selector: 'app-menu-report-summary-fragment',
