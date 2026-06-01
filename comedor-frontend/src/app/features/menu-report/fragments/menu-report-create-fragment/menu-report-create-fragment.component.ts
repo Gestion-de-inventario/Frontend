@@ -10,6 +10,9 @@ import { ToastService } from '@shared/services/toast.service';
 import { DishMenuResponse } from '@features/menu-report/interfaces/menu-report.response';
 import { MenuReportProductsFragmentComponent } from '../menu-report-products-fragment/menu-report-products-fragment.component';
 import { Router } from '@angular/router';
+import { MissingProductsResponse } from '@features/purchase-order/interfaces/missing-products.response';
+
+declare const bootstrap: any;
 
 const LocalToday = new Date();
 
@@ -33,6 +36,8 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
+
+  missingProducts = signal<MissingProductsResponse[]>([]);
 
   goToBeneficiariesControl(): void {
     this.router.navigate(['/beneficiaries-control']);
@@ -109,12 +114,32 @@ export class MenuReportCreateFragmentComponent implements OnInit {
           this.creating.set(false);
         },
         error: (err) => {
+          if (err.status === 409 && err.error?.faltantes) {
+            this.openMissingStockModal(err.error.faltantes);
+
+            return;
+          }
+
           this.toastService.show(err.error?.message || 'Error al crear', 'danger');
-          this.creating.set(false);
         },
       });
   }
 
+  openMissingStockModal(faltantes: MissingProductsResponse[]): void {
+    this.missingProducts.set(faltantes);
+
+    const modal = new bootstrap.Modal(document.getElementById('missingStockModal'));
+
+    modal.show();
+  }
+
+  goToCreatePurchase(): void {
+    this.router.navigate(['/purchase-order'], {
+      state: {
+        missingProducts: this.missingProducts(),
+      },
+    });
+  }
   // Helpers de cocineras
   addCook(cook: UserResponse) {
     this.selectedCooks.update((l) => [...l, cook]);

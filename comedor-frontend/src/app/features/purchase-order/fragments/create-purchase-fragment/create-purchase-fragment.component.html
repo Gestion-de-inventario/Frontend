@@ -1,0 +1,108 @@
+<div class="card shadow-sm border-0">
+  <div class="card-header bg-white">
+    <h5 class="mb-0">Orden de compra</h5>
+  </div>
+
+  <div class="card-body">
+    @if (purchaseDetails().length === 0) {
+      <div class="alert alert-info">No hay productos agregados.</div>
+    }
+
+    @for (detail of purchaseDetails(); track $index) {
+      <div class="row g-2 mb-3 align-items-end">
+        @if (!detail.productId) {
+          <input
+            class="form-control"
+            placeholder="Buscar producto..."
+            [ngModel]="detail.search"
+            (ngModelChange)="updateSearch($index, $event)"
+          />
+
+          @if (detail.search.length > 0) {
+            <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000">
+              @for (product of filteredProducts(detail.search); track product.id) {
+                <button
+                  type="button"
+                  class="list-group-item list-group-item-action"
+                  (click)="selectProduct($index, product)"
+                >
+                  {{ product.name }}
+                </button>
+              }
+            </div>
+          }
+        }
+
+        @if (detail.productId) {
+          <div class="form-control bg-light d-flex justify-content-between align-items-center">
+            <span>
+              {{ detail.productName }}
+            </span>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              (click)="clearProduct($index)"
+            >
+              Cambiar
+            </button>
+          </div>
+        }
+
+        <div class="col-md-3">
+          <label class="form-label"> Cantidad </label>
+
+          <input
+            type="number"
+            class="form-control"
+            [ngModel]="detail.quantity"
+            (ngModelChange)="updateQuantity($index, $event)"
+          />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label"> Precio unitario </label>
+
+          <input
+            type="number"
+            class="form-control"
+            [ngModel]="detail.unitPrice"
+            (ngModelChange)="updatePrice($index, $event)"
+          />
+        </div>
+
+        <div class="col-md-2">
+          <button class="btn btn-outline-danger w-100" (click)="removeDetail($index)">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="d-flex gap-2">
+      @if (hasDuplicateProducts()) {
+        <div class="alert alert-warning mt-3 mb-0">
+          Existen productos repetidos en la orden de compra.
+        </div>
+      }
+      <button class="btn btn-outline-primary" (click)="addEmptyRow()">Agregar producto</button>
+
+      <button
+        class="btn btn-success"
+        (click)="createPurchase()"
+        [disabled]="
+          loading() ||
+          purchaseDetails().length === 0 ||
+          hasDuplicateProducts() ||
+          purchaseDetails().some((d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0)
+        "
+      >
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+
+        Crear orden de compra
+      </button>
+    </div>
+  </div>
+</div>

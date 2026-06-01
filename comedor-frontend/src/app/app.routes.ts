@@ -123,10 +123,19 @@ export const routes: Routes = [
 
       {
         path: 'menu-report-summary',
-        title: 'Resumen de Reportes de Menú',
+        title: 'Resumen diario',
         loadComponent: () =>
           import('@features/menu-report-summary/pages/menu-report-summary').then(
             (m) => m.MenuReportSummary,
+          ),
+      },
+
+      {
+        path: 'purchase-order',
+        title: 'Ordenes de compra',
+        loadComponent: () =>
+          import('@features/purchase-order/pages/purchase-order-principal/purchase-orden').then(
+            (m) => m.PurchaseOrden,
           ),
       },
     ],

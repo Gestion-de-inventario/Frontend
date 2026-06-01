@@ -139,5 +139,39 @@
         </div>
       }
     </div>
+
+    <div class="modal fade" id="missingStockModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Stock insuficiente</h5>
+          </div>
+
+          <div class="modal-body">
+            <p>No existe stock suficiente para preparar el menú.</p>
+
+            <div class="list-group">
+              @for (item of missingProducts(); track item.productId) {
+                <div class="list-group-item">
+                  <div class="fw-semibold">
+                    {{ item.productName }}
+                  </div>
+
+                  <small class="text-danger"> Faltan {{ item.quantityNeeded }} </small>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+            <button class="btn btn-primary" (click)="goToCreatePurchase()">
+              Crear orden de compra
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   }
 </div>
