@@ -40,6 +40,8 @@ export class MenuReportBeneficiariesFragmentComponent {
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
 
+  public readonly localDate = localDate;
+
   readonly report = this.menuReportState.report;
 
   beneficiarySearch = signal('');

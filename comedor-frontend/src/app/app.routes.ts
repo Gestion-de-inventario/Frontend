@@ -120,6 +120,15 @@ export const routes: Routes = [
             (m) => m.BeneficiaryControl,
           ),
       },
+
+      {
+        path: 'menu-report-summary',
+        title: 'Resumen de Reportes de Menú',
+        loadComponent: () =>
+          import('@features/menu-report-summary/pages/menu-report-summary').then(
+            (m) => m.MenuReportSummary,
+          ),
+      },
     ],
   },
 ];
