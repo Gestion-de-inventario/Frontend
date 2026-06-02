@@ -5,10 +5,10 @@ import { Observable } from 'rxjs';
 import { MenuReportRequest } from '../interfaces/menu-report.request';
 import { MenuReportResponse } from '../interfaces/menu-report.response';
 import { MenuReportDetailResponse } from '../interfaces/menu-report.response';
-import { BeneficiaryRecordRequest } from '../interfaces/menu-report.request';
-import { BeneficiaryRecordResponse } from '../interfaces/menu-report.response';
+import { BeneficiaryRecordRequest } from '@features/beneficiaries-control/interfaces/beneficiary-record-request';
+import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
 import { DishMenuResponse } from '../interfaces/menu-report.response';
-import { MenuReportSummaryResponse } from '../interfaces/menu-report.response';
+import { MenuReportSummaryResponse } from '@features/menu-report-summary/interfaces/menu-report-summary-response';
 
 @Injectable({
   providedIn: 'root',
@@ -31,34 +31,6 @@ export class MenuReportApiService {
   // Buscar el reporte por fecha
   getByDate(fecha: string): Observable<MenuReportDetailResponse> {
     return this.http.get<MenuReportDetailResponse>(`${this.apiUrl}/date/${fecha}`);
-  }
-
-  // Agregar beneficiario
-  addBeneficiary(
-    reporteId: number,
-    dto: BeneficiaryRecordRequest,
-  ): Observable<BeneficiaryRecordResponse> {
-    return this.http.post<BeneficiaryRecordResponse>(
-      `${this.apiUrl}/${reporteId}/beneficiaries`,
-      dto,
-    );
-  }
-
-  // Editar beneficiario usando controlId (PATCH)
-  editBeneficiary(
-    reporteId: number,
-    controlId: number,
-    dto: BeneficiaryRecordRequest,
-  ): Observable<BeneficiaryRecordResponse> {
-    return this.http.patch<BeneficiaryRecordResponse>(
-      `${this.apiUrl}/${reporteId}/beneficiaries/${controlId}`,
-      dto,
-    );
-  }
-
-  // Eliminar beneficiario usando controlId (DELETE)
-  removeBeneficiary(reporteId: number, controlId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${reporteId}/beneficiaries/${controlId}`);
   }
 
   // Resumen final

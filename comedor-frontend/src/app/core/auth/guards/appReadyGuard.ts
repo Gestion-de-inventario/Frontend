@@ -1,10 +1,9 @@
 import { CanActivateFn } from '@angular/router';
 import { AuthStateService } from '../services/auth-state.service';
-import { Router } from '@angular/router';
 import { inject } from '@angular/core';
-export const authGuard: CanActivateFn = () => {
-  const authState = inject(AuthStateService);
-  const router = inject(Router);
 
-  return authState.isAuthenticated() ? true : router.createUrlTree(['/login']);
+export const appReadyGuard: CanActivateFn = () => {
+  const authState = inject(AuthStateService);
+
+  return !authState.initializing();
 };

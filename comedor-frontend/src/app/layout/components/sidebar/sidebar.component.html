@@ -19,90 +19,214 @@
   </div>
 
   <div class="offcanvas-body d-flex flex-column px-3 pt-3 gap-1">
-    
     <div class="px-2 mb-3">
       <a
         class="perfil-card d-flex align-items-center gap-3 p-3 rounded-4 text-decoration-none shadow-sm"
         (click)="navigateAndClose('/profile')"
       >
-        <div class="perfil-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm">
-          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+        <div
+          class="perfil-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm"
+        >
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+            ></path>
           </svg>
         </div>
         <div class="d-flex flex-column overflow-hidden">
           <span class="fw-bold text-truncate perfil-nombre mb-1">
             {{ authState.session()?.name }} {{ authState.session()?.lastname }}
           </span>
-          <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill perfil-rol d-inline-block text-truncate text-center" style="max-width: fit-content;">
+          <span
+            class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill perfil-rol d-inline-block text-truncate text-center"
+            style="max-width: fit-content"
+          >
             {{ authState.session()?.role }}
           </span>
         </div>
       </a>
     </div>
 
-    <small class="text-muted fw-bold px-3 mb-2 mt-2 text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">Módulos</small>
+    <small
+      class="text-muted fw-bold px-3 mb-2 mt-2 text-uppercase"
+      style="font-size: 0.7rem; letter-spacing: 1px"
+      >Módulos</small
+    >
 
     <a class="sidebar-link" (click)="navigateAndClose('/dashboard')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        ></path>
+      </svg>
       Dashboard
     </a>
 
+    @if (
+      authState.hasPermission('MENU_REPORT_CREATE_REPORT') ||
+      authState.hasPermission('MENU_REPORT_GET_BY_DATE')
+    ) {
+      <a class="sidebar-link" (click)="navigateAndClose('/menu-report')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path d="M2 12h20" />
+          <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
+          <path d="m4 8 16-4" />
+          <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
+        </svg>
+
+        Registrar Menú del día
+      </a>
+    }
+    @if (authState.hasPermission('MENU_REPORT_ADD_BENEFICIARY')) {
+      <a class="sidebar-link" (click)="navigateAndClose('/beneficiaries-control')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+          ></path>
+        </svg>
+        Recojo de Menú
+      </a>
+    }
+
+    @if (authState.hasPermission('MENU_REPORT_GET_SUMMARY')) {
+      <a class="sidebar-link" (click)="navigateAndClose('/menu-report-summary')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path d="M16 14v2.2l1.6 1" />
+          <path d="M16 4h2a2 2 0 0 1 2 2v.832" />
+          <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2" />
+          <circle cx="16" cy="16" r="6" />
+          <rect x="8" y="2" width="8" height="4" rx="1" />
+        </svg>
+        Resumen del Menú del día
+      </a>
+    }
+
+    @if (authState.hasPermission('PURCHASE_CREATE')) {
+      <a class="sidebar-link" (click)="navigateAndClose('/purchase-order')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path d="m15 11-1 9" />
+          <path d="m19 11-4-7" />
+          <path d="M2 11h20" />
+          <path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4" />
+          <path d="M4.5 15.5h15" />
+          <path d="m5 11 4-7" />
+          <path d="m9 11 1 9" />
+        </svg>
+        Orden de compra
+      </a>
+    }
+
     @if (authState.hasPermission('USER_LIST_ALL')) {
       <a class="sidebar-link" (click)="navigateAndClose('/users')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          ></path>
+        </svg>
         Usuarios
       </a>
     }
 
     @if (authState.hasPermission('PRODUCT_LIST_BY_STATUS')) {
       <a class="sidebar-link" (click)="navigateAndClose('/products')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+          ></path>
+        </svg>
         Productos
       </a>
     }
 
     @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
       <a class="sidebar-link" (click)="navigateAndClose('/beneficiaries')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          ></path>
+        </svg>
         Beneficiarios
       </a>
     }
 
-    @if (authState.hasPermission('CATEGORY_LIST_BY_STATUS') || authState.hasPermission('TAG_LIST_BY_STATUS')) {
+    @if (
+      authState.hasPermission('CATEGORY_LIST_BY_STATUS') ||
+      authState.hasPermission('TAG_LIST_BY_STATUS')
+    ) {
       <a class="sidebar-link" (click)="navigateAndClose('/categories')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+          ></path>
+        </svg>
         Categorías y Etiquetas
       </a>
     }
 
     @if (authState.hasPermission('ROLE_LIST_BY_STATUS')) {
       <a class="sidebar-link" (click)="navigateAndClose('/roles')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+          ></path>
+        </svg>
         Roles
       </a>
     }
 
-    @if (authState.hasPermission('MODIFICATION_LIST_ALL') || authState.hasPermission('TRANSACTION_LIST_ALL')) {
+    @if (
+      authState.hasPermission('MODIFICATION_LIST_ALL') ||
+      authState.hasPermission('TRANSACTION_LIST_ALL')
+    ) {
       <a class="sidebar-link" (click)="navigateAndClose('/transactions-modifications')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+          ></path>
+        </svg>
         Transacciones
       </a>
     }
 
-    @if (authState.hasPermission('MENU_REPORT_CREATE_REPORT') || authState.hasPermission('MENU_REPORT_GET_BY_DATE')) {
-      <a class="sidebar-link" (click)="navigateAndClose('/menu-report')">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-        Control Menú
-      </a>
-    }
-
     <div class="mt-auto p-3 border-top">
-      <button class="logout-btn btn w-100 d-flex align-items-center justify-content-center gap-2" (click)="logout()">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+      <button
+        class="logout-btn btn w-100 d-flex align-items-center justify-content-center gap-2"
+        (click)="logout()"
+      >
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          ></path>
+        </svg>
         Cerrar sesión
       </button>
     </div>
-    
   </div>
 </div>
