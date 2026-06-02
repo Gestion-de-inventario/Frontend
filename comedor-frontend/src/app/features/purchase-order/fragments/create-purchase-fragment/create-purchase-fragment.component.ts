@@ -14,6 +14,7 @@ import { ProductApiService } from '@features/products/services/product-api.servi
 import { ToastService } from '@shared/services/toast.service';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { CreatePurchaseRequest } from '@features/purchase-order/interfaces/purchase.request';
+import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
 
 @Component({
   selector: 'app-purchase-order-create-fragment',
@@ -26,6 +27,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   private readonly purchaseService = inject(PurchaseApiService);
   private readonly productService = inject(ProductApiService);
   private readonly toastService = inject(ToastService);
+  private readonly purchaseOrderState = inject(PurchaseOrderStateService);
 
   loading = signal(false);
 
@@ -36,16 +38,15 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   purchaseDetails = signal<PurchaseDetailForm[]>([]);
 
   ngOnInit(): void {
-    const navigation = this.router.getCurrentNavigation();
+    const missingProducts = this.purchaseOrderState.missingProducts();
 
-    const state = navigation?.extras?.state;
-
-    if (state?.['missingProducts']) {
-      this.missingProducts.set(state['missingProducts']);
+    if (missingProducts.length > 0) {
+      this.missingProducts.set(missingProducts);
 
       this.buildDraft();
     }
   }
+
   constructor() {
     this.productService.listByStatus().subscribe((products) => {
       this.productState.setProducts(products);
@@ -54,7 +55,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
 
   buildDraft(): void {
     this.purchaseDetails.set(
-      this.missingProducts().map((product) => ({
+      this.purchaseOrderState.missingProducts().map((product) => ({
         productId: product.productId,
         productName: product.productName,
         quantity: product.quantityNeeded,

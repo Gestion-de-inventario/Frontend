@@ -11,6 +11,8 @@ import { DishMenuResponse } from '@features/menu-report/interfaces/menu-report.r
 import { MenuReportProductsFragmentComponent } from '../menu-report-products-fragment/menu-report-products-fragment.component';
 import { Router } from '@angular/router';
 import { MissingProductsResponse } from '@features/purchase-order/interfaces/missing-products.response';
+import { finalize } from 'rxjs/internal/operators/finalize';
+import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
 
 declare const bootstrap: any;
 
@@ -36,6 +38,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
+  private readonly purchaseOrderState = inject(PurchaseOrderStateService);
 
   missingProducts = signal<MissingProductsResponse[]>([]);
 
@@ -107,6 +110,12 @@ export class MenuReportCreateFragmentComponent implements OnInit {
         quantityPrepared: this.quantityPrepared()!,
         cooks: this.selectedCooks().map((c) => c.user_id),
       })
+      .pipe(
+        finalize(() => {
+          this.creating.set(false);
+          this.loading.set(false);
+        }),
+      )
       .subscribe({
         next: () => {
           this.toastService.show('Reporte creado', 'success');
@@ -114,8 +123,9 @@ export class MenuReportCreateFragmentComponent implements OnInit {
           this.creating.set(false);
         },
         error: (err) => {
-          if (err.status === 409 && err.error?.faltantes) {
-            this.openMissingStockModal(err.error.faltantes);
+          if (err.status === 409 && err.error?.required) {
+            console.log('Faltantes detectados al crear el reporte:', err.error.required);
+            this.openMissingStockModal(err.error.required);
 
             return;
           }
@@ -134,11 +144,14 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
 
   goToCreatePurchase(): void {
-    this.router.navigate(['/purchase-order'], {
-      state: {
-        missingProducts: this.missingProducts(),
-      },
-    });
+    const modalElement = document.getElementById('missingStockModal');
+
+    const modal = bootstrap.Modal.getInstance(modalElement);
+
+    modal?.hide();
+    this.purchaseOrderState.setMissingProducts(this.missingProducts());
+
+    this.router.navigate(['/purchase-order']);
   }
   // Helpers de cocineras
   addCook(cook: UserResponse) {
@@ -162,5 +175,14 @@ export class MenuReportCreateFragmentComponent implements OnInit {
           (`${c.name} ${c.lastname}`.toLowerCase().includes(term) || c.dni.includes(term)),
       )
       .slice(0, 5);
+  });
+
+  readonly canCreateReport = computed(() => {
+    if (this.creating()) return false;
+    if (!this.selectedDishMenuId()) return false;
+    if (!this.quantityPrepared() || this.quantityPrepared()! <= 0) return false;
+    if (this.selectedCooks().length === 0) return false;
+
+    return true;
   });
 }
