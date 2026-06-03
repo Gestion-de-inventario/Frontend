@@ -57,6 +57,7 @@ export class ListPurchaseFragmentComponent {
   }
 
   loadPurchases(): void {
+    this.loading.set(true);
     this.purchaseService
       .list(
         this.page(),
@@ -102,7 +103,6 @@ export class ListPurchaseFragmentComponent {
 
   previousPage(): void {
     if (this.page() > 0) {
-      this.loading.set(true);
       this.page.update((v) => v - 1);
       this.loadPurchases();
     }
@@ -113,7 +113,6 @@ export class ListPurchaseFragmentComponent {
   }
 
   changePageSize(size: number): void {
-    this.loading.set(true);
     this.pageSize.set(size);
 
     this.page.set(0);

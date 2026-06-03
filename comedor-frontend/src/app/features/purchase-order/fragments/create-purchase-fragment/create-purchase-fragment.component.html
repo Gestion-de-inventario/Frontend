@@ -1,112 +1,177 @@
 @if (!canCreate) {
   <div class="alert alert-danger">No tienes permiso para crear órdenes de compra.</div>
 } @else {
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-white">
-      <h5 class="mb-0">Orden de compra</h5>
-    </div>
+  @if (purchaseCreated()) {
+    <div class="card shadow-sm border-0">
+      <div class="card-body text-center py-5">
+        <h4 class="text-success mb-3">Orden de compra creada correctamente</h4>
 
-    <div class="card-body">
-      @if (purchaseDetails().length === 0) {
-        <div class="alert alert-info">No hay productos agregados.</div>
-      }
+        <p class="text-muted">
+          La orden #{{ createdPurchaseId() }}
+          fue registrada exitosamente.
+        </p>
 
-      @for (detail of purchaseDetails(); track $index) {
-        <div class="row g-2 mb-3 align-items-end">
-          @if (!detail.productId) {
-            <input
-              class="form-control"
-              placeholder="Buscar producto..."
-              [ngModel]="detail.search"
-              (ngModelChange)="updateSearch($index, $event)"
-            />
-
-            @if (detail.search.length > 0) {
-              <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000">
-                @for (product of filteredProducts(detail.search); track product.id) {
-                  <button
-                    type="button"
-                    class="list-group-item list-group-item-action"
-                    (click)="selectProduct($index, product)"
-                  >
-                    {{ product.name }}
-                  </button>
-                }
-              </div>
-            }
-          }
-
-          @if (detail.productId) {
-            <div class="form-control bg-light d-flex justify-content-between align-items-center">
-              <span>
-                {{ detail.productName }}
-              </span>
-
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-secondary"
-                (click)="clearProduct($index)"
-              >
-                Cambiar
-              </button>
-            </div>
-          }
-
-          <div class="col-md-3">
-            <label class="form-label"> Cantidad </label>
-
-            <input
-              type="number"
-              class="form-control"
-              [ngModel]="detail.quantity"
-              (ngModelChange)="updateQuantity($index, $event)"
-            />
+        <div class="container mt-4">
+          <div class="row mt-4">
+            <button class="btn btn-primary" (click)="goToMenuReport()">Volver a crear menú</button>
           </div>
-
-          <div class="col-md-3">
-            <label class="form-label"> Precio unitario </label>
-
-            <input
-              type="number"
-              class="form-control"
-              [ngModel]="detail.unitPrice"
-              (ngModelChange)="updatePrice($index, $event)"
-            />
+          <div class="row mt-4">
+            <button class="btn btn-success" (click)="createAnotherPurchase()">
+              Crear otra orden
+            </button>
           </div>
-
-          <div class="col-md-2">
-            <button class="btn btn-outline-danger w-100" (click)="removeDetail($index)">
-              Eliminar
+          <div class="row mt-4">
+            <button class="btn btn-outline-secondary" (click)="goBackToList()">
+              Volver a la lista
             </button>
           </div>
         </div>
-      }
+      </div>
+    </div>
+  } @else {
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white row">
+        <div class="col-2">
+          <button class="btn btn-outline-secondary" (click)="goBackToList()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-left-icon lucide-arrow-left"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+          </button>
+        </div>
+        <div class="col-6">
+          <h5 class="mb-0">Orden de compra</h5>
+        </div>
+      </div>
 
-      <div class="d-flex gap-2">
+      <div class="card-body">
+        @if (purchaseDetails().length === 0) {
+          <div class="alert alert-info">No hay productos agregados.</div>
+        }
+
+        @for (detail of purchaseDetails(); track $index; let detailIndex = $index) {
+          <div class="row g-2 mb-3 align-items-end">
+            <div class="col-md-4 position-relative overflow-visible">
+              @if (!detail.productId) {
+                <input
+                  class="form-control"
+                  placeholder="Buscar producto..."
+                  [ngModel]="detail.search"
+                  (focus)="openDropdown.set($index)"
+                  (click)="$event.stopPropagation()"
+                  (ngModelChange)="updateSearch($index, $event)"
+                />
+
+                @if (openDropdown() === $index) {
+                  <div
+                    class="list-group position-absolute w-100 shadow-sm border rounded"
+                    style="
+                      z-index: 9999;
+                      max-height: 220px;
+                      overflow-y: auto;
+                      background: white;
+                      overflow: visible;
+                    "
+                    (click)="$event.stopPropagation()"
+                  >
+                    @for (product of filteredProducts(detail.search); track product.id) {
+                      <div
+                        class="list-group-item list-group-item-action"
+                        (mousedown)="selectProduct(detailIndex, product)"
+                      >
+                        {{ product.name }}
+                        ({{ product.unit }})
+                      </div>
+                    }
+                  </div>
+                }
+              }
+
+              @if (detail.productId) {
+                <div
+                  class="form-control bg-light d-flex justify-content-between align-items-center"
+                >
+                  <span>
+                    {{ detail.productName }}
+                    ({{ detail.productUnit }})
+                  </span>
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    (click)="clearProduct($index)"
+                  >
+                    Cambiar
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="col-md-3">
+              <label class="form-label"> Cantidad </label>
+
+              <input
+                type="number"
+                class="form-control"
+                [ngModel]="detail.quantity"
+                (ngModelChange)="updateQuantity($index, $event)"
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label"> Precio unitario </label>
+
+              <input
+                type="number"
+                class="form-control"
+                [ngModel]="detail.unitPrice"
+                (ngModelChange)="updatePrice($index, $event)"
+              />
+            </div>
+
+            <div class="col-md-2">
+              <button class="btn btn-outline-danger w-100" (click)="removeDetail($index)">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        }
         @if (hasDuplicateProducts()) {
-          <div class="alert alert-warning mt-3 mb-0">
+          <div class="alert alert-warning mt-3 mb-3">
             Existen productos repetidos en la orden de compra.
           </div>
         }
-        <button class="btn btn-outline-primary" (click)="addEmptyRow()">Agregar producto</button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary" (click)="addEmptyRow()">Agregar producto</button>
 
-        <button
-          class="btn btn-success"
-          (click)="createPurchase()"
-          [disabled]="
-            loading() ||
-            purchaseDetails().length === 0 ||
-            hasDuplicateProducts() ||
-            purchaseDetails().some((d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0)
-          "
-        >
-          @if (loading()) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-          }
+          <button
+            class="btn btn-success"
+            (click)="createPurchase()"
+            [disabled]="
+              loading() ||
+              purchaseDetails().length === 0 ||
+              hasDuplicateProducts() ||
+              purchaseDetails().some((d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0)
+            "
+          >
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
 
-          Crear orden de compra
-        </button>
+            Crear orden de compra
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 }
