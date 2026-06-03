@@ -20,6 +20,8 @@ export class CategoryListFragmentComponent {
   search = signal('');
   onlyActive = signal(false);
 
+  loading = signal<boolean>(true);
+
   readonly categories = this.categoryState.categories;
 
   readonly filteredCategories = computed(() => {
@@ -39,8 +41,17 @@ export class CategoryListFragmentComponent {
   }
 
   loadCategories(): void {
-    this.categoryService.listByStatus().subscribe((list) => {
-      this.categoryState.setCategories(list);
+    this.loading.set(true);
+
+    this.categoryService.listByStatus().subscribe({
+      next: (list) => {
+        this.categoryState.setCategories(list);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando categorías', err);
+        this.loading.set(false);
+      }
     });
   }
 
