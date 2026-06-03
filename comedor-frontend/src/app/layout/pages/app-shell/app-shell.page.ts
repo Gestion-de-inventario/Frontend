@@ -8,6 +8,8 @@ import { NavbarComponent } from '@layout/components/navbar/navbar.component';
 
 import { ToastComponent } from '@shared/components/toast/toast.component';
 
+import { PasswordChangeModalComponent } from '@layout/components/password-change-modal/password-change-modal';
+
 declare const bootstrap: any;
 
 @Component({
@@ -15,7 +17,7 @@ declare const bootstrap: any;
 
   standalone: true,
 
-  imports: [RouterOutlet, SidebarComponent, NavbarComponent, ToastComponent],
+  imports: [RouterOutlet, SidebarComponent, NavbarComponent, ToastComponent, PasswordChangeModalComponent],
 
   templateUrl: './app-shell.page.html',
 
