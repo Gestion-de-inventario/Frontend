@@ -24,6 +24,8 @@ export class BeneficiaryListFragmentComponent {
   currentPage = signal(1);
   readonly pageSize = 10;
 
+  loading = signal<boolean>(true);
+
   readonly beneficiaries = this.beneficiaryState.beneficiaries;
 
   readonly filteredBeneficiaries = computed(() => {
@@ -42,7 +44,6 @@ export class BeneficiaryListFragmentComponent {
       );
     });
 
-    // orden alfabético por nombre
     list = [...list].sort((a, b) =>
       `${a.name} ${a.lastname}`.localeCompare(`${b.name} ${b.lastname}`)
     );
@@ -68,9 +69,18 @@ export class BeneficiaryListFragmentComponent {
   }
 
   loadBeneficiaries(): void {
-    this.beneficiaryService.listByStatus().subscribe((list) => {
-      this.beneficiaryState.setBeneficiaries(list);
-      this.currentPage.set(1);
+    this.loading.set(true);
+
+    this.beneficiaryService.listByStatus().subscribe({
+      next: (list) => {
+        this.beneficiaryState.setBeneficiaries(list);
+        this.currentPage.set(1);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando beneficiarios', err);
+        this.loading.set(false);
+      }
     });
   }
 

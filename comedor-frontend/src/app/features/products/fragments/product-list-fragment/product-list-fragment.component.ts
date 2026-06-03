@@ -24,6 +24,8 @@ export class ProductListFragmentComponent {
   currentPage = signal(1);
   readonly pageSize = 10;
 
+  loading = signal<boolean>(true);
+
   readonly products = this.productState.products;
 
   readonly filteredProducts = computed(() => {
@@ -42,7 +44,6 @@ export class ProductListFragmentComponent {
       );
     });
 
-    // orden alfabético por nombre
     products = [...products].sort((a, b) => a.name.localeCompare(b.name));
 
     return products;
@@ -66,9 +67,18 @@ export class ProductListFragmentComponent {
   }
 
   loadProducts(): void {
-    this.productService.listByStatus().subscribe((products) => {
-      this.productState.setProducts(products);
-      this.currentPage.set(1);
+    this.loading.set(true);
+
+    this.productService.listByStatus().subscribe({
+      next: (products) => {
+        this.productState.setProducts(products);
+        this.currentPage.set(1);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando productos', err);
+        this.loading.set(false);
+      }
     });
   }
 
