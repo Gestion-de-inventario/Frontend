@@ -1,0 +1,224 @@
+@if (!canList) {
+  <div class="alert alert-danger">No tienes permiso para listar órdenes de compra.</div>
+} @else {
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Órdenes de compra</h5>
+
+        @if (canCreate) {
+          <button class="btn btn-primary" (click)="goToCreate()">Nueva orden</button>
+        }
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label class="form-label"> Fecha inicio </label>
+
+          <input
+            type="date"
+            class="form-control"
+            [ngModel]="startDate()"
+            (ngModelChange)="startDate.set($event)"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label"> Fecha fin </label>
+
+          <input
+            type="date"
+            class="form-control"
+            [ngModel]="endDate()"
+            (ngModelChange)="endDate.set($event)"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label"> Estado </label>
+
+          <select class="form-select" [ngModel]="status()" (ngModelChange)="status.set($event)">
+            <option value="">Todos</option>
+
+            <option value="PENDIENTE">Pendiente</option>
+
+            <option value="RECIBIDO">Recibido</option>
+          </select>
+        </div>
+        <div class="col-md-2 mb-4">
+          <label class="form-label"> Mostrar </label>
+
+          <select
+            class="form-select"
+            [ngModel]="pageSize()"
+            (ngModelChange)="changePageSize($event)"
+          >
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+            <option [ngValue]="100">100</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 mb-4">
+        <button
+          class="btn btn-outline-primary align-items-center gap-2"
+          (click)="search()"
+          [disabled]="loading()"
+        >
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <p class="mb-0">Buscando...</p>
+          } @else {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-search"
+            >
+              <path d="m21 21-4.34-4.34" />
+              <circle cx="11" cy="11" r="8" />
+            </svg>
+            Buscar
+          }
+        </button>
+
+        <button
+          class="btn btn-outline-secondary d-flex align-items-center gap-2"
+          [disabled]="loading()"
+          (click)="clearFilters()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 2v6h6" />
+            <path d="M21 12A9 9 0 0 0 6 5.3L3 8" />
+            <path d="M21 22v-6h-6" />
+            <path d="M3 12a9 9 0 0 0 15 6.7L21 16" />
+          </svg>
+          Limpiar filtros
+        </button>
+      </div>
+
+      @if (loading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border"></div>
+
+          <div class="mt-2">Cargando órdenes de compra...</div>
+        </div>
+      } @else if (purchases().length === 0) {
+        <div class="alert alert-info text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-search"
+          >
+            <path d="m21 21-4.34-4.34" />
+            <circle cx="11" cy="11" r="8" />
+          </svg>
+          No se encontraron órdenes de compra.
+        </div>
+      } @else {
+        <div class="text-muted mb-3">
+          Total de órdenes:
+          <strong>{{ totalElements() }}</strong>
+        </div>
+
+        <div class="row g-3 mb-4"></div>
+
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+
+              <th>Fecha</th>
+
+              <th>Estado</th>
+
+              <th>Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (purchase of purchases(); track purchase.id) {
+              <tr style="cursor: pointer">
+                <td>
+                  {{ purchase.id }}
+                </td>
+
+                <td>
+                  {{ purchase.purchaseDate }}
+                </td>
+
+                <td>
+                  <span
+                    class="badge"
+                    [class.bg-warning]="purchase.status === 'PENDIENTE'"
+                    [class.bg-success]="purchase.status === 'RECIBIDO'"
+                  >
+                    {{ purchase.status }}
+                  </span>
+                </td>
+
+                <td>
+                  S/.
+                  {{ purchase.totalSpent }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <button
+            class="btn btn-outline-secondary"
+            [disabled]="page() === 0"
+            (click)="previousPage()"
+          >
+            Anterior
+          </button>
+
+          <span>
+            Página
+            {{ page() + 1 }}
+            de
+            {{ totalPages() }}
+          </span>
+
+          <button
+            class="btn btn-outline-secondary"
+            [disabled]="page() + 1 >= totalPages()"
+            (click)="nextPage()"
+          >
+            Siguiente
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}

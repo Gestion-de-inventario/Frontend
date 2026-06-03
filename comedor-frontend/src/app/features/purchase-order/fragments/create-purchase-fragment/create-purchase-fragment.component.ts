@@ -15,6 +15,7 @@ import { ToastService } from '@shared/services/toast.service';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { CreatePurchaseRequest } from '@features/purchase-order/interfaces/purchase.request';
 import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
+import { AuthStateService } from '@core/auth/services/auth-state.service';
 
 @Component({
   selector: 'app-purchase-order-create-fragment',
@@ -36,6 +37,10 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   products = this.productState.products;
 
   purchaseDetails = signal<PurchaseDetailForm[]>([]);
+
+  readonly authState = inject(AuthStateService);
+
+  canCreate = this.authState.hasPermission('PURCHASE_CREATE');
 
   ngOnInit(): void {
     const missingProducts = this.purchaseOrderState.missingProducts();

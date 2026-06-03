@@ -151,7 +151,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     modal?.hide();
     this.purchaseOrderState.setMissingProducts(this.missingProducts());
 
-    this.router.navigate(['/purchase-order']);
+    this.router.navigate(['/purchase-order/create']);
   }
   // Helpers de cocineras
   addCook(cook: UserResponse) {

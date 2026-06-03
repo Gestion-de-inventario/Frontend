@@ -132,11 +132,29 @@ export const routes: Routes = [
 
       {
         path: 'purchase-order',
-        title: 'Ordenes de compra',
+        title: 'Órdenes de compra',
         loadComponent: () =>
           import('@features/purchase-order/pages/purchase-order-principal/purchase-orden').then(
             (m) => m.PurchaseOrden,
           ),
+
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('@features/purchase-order/fragments/list-purchase-fragment/list-purchase-fragment.component').then(
+                (m) => m.ListPurchaseFragmentComponent,
+              ),
+          },
+
+          {
+            path: 'create',
+            loadComponent: () =>
+              import('@features/purchase-order/fragments/create-purchase-fragment/create-purchase-fragment.component').then(
+                (m) => m.PurchaseOrderCreateFragmentComponent,
+              ),
+          },
+        ],
       },
     ],
   },
