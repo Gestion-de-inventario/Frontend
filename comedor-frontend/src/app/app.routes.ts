@@ -114,7 +114,7 @@ export const routes: Routes = [
 
       {
         path: 'beneficiaries-control',
-        title: 'Control de recojo de menús',
+        title: 'Control de Salida',
         loadComponent: () =>
           import('@features/beneficiaries-control/pages/beneficiary-control/beneficiary-control').then(
             (m) => m.BeneficiaryControl,

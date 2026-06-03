@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
@@ -32,14 +32,14 @@ export class RoleListFragmentComponent {
 
   readonly roles = computed(() => this.roleState.filteredRoles());
 
-  loading = false;
+  loading = signal(false);
 
   constructor() {
     this.loadRoles();
   }
 
   loadRoles(): void {
-    this.loading = true;
+    this.loading.set(true);
 
     this.roleService.listRolesByStatus('ACTIVO').subscribe({
       next: (roles) => {
@@ -47,7 +47,7 @@ export class RoleListFragmentComponent {
       },
 
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }
