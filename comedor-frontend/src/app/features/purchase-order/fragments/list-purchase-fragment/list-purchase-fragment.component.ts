@@ -6,6 +6,7 @@ import { PurchaseApiService } from '../../services/purchase-api.service';
 import { PurchaseResponse } from '../../interfaces/purchase.response';
 import { Router } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
+import { ToastService } from '@shared/services/toast.service';
 
 @Component({
   selector: 'app-list-purchase-fragment',
@@ -19,10 +20,17 @@ export class ListPurchaseFragmentComponent {
 
   readonly authState = inject(AuthStateService);
 
+  readonly toastService = inject(ToastService);
+
   canList = this.authState.hasPermission('PURCHASE_LIST_ALL');
   canCreate = this.authState.hasPermission('PURCHASE_CREATE');
+  canChangeStatus = this.authState.hasPermission('PURCHASE_CHANGE_STATUS');
 
   purchases = signal<PurchaseResponse[]>([]);
+
+  selectedPurchase = signal<PurchaseResponse | null>(null);
+
+  changeStatusLoading = signal(false);
 
   loading = signal(false);
 
@@ -84,6 +92,34 @@ export class ListPurchaseFragmentComponent {
           this.purchases.set([]);
         },
       });
+  }
+
+  openDetail(purchase: PurchaseResponse): void {
+    this.selectedPurchase.set(purchase);
+  }
+
+  confirmPurchase(id: number): void {
+    this.changeStatusLoading.set(true);
+
+    this.purchaseService.confirmPurchase(id).subscribe({
+      next: (updatedPurchase) => {
+        this.selectedPurchase.set(updatedPurchase);
+
+        this.purchases.update((purchases) =>
+          purchases.map((p) => (p.id === updatedPurchase.id ? updatedPurchase : p)),
+        );
+
+        this.toastService.show('Orden marcada como recibida', 'success');
+      },
+
+      error: (error) => {
+        this.toastService.show(error.error.message, 'danger');
+      },
+
+      complete: () => {
+        this.changeStatusLoading.set(false);
+      },
+    });
   }
 
   search(): void {

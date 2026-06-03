@@ -166,7 +166,12 @@
 
           <tbody>
             @for (purchase of purchases(); track purchase.id) {
-              <tr style="cursor: pointer">
+              <tr
+                style="cursor: pointer"
+                (click)="openDetail(purchase)"
+                data-bs-toggle="modal"
+                data-bs-target="#purchaseDetailModal"
+              >
                 <td>
                   {{ purchase.id }}
                 </td>
@@ -219,6 +224,96 @@
           </button>
         </div>
       }
+    </div>
+  </div>
+
+  <div class="modal fade" id="purchaseDetailModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        @if (selectedPurchase(); as purchase) {
+          <div class="modal-header">
+            <h5 class="modal-title">Orden #{{ purchase.id }}</h5>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <strong>ID</strong>
+                <div>{{ purchase.id }}</div>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Fecha</strong>
+                <div>{{ purchase.purchaseDate }}</div>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Estado</strong>
+
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-warning text-dark': purchase.status === 'PENDING',
+                    'bg-success': purchase.status === 'CONFIRMED',
+                  }"
+                >
+                  {{ purchase.status === 'PENDING' ? 'Pendiente' : 'Recibido' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col">
+                <strong>Total gastado:</strong>
+                S/ {{ purchase.totalSpent }}
+              </div>
+            </div>
+
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>P. Unit.</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (detail of purchase.details; track detail.productId) {
+                  <tr>
+                    <td>{{ detail.productName }}</td>
+                    <td>{{ detail.quantity }} {{ detail.productUnit }}</td>
+                    <td>S/ {{ detail.unitPrice }}</td>
+                    <td>S/ {{ detail.subTotal }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="modal-footer">
+            @if (changeStatusLoading()) {
+              <button class="btn btn-success" disabled>
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Procesando...
+              </button>
+            } @else if (purchase.status !== 'RECIBIDO' && canChangeStatus) {
+              <button
+                class="btn btn-success"
+                (click)="confirmPurchase(purchase.id)"
+                [disabled]="changeStatusLoading()"
+              >
+                Marcar como recibido
+              </button>
+            }
+
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        }
+      </div>
     </div>
   </div>
 }

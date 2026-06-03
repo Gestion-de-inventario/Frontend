@@ -82,4 +82,8 @@ export const API_ENDPOINTS = {
   ALERT: {
     STOCK_MIN: '/alerts/stock-min',
   },
+
+  PURCHASE: {
+    CHANGE_STATUS: '/{id}/confirm',
+  },
 };
