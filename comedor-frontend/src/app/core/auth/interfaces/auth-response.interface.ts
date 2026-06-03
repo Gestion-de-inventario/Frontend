@@ -10,4 +10,6 @@ export interface AuthResponse {
   role: string;
 
   token: string;
+
+  passwordChanged: boolean;
 }
