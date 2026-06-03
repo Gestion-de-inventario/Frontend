@@ -33,6 +33,8 @@ export class UserListFragmentComponent {
 
   onlyActive = signal(false);
 
+  loading = signal<boolean>(true);
+
   readonly users = this.userState.users;
 
   readonly filteredUsers = computed(() => {
@@ -58,8 +60,18 @@ export class UserListFragmentComponent {
   }
 
   loadUsers(): void {
-    this.userService.listUsers().subscribe((users) => {
-      this.userState.setUsers(users);
+
+    this.loading.set(true);                   
+
+    this.userService.listUsers().subscribe({
+      next: (users) => {
+        this.userState.setUsers(users);
+        this.loading.set(false);               
+      },
+      error: (err) => {
+        console.error('Error cargando usuarios', err);
+        this.loading.set(false);
+      }
     });
   }
 

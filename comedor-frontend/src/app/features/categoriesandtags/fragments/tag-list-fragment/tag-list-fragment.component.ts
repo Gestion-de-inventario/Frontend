@@ -20,6 +20,8 @@ export class TagListFragmentComponent {
   search = signal('');
   onlyActive = signal(false);
 
+  loading = signal<boolean>(true);
+
   readonly tags = this.tagState.tags;
 
   readonly filteredTags = computed(() => {
@@ -39,8 +41,17 @@ export class TagListFragmentComponent {
   }
 
   loadTags(): void {
-    this.tagService.listByStatus().subscribe((list) => {
-      this.tagState.setTags(list);
+    this.loading.set(true);
+
+    this.tagService.listByStatus().subscribe({
+      next: (list) => {
+        this.tagState.setTags(list);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargando etiquetas', err)
+        this.loading.set(false)
+      }
     });
   }
 
