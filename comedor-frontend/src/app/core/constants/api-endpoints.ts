@@ -56,9 +56,10 @@ export const API_ENDPOINTS = {
     LIST_ALL: '/user/all',
     LIST_ACTIVE: '/user/actived',
     CREATE: '/user/register',
-    EDIT: '/user/edit/{id}', // COINCIDE CON @PostMapping("/edit/{id}")
-    ACTIVATE: '/user/activate/{id}', // COINCIDE CON @PostMapping("activate/{id}")
-    DEACTIVATE: '/user/deactivate/{id}', // COINCIDE CON @PostMapping("deactivate/{id}")
+    EDIT: '/user/edit/{id}',
+    ACTIVATE: '/user/activate/{id}',
+    DEACTIVATE: '/user/deactivate/{id}',
+    CHANGE_PASSWORD: '/user/change-password/{id}',
   },
 
   ROLE: {
