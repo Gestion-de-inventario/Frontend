@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -15,6 +15,7 @@ import { UserService } from '@features/users/services/user-api.service';
 import { RoleService } from '@features/roles_permissions/services/role-api.service';
 
 import { MinRoleResponse } from '@features/roles_permissions/interfaces/min.role.response';
+import { finalize } from 'rxjs/internal/operators/finalize';
 
 @Component({
   selector: 'app-user-detail-modal',
@@ -41,9 +42,9 @@ export class UserDetailModalComponent {
 
   readonly user = computed(() => this.userState.selectedUser());
 
-  mode: 'view' | 'edit' = 'view';
+  mode: 'view' | 'edit' | 'change-password' = 'view';
 
-  loading = false;
+  loading = signal(false);
 
   constructor() {
     this.roleService.listMinRolesByStatus('ACTIVO').subscribe((roles) => {
@@ -66,14 +67,16 @@ export class UserDetailModalComponent {
       nonNullable: true,
       validators: [Validators.required],
     }),
-
-    password: new FormControl('', {
-      nonNullable: true,
-    }),
-
     role_id: new FormControl(0, {
       nonNullable: true,
       validators: [Validators.required],
+    }),
+  });
+
+  readonly passwordForm = new FormGroup({
+    newPassword: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(8)],
     }),
   });
 
@@ -97,6 +100,49 @@ export class UserDetailModalComponent {
     this.mode = 'edit';
   }
 
+  openForceChangePassword(): void {
+    const user = this.user();
+
+    if (!user) {
+      return;
+    }
+
+    this.passwordForm.reset();
+
+    this.mode = 'change-password';
+  }
+
+  savePassword(): void {
+    const user = this.user();
+
+    if (!user || this.passwordForm.invalid || this.loading()) {
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.userService
+      .changePasswordUser(user.user_id, {
+        newPassword: this.passwordForm.controls.newPassword.value,
+      })
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.toastService.show('Contraseña actualizada correctamente', 'success');
+          this.mode = 'view';
+        },
+
+        error: (error) => {
+          this.toastService.show('No se pudo actualizar: ' + error.error.message, 'danger');
+        },
+      });
+  }
+
   goBack(): void {
     this.mode = 'view';
   }
@@ -104,11 +150,11 @@ export class UserDetailModalComponent {
   save(): void {
     const user = this.user();
 
-    if (!user || this.form.invalid || this.loading) {
+    if (!user || this.form.invalid || this.loading()) {
       return;
     }
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.userService
       .editUser(user.user_id, {
@@ -128,7 +174,7 @@ export class UserDetailModalComponent {
         },
 
         complete: () => {
-          this.loading = false;
+          this.loading.set(false);
         },
       });
   }
@@ -136,7 +182,7 @@ export class UserDetailModalComponent {
   activate(): void {
     const user = this.user();
 
-    if (!user || this.loading) {
+    if (!user || this.loading()) {
       return;
     }
 
@@ -146,7 +192,7 @@ export class UserDetailModalComponent {
       return;
     }
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.userService.activateUser(user.user_id).subscribe({
       next: (updatedUser) => {
@@ -159,7 +205,7 @@ export class UserDetailModalComponent {
         this.toastService.show('No se pudo activar: ' + error.error.message, 'danger');
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }
@@ -177,7 +223,7 @@ export class UserDetailModalComponent {
       return;
     }
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.userService.deactivateUser(user.user_id).subscribe({
       next: (updatedUser) => {
@@ -190,7 +236,7 @@ export class UserDetailModalComponent {
         this.toastService.show('No se pudo desactivar: ' + error.error.message, 'danger');
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

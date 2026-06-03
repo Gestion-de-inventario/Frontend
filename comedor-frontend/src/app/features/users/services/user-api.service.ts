@@ -8,6 +8,7 @@ import { UserRequest } from '../interfaces/user.request';
 import { buildEndpoint } from '@shared/utils/api.utils';
 import { EditProfileRequest } from '@features/profile/interfaces/edit-profile.request';
 import { ChangePasswordRequest } from '@features/profile/interfaces/change-password.request';
+import { ForceChangePasswordRequest } from '../interfaces/force.change.password.request';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +32,12 @@ export class UserService {
 
   editUser(id: number, request: UserRequest) {
     const endpoint = buildEndpoint(API_ENDPOINTS.USER.EDIT, { id });
-    return this.http.post<UserResponse>(`${this.apiUrl}${endpoint}`, request);
+    return this.http.put<UserResponse>(`${this.apiUrl}${endpoint}`, request);
+  }
+
+  changePasswordUser(id: number, request: ForceChangePasswordRequest) {
+    const endpoint = buildEndpoint(API_ENDPOINTS.USER.CHANGE_PASSWORD, { id });
+    return this.http.put<{ mensaje: string }>(`${this.apiUrl}${endpoint}`, request);
   }
 
   deactivateUser(id: number) {
@@ -43,7 +49,6 @@ export class UserService {
     const endpoint = buildEndpoint(API_ENDPOINTS.USER.ACTIVATE, { id });
     return this.http.post<UserResponse>(`${this.apiUrl}${endpoint}`, {});
   }
-
 
   editMyProfile(request: EditProfileRequest) {
     return this.http.put<UserResponse>(`${this.apiUrl}/user/me/edit`, request);

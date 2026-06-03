@@ -1,14 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
-import { PurchaseOrderCreateFragmentComponent } from '@features/purchase-order/fragments/create-purchase-fragment/create-purchase-fragment.component';
-
+import { inject } from '@angular/core';
 @Component({
   selector: 'app-purchase-orden',
-  imports: [PurchaseOrderCreateFragmentComponent],
+  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './purchase-orden.html',
-  styleUrl: './purchase-orden.scss',
 })
 export class PurchaseOrden {
   readonly authState = inject(AuthStateService);
-  canCreatePurchase = this.authState.hasPermission('PURCHASE_CREATE');
+
+  canAccess =
+    this.authState.hasPermission('PURCHASE_LIST_ALL') ||
+    this.authState.hasPermission('PURCHASE_CREATE');
 }

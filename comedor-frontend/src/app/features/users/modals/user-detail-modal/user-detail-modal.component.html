@@ -1,34 +1,95 @@
 <div class="modal fade" id="userDetailModal" tabindex="-1" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-
       <div class="modal-header bg-light border-bottom-0 pb-0 pt-4 px-4 px-md-5">
         <div class="d-flex align-items-center gap-3">
           @if (mode === 'edit') {
-            <button class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0" style="width:32px; height:32px;" (click)="goBack()">
-              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+            <button
+              class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0"
+              style="width: 32px; height: 32px"
+              (click)="goBack()"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+              </svg>
             </button>
           }
-          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          @if (mode === 'change-password') {
+            <button
+              class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center p-0"
+              style="width: 32px; height: 32px"
+              (click)="goBack()"
+            >
+              <svg
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+          }
+          <div
+            class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+            style="width: 44px; height: 44px"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+              ></path>
+            </svg>
           </div>
           <h4 class="modal-title fw-bold text-dark">
-            @if (mode === 'view') { Ficha del Usuario } @else { Editar Usuario }
+            @if (mode === 'view') {
+              Ficha del Usuario
+            } @else if (mode === 'edit') {
+              Editar Usuario
+            } @else if (mode === 'change-password') {
+              Cambiar Contraseña
+            }
           </h4>
         </div>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" (click)="close()"></button>
+        <button
+          type="button"
+          class="btn-close shadow-none"
+          data-bs-dismiss="modal"
+          (click)="close()"
+        ></button>
       </div>
 
       <div class="modal-body px-4 px-md-5 py-4">
         @if (user(); as user) {
-
           @if (mode === 'view') {
             <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
               <div>
                 <h3 class="fw-bold text-dark mb-1">{{ user.name }} {{ user.lastname }}</h3>
                 <span class="text-muted small">@{{ user.dni }} · {{ user.role }}</span>
               </div>
-              <span class="badge rounded-pill px-3 py-2" [class]="user.status === 'INACTIVO' ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success'">
+              <span
+                class="badge rounded-pill px-3 py-2"
+                [class]="
+                  user.status === 'INACTIVO'
+                    ? 'bg-danger bg-opacity-10 text-danger'
+                    : 'bg-success bg-opacity-10 text-success'
+                "
+              >
                 {{ user.status }}
               </span>
             </div>
@@ -52,39 +113,51 @@
               </div>
               <div class="col-6 col-md-3">
                 <small class="text-muted d-block mb-1">Rol</small>
-                <span class="badge bg-primary bg-opacity-10 text-primary border fw-normal px-2 py-1">{{ user.role }}</span>
+                <span
+                  class="badge bg-primary bg-opacity-10 text-primary border fw-normal px-2 py-1"
+                  >{{ user.role }}</span
+                >
               </div>
             </div>
-
-          } @else {
+          } @else if (mode === 'edit') {
             <form [formGroup]="form" class="row g-4">
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold text-dark small">Nombre</label>
-                <input type="text" class="form-control custom-input" formControlName="name"
-                  [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid" />
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  formControlName="name"
+                  [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+                />
                 @if (form.controls.name.touched && form.controls.name.invalid) {
                   <small class="text-danger">Este campo es obligatorio</small>
                 }
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold text-dark small">Apellido</label>
-                <input type="text" class="form-control custom-input" formControlName="lastname"
-                  [class.is-invalid]="form.controls.lastname.touched && form.controls.lastname.invalid" />
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  formControlName="lastname"
+                  [class.is-invalid]="
+                    form.controls.lastname.touched && form.controls.lastname.invalid
+                  "
+                />
                 @if (form.controls.lastname.touched && form.controls.lastname.invalid) {
                   <small class="text-danger">Este campo es obligatorio</small>
                 }
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold text-dark small">DNI</label>
-                <input type="text" class="form-control custom-input" formControlName="dni"
-                  [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid" />
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  formControlName="dni"
+                  [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
+                />
                 @if (form.controls.dni.touched && form.controls.dni.invalid) {
                   <small class="text-danger">Este campo es obligatorio</small>
                 }
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label fw-semibold text-dark small">Password</label>
-                <input type="password" class="form-control custom-input" formControlName="password" />
               </div>
               <div class="col-12">
                 <label class="form-label fw-semibold text-dark small">Rol</label>
@@ -96,31 +169,125 @@
                 </select>
               </div>
             </form>
+          } @else if (mode === 'change-password') {
+            <form [formGroup]="passwordForm" class="row g-4">
+              <div class="col-12">
+                <label class="form-label fw-semibold text-dark small"> Nueva contraseña </label>
+
+                <input
+                  type="password"
+                  class="form-control custom-input"
+                  formControlName="newPassword"
+                  [class.is-invalid]="
+                    passwordForm.controls.newPassword.touched &&
+                    passwordForm.controls.newPassword.invalid
+                  "
+                />
+
+                @if (
+                  passwordForm.controls.newPassword.touched &&
+                  passwordForm.controls.newPassword.hasError('required')
+                ) {
+                  <small class="text-danger"> La contraseña es obligatoria </small>
+                }
+
+                @if (
+                  passwordForm.controls.newPassword.touched &&
+                  passwordForm.controls.newPassword.hasError('minlength')
+                ) {
+                  <small class="text-danger"> Debe tener al menos 8 caracteres </small>
+                }
+              </div>
+            </form>
           }
         }
       </div>
 
-      <div class="modal-footer bg-light border-top-0 px-4 px-md-5 py-3 d-flex justify-content-between align-items-center">
+      <div
+        class="modal-footer bg-light border-top-0 px-4 px-md-5 py-3 d-flex justify-content-between align-items-center"
+      >
         @if (mode === 'view') {
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2 row">
             @if (authState.hasPermission('USER_ACTIVATE')) {
-              <button class="btn btn-outline-success rounded-pill px-3 fw-medium" (click)="activate()" [disabled]="loading">Activar</button>
+              <div class="col">
+                <button
+                  class="btn btn-outline-success rounded-pill px-3 fw-medium"
+                  (click)="activate()"
+                  [disabled]="loading()"
+                >
+                  Activar
+                </button>
+              </div>
             }
             @if (authState.hasPermission('USER_DEACTIVATE')) {
-              <button class="btn btn-outline-danger rounded-pill px-3 fw-medium" (click)="deactivate()" [disabled]="loading">Desactivar</button>
+              <div class="col">
+                <button
+                  class="btn btn-outline-danger rounded-pill px-3 fw-medium"
+                  (click)="deactivate()"
+                  [disabled]="loading()"
+                >
+                  Desactivar
+                </button>
+              </div>
             }
           </div>
-          @if (authState.hasPermission('USER_EDIT')) {
-            <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="openEdit()">Editar Datos</button>
-          }
-        } @else {
-          <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-medium" (click)="goBack()">Cancelar</button>
-          <button class="btn btn-primary rounded-pill px-4 fw-medium" [disabled]="form.invalid || loading" (click)="save()">
-            @if (loading) { <span class="spinner-border spinner-border-sm"></span> Guardando... } @else { Guardar Cambios }
+          <div class="container">
+            @if (authState.hasPermission('USER_EDIT')) {
+              <div class="row mt-2">
+                <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="openEdit()">
+                  Editar Datos
+                </button>
+              </div>
+              <div class="row mt-2">
+                <button
+                  class="btn btn-primary rounded-pill px-4 fw-medium"
+                  (click)="openForceChangePassword()"
+                >
+                  Cambiar Contraseña
+                </button>
+              </div>
+            }
+          </div>
+        } @else if (mode === 'edit') {
+          <button
+            type="button"
+            class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
+            (click)="goBack()"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary rounded-pill px-4 fw-medium"
+            [disabled]="form.invalid || loading"
+            (click)="save()"
+          >
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm"></span> Guardando...
+            } @else {
+              Guardar Cambios
+            }
+          </button>
+        } @else if (mode === 'change-password') {
+          <button
+            type="button"
+            class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
+            (click)="goBack()"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary rounded-pill px-4 fw-medium"
+            [disabled]="passwordForm.invalid || loading()"
+            (click)="savePassword()"
+          >
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm"></span> Guardando...
+            } @else {
+              Guardar Nueva Contraseña
+            }
           </button>
         }
       </div>
-
     </div>
   </div>
 </div>

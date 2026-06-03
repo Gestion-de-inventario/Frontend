@@ -1,11 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
 import { MissingProductsResponse } from '@features/purchase-order/interfaces/missing-products.response';
 
-import { CreatePurchaseDetailRequest } from '../../interfaces/purchase-detail.request';
 import { ProductStateService } from '@features/products/services/product-state.service';
 import { PurchaseDetailForm } from '@features/purchase-order/interfaces/purchase-detail-form.request';
 import { ProductResponse } from '@features/products/interfaces/product.response';
@@ -15,6 +13,7 @@ import { ToastService } from '@shared/services/toast.service';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { CreatePurchaseRequest } from '@features/purchase-order/interfaces/purchase.request';
 import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
+import { AuthStateService } from '@core/auth/services/auth-state.service';
 
 @Component({
   selector: 'app-purchase-order-create-fragment',
@@ -36,6 +35,21 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   products = this.productState.products;
 
   purchaseDetails = signal<PurchaseDetailForm[]>([]);
+
+  readonly authState = inject(AuthStateService);
+
+  canCreate = this.authState.hasPermission('PURCHASE_CREATE');
+
+  purchaseCreated = signal(false);
+
+  createdPurchaseId = signal<number | null>(null);
+
+  openDropdown = signal<number | null>(null);
+
+  @HostListener('document:click')
+  closeDropdown(): void {
+    this.openDropdown.set(null);
+  }
 
   ngOnInit(): void {
     const missingProducts = this.purchaseOrderState.missingProducts();
@@ -59,6 +73,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
         productId: product.productId,
         productName: product.productName,
         quantity: product.quantityNeeded,
+        productUnit: product.productUnit,
         unitPrice: 0,
         search: '',
       })),
@@ -113,6 +128,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
       {
         productId: null,
         productName: '',
+        productUnit: '',
         quantity: 1,
         unitPrice: 0,
         search: '',
@@ -146,6 +162,9 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
         next: (purchase) => {
           console.log('Compra creada', purchase);
           this.toastService.show('Compra creada exitosamente');
+          this.createdPurchaseId.set(purchase.id);
+
+          this.purchaseCreated.set(true);
         },
         error: (error) => {
           console.error(error);
@@ -170,12 +189,15 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
               ...d,
               productId: product.id,
               productName: product.name,
+              productUnit: product.unit,
               search: '',
             }
           : d,
       ),
     );
+    this.openDropdown.set(null);
   }
+
   clearProduct(index: number): void {
     this.purchaseDetails.update((details) =>
       details.map((d, i) =>
@@ -184,17 +206,52 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
               ...d,
               productId: null,
               productName: '',
+              productUnit: '',
               search: '',
               unitPrice: 0,
             }
           : d,
       ),
     );
+
+    setTimeout(() => {
+      this.openDropdown.set(index);
+    });
   }
 
   filteredProducts(search: string) {
-    return this.products()
-      .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
-      .slice(0, 5);
+    const products = this.products();
+
+    if (!search?.trim()) {
+      return products.slice(0, 5);
+    }
+
+    return products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 5);
+  }
+
+  goToMenuReport(): void {
+    this.router.navigate(['/menu-report']);
+  }
+
+  goBackToList(): void {
+    this.router.navigate(['/purchase-order']);
+  }
+  createAnotherPurchase(): void {
+    this.purchaseCreated.set(false);
+
+    this.createdPurchaseId.set(null);
+
+    this.missingProducts.set([]);
+
+    this.purchaseDetails.set([
+      {
+        productId: null,
+        productName: '',
+        productUnit: '',
+        quantity: 1,
+        unitPrice: 0,
+        search: '',
+      },
+    ]);
   }
 }
