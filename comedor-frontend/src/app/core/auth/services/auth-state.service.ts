@@ -96,4 +96,9 @@ export class AuthStateService {
 
     this.initAuth().subscribe();
   }
+
+  updateSession(partial: Partial<AuthResponse>): void {
+    const current = this._session();
+    if (current) this._session.set({ ...current, ...partial });
+  }
 }

@@ -6,6 +6,8 @@ import { API_ENDPOINTS } from '@core/constants/api-endpoints';
 import { UserResponse } from '../interfaces/user.response';
 import { UserRequest } from '../interfaces/user.request';
 import { buildEndpoint } from '@shared/utils/api.utils';
+import { EditProfileRequest } from '@features/profile/interfaces/edit-profile.request';
+import { ChangePasswordRequest } from '@features/profile/interfaces/change-password.request';
 
 @Injectable({
   providedIn: 'root',
@@ -40,5 +42,14 @@ export class UserService {
   activateUser(id: number) {
     const endpoint = buildEndpoint(API_ENDPOINTS.USER.ACTIVATE, { id });
     return this.http.post<UserResponse>(`${this.apiUrl}${endpoint}`, {});
+  }
+
+
+  editMyProfile(request: EditProfileRequest) {
+    return this.http.put<UserResponse>(`${this.apiUrl}/user/me/edit`, request);
+  }
+
+  changeMyPassword(request: ChangePasswordRequest) {
+    return this.http.put<{ mensaje: string }>(`${this.apiUrl}/user/me/change-password`, request);
   }
 }
