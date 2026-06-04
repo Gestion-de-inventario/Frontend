@@ -52,8 +52,12 @@ export class MenuReportBeneficiariesFragmentComponent {
   entregado = signal(false);
   selectedBeneficiary: BeneficiaryResponse | null = null;
   editingRecord: BeneficiaryRecordResponse | null = null;
+  beneficiaryToDelete: BeneficiaryRecordResponse | null = null;
+  deletingLoading = signal(false);
   loading = signal(false);
   loadingReport = signal(false);
+
+  listLoading = signal(false);
 
   ngOnInit(): void {
     this.initReport();
@@ -112,9 +116,19 @@ export class MenuReportBeneficiariesFragmentComponent {
     modal.show();
   }
 
+  openDeleteModal(record: BeneficiaryRecordResponse): void {
+    this.beneficiaryToDelete = record;
+    const modal = new bootstrap.Modal(document.getElementById('deleteBeneficiaryModal'));
+    modal.show();
+  }
+
   selectBeneficiary(beneficiary: BeneficiaryResponse): void {
     this.selectedBeneficiary = beneficiary;
     this.beneficiarySearch.set('');
+  }
+
+  navigateToCreateReport(): void {
+    this.router.navigate(['/menu-report']);
   }
 
   saveBeneficiary(): void {
@@ -172,19 +186,38 @@ export class MenuReportBeneficiariesFragmentComponent {
       });
   }
 
+  cancelDelete(): void {
+    this.beneficiaryToDelete = null;
+    bootstrap.Modal.getInstance(document.getElementById('deleteBeneficiaryModal')!)?.hide();
+  }
+
   removeBeneficiary(record: BeneficiaryRecordResponse): void {
+    this.openDeleteModal(record);
+  }
+
+  confirmRemoveBeneficiary(): void {
     const report = this.report();
-    if (!report) return;
+    if (!report || !this.beneficiaryToDelete) return;
+
+    this.deletingLoading.set(true);
 
     this.beneficiaryControlService
-      .removeBeneficiary(report.id, this.getBeneficiaryControlId(record))
+      .removeBeneficiary(report.id, this.beneficiaryToDelete.id)
+      .pipe(
+        finalize(() => {
+          this.deletingLoading.set(false);
+        }),
+      )
       .subscribe({
         next: () => {
-          this.toastService.show('Beneficiario eliminado', 'warning');
+          this.toastService.show('Registro eliminado', 'warning');
+          bootstrap.Modal.getInstance(document.getElementById('deleteBeneficiaryModal')!)?.hide();
+          this.beneficiaryToDelete = null;
           this.reloadReport();
         },
         error: (error) => {
           this.toastService.show('Error: ' + error.error.message, 'danger');
+          this.deletingLoading.set(false);
         },
       });
   }
@@ -197,9 +230,21 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   reloadReport(): void {
     const date = this.report()!.date;
-    this.menuReportService.getByDate(date).subscribe({
-      next: (report) => this.menuReportState.setReport(report),
-    });
+
+    this.listLoading.set(true);
+
+    this.menuReportService
+      .getByDate(date)
+      .pipe(
+        finalize(() => {
+          this.listLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: (report) => {
+          this.menuReportState.setReport(report);
+        },
+      });
   }
 
   resetForm(): void {

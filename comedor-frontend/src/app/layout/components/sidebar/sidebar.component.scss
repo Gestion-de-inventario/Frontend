@@ -47,7 +47,6 @@
   font-weight: 600;
 }
 
-/* Enlaces del Menú (Reemplaza a los antiguos botones outline) */
 .sidebar-link {
   display: flex;
   align-items: center;
@@ -64,7 +63,6 @@
   border: none;
   background: transparent;
 
-  /* Color del ícono SVG por defecto */
   svg {
     color: var(--color-text-secondary);
     transition: var(--transition-normal);
@@ -99,4 +97,9 @@
     background-color: var(--color-error);
     color: #ffffff;
   }
+}
+
+.offcanvas {
+  touch-action: pan-y;
+  transition: transform 0.4s ease-in-out;
 }

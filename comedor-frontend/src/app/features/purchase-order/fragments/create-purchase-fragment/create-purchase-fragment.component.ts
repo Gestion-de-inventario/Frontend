@@ -160,7 +160,6 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
       )
       .subscribe({
         next: (purchase) => {
-          console.log('Compra creada', purchase);
           this.toastService.show('Compra creada exitosamente');
           this.createdPurchaseId.set(purchase.id);
 
