@@ -33,29 +33,25 @@ export class SidebarComponent implements AfterViewInit {
 
       // swipe izquierda
       if (diff > 70) {
-        this.closeOffcanvas();
+        const offcanvas = bootstrap.Offcanvas.getInstance(element);
+
+        offcanvas?.hide();
       }
     });
   }
 
-  /**
-   * Método que reemplaza al routerLink y al data-bs-dismiss
-   * para evitar el bug del doble clic en Bootstrap + Angular
-   */
   navigateAndClose(path: string): void {
     this.router.navigate([path]).then(() => {
       this.closeOffcanvas();
     });
   }
 
-  /**
-   * Método auxiliar para cerrar el menú lateral limpiamente
-   */
   private closeOffcanvas(): void {
     if (this.sidebarElement) {
       const element = this.sidebarElement.nativeElement;
-      const offcanvas = bootstrap.Offcanvas.getInstance(element) || new bootstrap.Offcanvas(element);
-      
+      const offcanvas =
+        bootstrap.Offcanvas.getInstance(element) || new bootstrap.Offcanvas(element);
+
       if (offcanvas) {
         offcanvas.hide();
       }
@@ -64,7 +60,7 @@ export class SidebarComponent implements AfterViewInit {
 
   logout(): void {
     // Cerramos el menú por precaución visual antes del logout
-    this.closeOffcanvas(); 
+    this.closeOffcanvas();
 
     this.authState.logout().subscribe({
       next: () => {

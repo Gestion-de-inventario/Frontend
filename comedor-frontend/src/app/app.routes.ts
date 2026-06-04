@@ -105,7 +105,7 @@ export const routes: Routes = [
       },
       {
         path: 'menu-report',
-        title: 'Control Menú',
+        title: 'Orden de producción',
         loadComponent: () =>
           import('@features/menu-report/pages/menu_report_principal/menu_report_principal').then(
             (m) => m.MenuReportPrincipal,
