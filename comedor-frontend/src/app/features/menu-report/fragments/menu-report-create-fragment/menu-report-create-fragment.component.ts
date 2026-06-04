@@ -75,13 +75,11 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
 
   loadTodayReport(): void {
-    console.log('Cargando reporte de hoy');
     if (!this.authState.hasPermission('MENU_REPORT_GET_BY_DATE')) return;
     this.loading.set(true);
     this.menuReportService.getByDate(localDate).subscribe({
       next: (report) => {
         this.menuReportState.setReport(report);
-        console.log('Menu encontrado para hoy:', report);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -124,7 +122,6 @@ export class MenuReportCreateFragmentComponent implements OnInit {
         },
         error: (err) => {
           if (err.status === 409 && err.error?.required) {
-            console.log('Faltantes detectados al crear el reporte:', err.error.required);
             this.openMissingStockModal(err.error.required);
 
             return;
