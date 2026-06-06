@@ -16,6 +16,13 @@ export const API_ENDPOINTS = {
     CHANGE_STATUS: '/beneficiary/changeStatus/{id}',
   },
 
+  BENEFICIARY_TYPE: {
+    EDIT: '/beneficiary/type/edit/{id}',
+    CHANGE_STATUS: '/beneficiary/type/changeStatus/{id}',
+    LIST_BY_STATUS: '/beneficiary/type/list',
+    CREATE: '/beneficiary/type/create',
+  },
+
   CATEGORY: {
     LIST_BY_STATUS: '/category/list',
     CREATE: '/category/create',

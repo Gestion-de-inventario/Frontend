@@ -124,6 +124,9 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   selectBeneficiary(beneficiary: BeneficiaryResponse): void {
     this.selectedBeneficiary = beneficiary;
+
+    this.menuPrice.set(beneficiary.menu_cost);
+
     this.beneficiarySearch.set('');
   }
 

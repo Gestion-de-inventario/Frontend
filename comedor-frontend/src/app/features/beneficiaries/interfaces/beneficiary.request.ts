@@ -8,5 +8,5 @@ export interface EditBeneficiaryRequest {
   dni?: string;
   name?: string;
   lastname?: string;
-  status?: string;
+  beneficiaryTypeId?: number;
 }

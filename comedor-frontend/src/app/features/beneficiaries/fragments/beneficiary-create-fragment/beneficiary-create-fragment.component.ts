@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BeneficiaryApiService } from '@features/beneficiaries/services/beneficiary-api.service';
 import { BeneficiaryStateService } from '@features/beneficiaries/services/beneficiary-state.service';
+import { BeneficiaryTypeApiService } from '@features/beneficiaryType/services/beneficiaryType-api.service';
+import { BeneficiaryTypeStateService } from '@features/beneficiaryType/services/beneficiaryType-state.service';
 import { ToastService } from '@shared/services/toast.service';
 
 declare const bootstrap: any;
@@ -13,14 +15,18 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './beneficiary-create-fragment.component.html',
-  styleUrl: './beneficiary-create-fragment.scss'
+  styleUrl: './beneficiary-create-fragment.scss',
 })
 export class BeneficiaryCreateFragmentComponent {
   private readonly beneficiaryService = inject(BeneficiaryApiService);
   private readonly beneficiaryState = inject(BeneficiaryStateService);
   private readonly toastService = inject(ToastService);
+  private readonly beneficiaryTypeApi = inject(BeneficiaryTypeApiService);
+  private readonly beneficiaryTypeState = inject(BeneficiaryTypeStateService);
 
-  loading = false;
+  readonly beneficiaryTypes = this.beneficiaryTypeState.types;
+
+  loading = signal<boolean>(false);
   reniecError: string | null = null;
   dniSearch = signal('');
 
@@ -37,6 +43,7 @@ export class BeneficiaryCreateFragmentComponent {
       nonNullable: true,
       validators: [Validators.required],
     }),
+    beneficiaryTypeId: new FormControl<number | null>(null),
   });
 
   openModalManual(): void {
@@ -51,29 +58,32 @@ export class BeneficiaryCreateFragmentComponent {
   }
 
   createManual(): void {
-    if (this.manualForm.invalid || this.loading) return;
-    this.loading = true;
+    if (this.manualForm.invalid || this.loading()) return;
+    this.loading.set(true);
 
     this.beneficiaryService.createManual(this.manualForm.getRawValue()).subscribe({
       next: (created) => {
         this.beneficiaryState.addBeneficiary(created);
         this.toastService.show('Beneficiario creado correctamente', 'success');
         this.manualForm.reset();
-        bootstrap.Modal.getInstance(document.getElementById('createBeneficiaryManualModal')!)?.hide();
+        bootstrap.Modal.getInstance(
+          document.getElementById('createBeneficiaryManualModal')!,
+        )?.hide();
       },
       error: (error) => {
         this.toastService.show('No se pudo crear: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }
 
   createByDni(): void {
-    if (this.dniSearch().length !== 8 || this.loading) return;
+    if (this.dniSearch().length !== 8 || this.loading()) return;
 
-    this.loading = true;
+    this.loading.set(true);
     this.reniecError = null;
 
     this.beneficiaryService.createByDni(this.dniSearch()).subscribe({
@@ -81,14 +91,16 @@ export class BeneficiaryCreateFragmentComponent {
         this.beneficiaryState.addBeneficiary(created);
         this.toastService.show('Beneficiario registrado correctamente', 'success');
         this.resetReniec();
-        bootstrap.Modal.getInstance(document.getElementById('createBeneficiaryReniecModal')!)?.hide();
+        bootstrap.Modal.getInstance(
+          document.getElementById('createBeneficiaryReniecModal')!,
+        )?.hide();
       },
       error: (error) => {
         this.reniecError = error.error?.message ?? 'No se pudo registrar el beneficiario';
-        this.loading = false;
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

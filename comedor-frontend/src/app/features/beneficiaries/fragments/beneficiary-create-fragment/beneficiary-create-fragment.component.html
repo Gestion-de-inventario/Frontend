@@ -1,9 +1,13 @@
 <div class="mb-4">
   <h4>Crear beneficiario:</h4>
   <div class="d-flex gap-2">
-  <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="openModalReniec()">Registrar por RENIEC</button>
-  <button class="btn btn-outline-primary rounded-pill px-4" (click)="openModalManual()">Registro Manual</button>
-</div>
+    <button class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="openModalReniec()">
+      Registrar por RENIEC
+    </button>
+    <button class="btn btn-outline-primary rounded-pill px-4" (click)="openModalManual()">
+      Registro Manual
+    </button>
+  </div>
 </div>
 
 <!-- MODAL MANUAL -->
@@ -22,8 +26,14 @@
         <form [formGroup]="manualForm" class="d-flex flex-column gap-3">
           <div>
             <label class="form-label">DNI <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="dni"
-              [class.is-invalid]="manualForm.controls.dni.touched && manualForm.controls.dni.invalid" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="dni"
+              [class.is-invalid]="
+                manualForm.controls.dni.touched && manualForm.controls.dni.invalid
+              "
+            />
             @if (manualForm.controls.dni.touched && manualForm.controls.dni.invalid) {
               <small class="text-danger">El DNI debe tener 8 dígitos</small>
             }
@@ -31,8 +41,14 @@
 
           <div>
             <label class="form-label">Nombre <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="name"
-              [class.is-invalid]="manualForm.controls.name.touched && manualForm.controls.name.invalid" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="
+                manualForm.controls.name.touched && manualForm.controls.name.invalid
+              "
+            />
             @if (manualForm.controls.name.touched && manualForm.controls.name.invalid) {
               <small class="text-danger">Este campo es obligatorio</small>
             }
@@ -40,19 +56,38 @@
 
           <div>
             <label class="form-label">Apellido <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="lastname"
-              [class.is-invalid]="manualForm.controls.lastname.touched && manualForm.controls.lastname.invalid" />
+            <input
+              type="text"
+              class="form-control"
+              formControlName="lastname"
+              [class.is-invalid]="
+                manualForm.controls.lastname.touched && manualForm.controls.lastname.invalid
+              "
+            />
             @if (manualForm.controls.lastname.touched && manualForm.controls.lastname.invalid) {
               <small class="text-danger">Este campo es obligatorio</small>
             }
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label fw-semibold text-dark small">Tipo de beneficiario</label>
+            <select class="form-select" formControlName="beneficiaryTypeId">
+              @for (type of beneficiaryTypes(); track type.id) {
+                <option [value]="type.id">
+                  {{ type.name }}
+                </option>
+              }
+            </select>
           </div>
         </form>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary d-flex align-items-center gap-2"
-          [disabled]="manualForm.invalid || loading" (click)="createManual()">
-          @if (loading) {
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          [disabled]="manualForm.invalid || loading()"
+          (click)="createManual()"
+        >
+          @if (loading()) {
             <span class="spinner-border spinner-border-sm"></span>
             Creando...
           } @else {
@@ -70,11 +105,18 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Registrar por DNI (RENIEC)</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="resetReniec()"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          (click)="resetReniec()"
+        ></button>
       </div>
 
       <div class="modal-body">
-        <p class="text-muted">Ingresa el DNI y el sistema lo registrará automáticamente consultando RENIEC.</p>
+        <p class="text-muted">
+          Ingresa el DNI y el sistema lo registrará automáticamente consultando RENIEC.
+        </p>
         <input
           type="text"
           class="form-control"
@@ -92,10 +134,10 @@
       <div class="modal-footer">
         <button
           class="btn btn-primary d-flex align-items-center gap-2"
-          [disabled]="dniSearch().length !== 8 || loading"
+          [disabled]="dniSearch().length !== 8 || loading()"
           (click)="createByDni()"
         >
-          @if (loading) {
+          @if (loading()) {
             <span class="spinner-border spinner-border-sm"></span>
             Registrando...
           } @else {
