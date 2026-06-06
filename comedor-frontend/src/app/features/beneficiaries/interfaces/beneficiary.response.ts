@@ -3,6 +3,8 @@ export interface BeneficiaryResponse {
   dni: string;
   name: string;
   lastname: string;
+  beneficiaryTypeId: number;
+  beneficiaryType: string;
   menu_cost: number;
   status: string;
 }
