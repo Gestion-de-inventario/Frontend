@@ -80,6 +80,17 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'beneficiaries/type',
+
+        title: 'Tipos de beneficiario',
+
+        loadComponent: () =>
+          import('@features/beneficiaryType/pages/beneficiary-type-principal/beneficiary-type-principal').then(
+            (m) => m.BeneficiaryTypePrincipal,
+          ),
+      },
+
+      {
         path: 'categories',
         title: 'Categorías y Etiquetas',
         loadComponent: () =>

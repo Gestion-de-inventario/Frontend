@@ -1,0 +1,117 @@
+<div class="mb-3">
+  <button
+    class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
+    (click)="openModal()"
+  >
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+    </svg>
+
+    Nuevo Tipo
+  </button>
+</div>
+<div class="modal fade" id="beneficiaryTypeCreateModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <!-- HEADER -->
+
+      <div class="modal-header">
+        <h5 class="modal-title">Registrar Tipo de Beneficiario</h5>
+
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+
+      <!-- BODY -->
+
+      <div class="modal-body">
+        <form [formGroup]="form" class="row g-4">
+          <!-- NOMBRE -->
+
+          <div class="col-12">
+            <label class="form-label fw-semibold"> Nombre </label>
+
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+            />
+
+            @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
+
+            @if (form.controls.name.touched && form.controls.name.hasError('minlength')) {
+              <small class="text-danger"> Debe tener al menos 3 caracteres </small>
+            }
+          </div>
+
+          <!-- DESCRIPCION -->
+
+          <div class="col-12">
+            <label class="form-label fw-semibold"> Descripción </label>
+
+            <textarea
+              rows="4"
+              class="form-control"
+              formControlName="desc"
+              [class.is-invalid]="form.controls.desc.touched && form.controls.desc.invalid"
+            ></textarea>
+
+            @if (form.controls.desc.touched && form.controls.desc.hasError('required')) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
+
+            @if (form.controls.desc.touched && form.controls.desc.hasError('minlength')) {
+              <small class="text-danger"> Debe tener al menos 5 caracteres </small>
+            }
+          </div>
+
+          <!-- COSTO -->
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold"> Costo del Menú </label>
+
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              class="form-control"
+              formControlName="menu_cost"
+              [class.is-invalid]="
+                form.controls.menu_cost.touched && form.controls.menu_cost.invalid
+              "
+            />
+
+            @if (form.controls.menu_cost.touched && form.controls.menu_cost.hasError('required')) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
+
+            @if (form.controls.menu_cost.touched && form.controls.menu_cost.hasError('min')) {
+              <small class="text-danger"> El costo debe ser mayor a 0 </small>
+            }
+          </div>
+        </form>
+      </div>
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeModal()">Cancelar</button>
+
+        <button
+          class="btn btn-primary d-flex align-items-center gap-2"
+          [disabled]="loading()"
+          (click)="save()"
+        >
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm"></span>
+            Guardando...
+          } @else {
+            Registrar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

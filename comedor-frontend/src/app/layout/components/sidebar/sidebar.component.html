@@ -129,7 +129,11 @@
       </a>
     }
 
-    @if (authState.hasPermission('USER_LIST_ALL')) {
+    @if (
+      authState.hasPermission('USER_LIST_ALL') ||
+      authState.hasPermission('BENEFICIARY_LIST_BY_STATUS') ||
+      authState.hasPermission('BENEFICIARY_TYPE_LIST_BY_STATUS')
+    ) {
       <a class="sidebar-link" (click)="navigateAndClose('/users')">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
@@ -155,7 +159,7 @@
       </a>
     }
 
-    @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
+    <!--  @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
       <a class="sidebar-link" (click)="navigateAndClose('/beneficiaries')">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
@@ -166,7 +170,7 @@
         </svg>
         Beneficiarios
       </a>
-    }
+    } -->
 
     @if (
       authState.hasPermission('CATEGORY_LIST_BY_STATUS') ||
