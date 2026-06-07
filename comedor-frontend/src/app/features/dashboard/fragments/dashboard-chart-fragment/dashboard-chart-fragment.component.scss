@@ -1,0 +1,5 @@
+.custom-bar {
+  background: linear-gradient(90deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.7) 100%);
+  border-radius: 8px;
+  transition: width 1s ease-in-out; // Animación suave al cargar
+}

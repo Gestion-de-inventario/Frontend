@@ -1,0 +1,54 @@
+<div class="container-fluid py-4">
+  
+  @if (!canView) {
+    <div class="d-flex flex-column justify-content-center align-items-center mt-5 text-center">
+      <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="40" height="40" class="text-danger">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path>
+        </svg>
+      </div>
+      <h4 class="fw-bold text-dark mb-2">Acceso Denegado</h4>
+      <p class="text-muted mb-4">No tienes permisos para visualizar el panel de métricas.</p>
+    </div>
+  } 
+  
+  @else {
+    <div class="d-flex flex-column gap-4">
+      
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <h3 class="fw-bold text-dark mb-1">Resumen Financiero y Rotación</h3>
+          <!-- <p class="text-muted mb-0">Estado general del comedor en el mes actual</p> -->
+          <p class="text-muted mb-0">Estado general del negocio en el mes actual</p>
+
+        </div>
+        </div>
+
+      @if (dashboardState.loading()) {
+        <div class="text-center py-5 my-5">
+          <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+          <h5 class="text-muted">Calculando métricas...</h5>
+        </div>
+      }
+
+      @else if (dashboardState.error()) {
+        <div class="alert alert-danger text-center" role="alert">
+          {{ dashboardState.error() }}
+        </div>
+      }
+
+      @else {
+        <app-dashboard-cards-fragment />
+        
+        <div class="row mt-2">
+          <div class="col-12 col-xl-6">
+            <app-dashboard-chart-fragment />
+          </div>
+          <div class="col-12 col-xl-6">
+            <app-dashboard-financial-fragment />
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

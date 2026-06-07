@@ -93,4 +93,9 @@ export const API_ENDPOINTS = {
   PURCHASE: {
     CHANGE_STATUS: '/{id}/confirm',
   },
+
+  DASHBOARD: {
+    GET_SUMMARY: '/dashboard',
+  }
+  
 };
