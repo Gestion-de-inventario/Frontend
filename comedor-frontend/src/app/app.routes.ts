@@ -34,15 +34,46 @@ export const routes: Routes = [
       },
 
       {
-        path: 'users',
-
-        title: 'Usuarios',
-
+        path: 'management',
+        title: 'Gestión de Usuarios',
         loadComponent: () =>
-          import('@features/users/pages/user_principal/user_principal').then(
-            (m) => m.UserPrincipal,
+          import('@features/users/pages/user-managment-principal/user-management-principal.component').then(
+            (m) => m.UserManagementPrincipalComponent,
           ),
+
+        children: [
+          {
+            path: '',
+            redirectTo: 'users',
+            pathMatch: 'full',
+          },
+
+          {
+            path: 'users',
+            loadComponent: () =>
+              import('@features/users/pages/user_principal/user_principal').then(
+                (m) => m.UserPrincipal,
+              ),
+          },
+
+          {
+            path: 'beneficiaries',
+            loadComponent: () =>
+              import('@features/beneficiaries/pages/beneficiary_principal/beneficiary_principal').then(
+                (m) => m.BeneficiaryPrincipal,
+              ),
+          },
+
+          {
+            path: 'beneficiary-types',
+            loadComponent: () =>
+              import('@features/beneficiaryType/pages/beneficiary-type-principal/beneficiary-type-principal').then(
+                (m) => m.BeneficiaryTypePrincipal,
+              ),
+          },
+        ],
       },
+
       {
         path: 'roles',
 
@@ -61,6 +92,7 @@ export const routes: Routes = [
 
         pathMatch: 'full',
       },
+
       {
         path: 'products',
 
@@ -71,22 +103,13 @@ export const routes: Routes = [
             (m) => m.ProductPrincipal,
           ),
       },
+
       {
         path: 'beneficiaries',
         title: 'Beneficiarios',
         loadComponent: () =>
           import('@features/beneficiaries/pages/beneficiary_principal/beneficiary_principal').then(
             (m) => m.BeneficiaryPrincipal,
-          ),
-      },
-      {
-        path: 'beneficiaries/type',
-
-        title: 'Tipos de beneficiario',
-
-        loadComponent: () =>
-          import('@features/beneficiaryType/pages/beneficiary-type-principal/beneficiary-type-principal').then(
-            (m) => m.BeneficiaryTypePrincipal,
           ),
       },
 
@@ -98,6 +121,7 @@ export const routes: Routes = [
             (m) => m.CategoryPrincipal,
           ),
       },
+
       {
         path: 'profile',
         title: 'Mi perfil',
@@ -106,6 +130,7 @@ export const routes: Routes = [
             (m) => m.ProfilePrincipal,
           ),
       },
+
       {
         path: 'transactions-modifications',
         title: 'Transacciones y Modificaciones',
@@ -114,6 +139,7 @@ export const routes: Routes = [
             (m) => m.TransactionsModificationsPrincipalComponent,
           ),
       },
+
       {
         path: 'menu-report',
         title: 'Orden de producción',

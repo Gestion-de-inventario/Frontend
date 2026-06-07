@@ -1,0 +1,21 @@
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <label class="fw-semibold mb-0"> Módulo: </label>
+      </div>
+
+      <div class="col-md-4">
+        <select class="form-select" [value]="currentModule" (change)="changeModule($event)">
+          <option value="users">Usuarios</option>
+
+          <option value="beneficiaries">Beneficiarios</option>
+
+          <option value="beneficiary-types">Tipos de Beneficiario</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<router-outlet />
