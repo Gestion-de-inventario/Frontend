@@ -1,0 +1,150 @@
+<div class="modal fade" id="beneficiaryTypeDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      @if (beneficiaryType(); as type) {
+        <!-- HEADER -->
+
+        <div class="modal-header">
+          <div class="d-flex align-items-center gap-2">
+            @if (mode !== 'view') {
+              <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">←</button>
+            }
+
+            <h5 class="modal-title">
+              @if (mode === 'view') {
+                Detalle del tipo de beneficiario
+              }
+
+              @if (mode === 'edit') {
+                Editar tipo de beneficiario
+              }
+            </h5>
+          </div>
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            (click)="close()"
+          ></button>
+        </div>
+
+        <!-- BODY -->
+
+        <div class="modal-body">
+          <!-- VIEW -->
+
+          @if (mode === 'view') {
+            <div class="mb-3">
+              <strong>Nombre</strong>
+
+              <div>
+                {{ type.name }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <strong>Descripción</strong>
+
+              <div>
+                {{ type.desc }}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <strong>Costo menú</strong>
+
+              <div>S/ {{ type.menu_cost }}</div>
+            </div>
+
+            <div>
+              <strong>Estado</strong>
+
+              <div>
+                <span class="badge" [class]="type.status === 'ACTIVO' ? 'bg-success' : 'bg-danger'">
+                  {{ type.status }}
+                </span>
+              </div>
+            </div>
+          }
+
+          <!-- EDIT -->
+
+          @if (mode === 'edit') {
+            <form [formGroup]="form" class="d-flex flex-column gap-3">
+              <div>
+                <label class="form-label"> Nombre </label>
+
+                <input type="text" class="form-control" formControlName="name" />
+              </div>
+
+              <div>
+                <label class="form-label"> Descripción </label>
+
+                <textarea rows="3" class="form-control" formControlName="desc"></textarea>
+              </div>
+
+              <div>
+                <label class="form-label"> Costo menú </label>
+
+                <input type="number" step="0.01" class="form-control" formControlName="menu_cost" />
+              </div>
+            </form>
+          }
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="modal-footer">
+          <!-- VIEW -->
+
+          @if (mode === 'view' && authState.hasPermission('BENEFICIARY_TYPE_EDIT')) {
+            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
+          }
+
+          @if (mode === 'view' && authState.hasPermission('BENEFICIARY_TYPE_CHANGE_STATUS')) {
+            @if (type.status === 'ACTIVO') {
+              <button
+                class="btn btn-warning"
+                [disabled]="loading()"
+                (click)="changeStatus('DESACTIVAR')"
+              >
+                @if (loading()) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                }
+
+                Desactivar
+              </button>
+            } @else {
+              <button
+                class="btn btn-success"
+                [disabled]="loading()"
+                (click)="changeStatus('ACTIVAR')"
+              >
+                @if (loading()) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                }
+
+                Activar
+              </button>
+            }
+          }
+
+          <!-- EDIT -->
+
+          @if (mode === 'edit') {
+            <button class="btn btn-success" [disabled]="form.invalid || loading()" (click)="save()">
+              @if (loading()) {
+                <span class="spinner-border spinner-border-sm"></span>
+
+                Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
