@@ -1,0 +1,114 @@
+<div class="d-flex flex-column gap-4">
+
+  <!-- <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-calendar-check text-primary fs-5"></i>
+        <h5 class="fw-semibold mb-0">Resumen de hoy</h5>
+      </div>
+
+      @if (loadingToday()) {
+        <div class="d-flex align-items-center gap-2 text-muted">
+          <span class="spinner-border spinner-border-sm"></span>
+          <small>Buscando reporte de hoy...</small>
+        </div>
+      } @else if (todayError()) {
+        <div class="alert alert-warning rounded-3 py-2 px-3 mb-0">
+          <small><i class="bi bi-exclamation-triangle me-1"></i>{{ todayError() }}</small>
+        </div>
+      } @else {
+        <p class="text-muted small mb-3">
+          Se encontró el reporte del día. Descárgalo en el formato que prefieras.
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+          <button
+            class="btn btn-danger d-flex align-items-center gap-2"
+            [disabled]="exporting() !== null"
+            (click)="exportToday('pdf')"
+          >
+            @if (exporting() === 'pdf-today') {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <i class="bi bi-file-earmark-pdf"></i>
+            }
+            Exportar PDF
+          </button>
+          <button
+            class="btn btn-success d-flex align-items-center gap-2"
+            [disabled]="exporting() !== null"
+            (click)="exportToday('excel')"
+          >
+            @if (exporting() === 'excel-today') {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <i class="bi bi-file-earmark-excel"></i>
+            }
+            Exportar Excel
+          </button>
+        </div>
+      }
+    </div>
+  </div> -->
+
+  <!-- Exportar por fecha específica -->
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-calendar-range text-secondary fs-5"></i>
+        <h5 class="fw-semibold mb-0">Exportar por fecha</h5>
+      </div>
+      <p class="text-muted small mb-3">
+        Selecciona una fecha para exportar el reporte de ese día.
+      </p>
+
+      <div class="col-md-5 mb-3">
+        <input
+          type="date"
+          class="form-control"
+          [value]="selectedDate()"
+          [max]="getTodayString()"
+          (change)="onDateChange($any($event.target).value)"
+        />
+      </div>
+
+      @if (fetchingByDate()) {
+        <div class="d-flex align-items-center gap-2 text-muted">
+          <span class="spinner-border spinner-border-sm"></span>
+          <small>Buscando reporte...</small>
+        </div>
+      } @else if (dateError()) {
+        <div class="alert alert-warning rounded-3 py-2 px-3 mb-0">
+          <small><i class="bi bi-exclamation-triangle me-1"></i>{{ dateError() }}</small>
+        </div>
+      } @else if (dateId()) {
+        <div class="d-flex gap-3 flex-wrap">
+          <button
+            class="btn btn-danger d-flex align-items-center gap-2"
+            [disabled]="exporting() !== null"
+            (click)="exportByDate('pdf')"
+          >
+            @if (exporting() === 'pdf-date') {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <i class="bi bi-file-earmark-pdf"></i>
+            }
+            Exportar PDF
+          </button>
+          <button
+            class="btn btn-success d-flex align-items-center gap-2"
+            [disabled]="exporting() !== null"
+            (click)="exportByDate('excel')"
+          >
+            @if (exporting() === 'excel-date') {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <i class="bi bi-file-earmark-excel"></i>
+            }
+            Exportar Excel
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

@@ -43,6 +43,8 @@ export const API_ENDPOINTS = {
     ADD_BENEFICIARY: '/menu_report/{id}/beneficiaries',
     EDIT_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     REMOVE_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
+    EXPORT_PDF: '/menu_report/{id}/export/pdf',
+    EXPORT_EXCEL: '/menu_report/{id}/export/excel'
   },
 
   PRODUCT: {
