@@ -194,6 +194,36 @@ export const routes: Routes = [
           },
         ],
       },
+
+      {
+        path: 'inventory',
+        title: 'Inventario',
+        loadComponent: () =>
+          import('@features/inventory/pages/inventory-principal/inventory-principal.component').then(
+            (m) => m.InventoryPrincipalComponent,
+          ),
+        children: [
+          {
+            path: '',
+            redirectTo: 'products',
+            pathMatch: 'full',
+          },
+          {
+            path: 'products',
+            loadComponent: () =>
+              import('@features/products/pages/product_principal/product_principal').then(
+                (m) => m.ProductPrincipal,
+              ),
+          },
+          {
+            path: 'dishes',
+            loadComponent: () =>
+              import('@features/dish-menus/pages/dish_principal/dish_principal').then(
+                (m) => m.DishPrincipal,
+              ),
+          },
+        ],
+      },
     ],
   },
 ];

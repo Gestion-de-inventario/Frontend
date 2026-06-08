@@ -146,16 +146,12 @@
       </a>
     }
 
-    @if (authState.hasPermission('PRODUCT_LIST_BY_STATUS')) {
-      <a class="sidebar-link" (click)="navigateAndClose('/products')">
+    @if (authState.hasPermission('PRODUCT_LIST_BY_STATUS') || authState.hasPermission('DISH_MENU_LIST_ALL')) {
+      <a class="sidebar-link" (click)="navigateAndClose('/inventory')">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          ></path>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
         </svg>
-        Productos
+        Inventario
       </a>
     }
 
