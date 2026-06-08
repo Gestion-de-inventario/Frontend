@@ -224,6 +224,51 @@ export const routes: Routes = [
           },
         ],
       },
+
+      {
+        path: 'reports',
+        title: 'Reportes',
+        loadComponent: () =>
+          import('@features/reports/pages/reports-principal/reports-principal.component').then(
+            (m) => m.ReportsPrincipalComponent,
+          ),
+        children: [
+          {
+            path: '',
+            redirectTo: 'transactions',
+            pathMatch: 'full',
+          },
+          {
+            path: 'transactions',
+            loadComponent: () =>
+              import('@features/transactions_modifications/fragments/transactions-fragment/transactions-fragment.component').then(
+                (m) => m.TransactionsFragmentComponent,
+              ),
+          },
+          {
+            path: 'modifications',
+            loadComponent: () =>
+              import('@features/transactions_modifications/fragments/modifications-fragment/modifications-fragment.component').then(
+                (m) => m.ModificationsFragmentComponent,
+              ),
+          },
+          {
+            path: 'summary',
+            loadComponent: () =>
+              import('@features/menu-report-summary/pages/menu-report-summary').then(
+                (m) => m.MenuReportSummary,
+              ),
+          },
+          {
+            path: 'export',
+            loadComponent: () =>
+              import('@features/exports-report/fragments/export-report-fragment.component').then(
+                (m) => m.ExportReportFragmentComponent,
+              ),
+          },
+        ],
+      },
+      
     ],
   },
 ];

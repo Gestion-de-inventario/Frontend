@@ -1,0 +1,35 @@
+<div class="container-fluid py-3">
+
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <label class="fw-semibold mb-0">Módulo:</label>
+        </div>
+        <div class="col-md-4">
+          <select
+            class="form-select"
+            [value]="currentModule()"
+            (change)="changeModule($event)"
+          >
+            @if (canViewTransactions()) {
+              <option value="transactions">Transacciones</option>
+            }
+            @if (canViewModifications()) {
+              <option value="modifications">Modificaciones</option>
+            }
+            @if (canViewSummary()) {
+              <option value="summary">Resumen del día</option>
+            }
+            @if (canExport()) {
+              <option value="export">Exportar reporte</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <router-outlet />
+
+</div>
