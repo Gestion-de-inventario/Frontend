@@ -31,6 +31,9 @@ export const API_ENDPOINTS = {
 
   DISH_MENU: {
     LIST_ALL: '/dish-menus',
+    CREATE: '/dish-menus/create',
+    EDIT: '/dish-menus/{id}',
+    CHANGE_STATUS: '/dish-menus/{id}/changeStatus',
   },
 
   MENU_REPORT: {
@@ -96,6 +99,6 @@ export const API_ENDPOINTS = {
 
   DASHBOARD: {
     GET_SUMMARY: '/dashboard',
-  }
-  
+  },
+
 };
