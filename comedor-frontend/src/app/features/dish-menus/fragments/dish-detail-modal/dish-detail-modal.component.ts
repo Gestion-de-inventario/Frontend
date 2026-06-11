@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
@@ -24,7 +24,7 @@ export class DishDetailModalComponent {
   readonly dish = computed(() => this.dishState.selectedDish());
 
   mode: 'view' | 'edit' = 'view';
-  loading = false;
+  loading = signal<boolean>(false);
   products: ProductResponse[] = [];
   editSupplies: { productId: number; quantityNeeded: number }[] = [];
 
@@ -42,7 +42,7 @@ export class DishDetailModalComponent {
     const dish = this.dish();
     if (!dish) return;
     this.form.patchValue({ name: dish.name });
-    this.editSupplies = dish.supplies.map(s => ({
+    this.editSupplies = dish.supplies.map((s) => ({
       productId: s.productId,
       quantityNeeded: Number(s.quantityNeeded),
     }));
@@ -63,42 +63,52 @@ export class DishDetailModalComponent {
 
   save(): void {
     const dish = this.dish();
-    if (!dish || this.loading) return;
-    this.loading = true;
+    if (!dish || this.loading()) return;
+    this.loading.set(true);
 
-    this.dishService.edit(dish.id, {
-      name: this.form.value.name || undefined,
-      supplies: this.editSupplies,
-    }).subscribe({
-      next: (updated) => {
-        this.dishState.updateDish(updated);
-        this.toastService.show('Plato actualizado correctamente', 'success');
-        this.mode = 'view';
-      },
-      error: (error) => {
-        this.toastService.show('No se pudo actualizar: ' + error.error?.message, 'danger');
-      },
-      complete: () => { this.loading = false; },
-    });
+    this.dishService
+      .edit(dish.id, {
+        name: this.form.value.name || undefined,
+        supplies: this.editSupplies,
+      })
+      .subscribe({
+        next: (updated) => {
+          this.dishState.updateDish(updated);
+          this.toastService.show('Plato actualizado correctamente', 'success');
+          this.mode = 'view';
+          this.loading.set(false);
+        },
+        error: (error) => {
+          this.toastService.show('No se pudo actualizar: ' + error.error?.message, 'danger');
+          this.loading.set(false);
+        },
+        complete: () => {
+          this.loading.set(false);
+        },
+      });
   }
 
   changeStatus(status: string): void {
     const dish = this.dish();
-    if (!dish || this.loading) return;
-    this.loading = true;
+    if (!dish || this.loading()) return;
+    this.loading.set(true);
 
     this.dishService.changeStatus(dish.id, status).subscribe({
       next: (updated) => {
         this.dishState.updateDish(updated);
         this.toastService.show(
           status === 'ACTIVO' ? 'Plato activado' : 'Plato desactivado',
-          status === 'ACTIVO' ? 'success' : 'warning'
+          status === 'ACTIVO' ? 'success' : 'warning',
         );
+        this.loading.set(false);
       },
       error: (error) => {
         this.toastService.show('No se pudo cambiar el estado: ' + error.error?.message, 'danger');
+        this.loading.set(false);
       },
-      complete: () => { this.loading = false; },
+      complete: () => {
+        this.loading.set(false);
+      },
     });
   }
 

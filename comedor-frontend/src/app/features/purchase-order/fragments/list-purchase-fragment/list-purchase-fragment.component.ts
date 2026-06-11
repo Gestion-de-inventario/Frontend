@@ -7,7 +7,8 @@ import { PurchaseResponse } from '../../interfaces/purchase.response';
 import { Router } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
-
+import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
+declare const bootstrap: any;
 @Component({
   selector: 'app-list-purchase-fragment',
   standalone: true,
@@ -16,6 +17,8 @@ import { ToastService } from '@shared/services/toast.service';
 })
 export class ListPurchaseFragmentComponent {
   private readonly purchaseService = inject(PurchaseApiService);
+  private readonly purchaseOrderState = inject(PurchaseOrderStateService);
+
   private readonly router = inject(Router);
 
   readonly authState = inject(AuthStateService);
@@ -154,5 +157,30 @@ export class ListPurchaseFragmentComponent {
     this.page.set(0);
 
     this.loadPurchases();
+  }
+
+  createSameOrder(): void {
+    const purchase = this.selectedPurchase();
+
+    if (!purchase) {
+      return;
+    }
+
+    this.purchaseOrderState.setDraftPurchase(
+      purchase.details.map((detail) => ({
+        productId: detail.productId,
+        productName: detail.productName,
+        productUnit: detail.productUnit,
+        quantity: detail.quantity,
+        unitPrice: detail.unitPrice,
+        search: '',
+      })),
+    );
+    const modalElement = document.getElementById('purchaseDetailModal');
+
+    const modal = bootstrap.Modal.getInstance(modalElement);
+
+    modal?.hide();
+    this.router.navigate(['/purchase-order/create']);
   }
 }

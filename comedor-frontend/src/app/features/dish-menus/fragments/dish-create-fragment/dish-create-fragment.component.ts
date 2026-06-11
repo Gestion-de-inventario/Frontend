@@ -1,5 +1,11 @@
-import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DishApiService } from '@features/dish-menus/services/dish-api.service';
 import { DishStateService } from '@features/dish-menus/services/dish-state.service';
@@ -22,7 +28,7 @@ export class DishCreateFragmentComponent {
   private readonly toastService = inject(ToastService);
 
   products: ProductResponse[] = [];
-  loading = false;
+  loading = signal<boolean>(false);
   supplies: { productId: number | null; quantityNeeded: number | null }[] = [];
 
   readonly form = new FormGroup({
@@ -54,31 +60,37 @@ export class DishCreateFragmentComponent {
   }
 
   create(): void {
-    if (this.form.invalid || this.supplies.length === 0 || this.loading) return;
-    const invalidSupplies = this.supplies.some(s => !s.productId || !s.quantityNeeded);
+    if (this.form.invalid || this.supplies.length === 0 || this.loading()) return;
+    const invalidSupplies = this.supplies.some((s) => !s.productId || !s.quantityNeeded);
     if (invalidSupplies) {
       this.toastService.show('Completa todos los insumos', 'warning');
       return;
     }
-    this.loading = true;
+    this.loading.set(true);
 
-    this.dishService.create({
-      name: this.form.getRawValue().name,
-      supplies: this.supplies.map(s => ({
-        productId: s.productId!,
-        quantityNeeded: s.quantityNeeded!,
-      })),
-    }).subscribe({
-      next: (created) => {
-        this.dishState.addDish(created);
-        this.toastService.show('Plato creado correctamente', 'success');
-        this.resetForm();
-        bootstrap.Modal.getInstance(document.getElementById('createDishModal')!)?.hide();
-      },
-      error: (error) => {
-        this.toastService.show('No se pudo crear: ' + error.error?.message, 'danger');
-      },
-      complete: () => { this.loading = false; },
-    });
+    this.dishService
+      .create({
+        name: this.form.getRawValue().name,
+        supplies: this.supplies.map((s) => ({
+          productId: s.productId!,
+          quantityNeeded: s.quantityNeeded!,
+        })),
+      })
+      .subscribe({
+        next: (created) => {
+          this.dishState.addDish(created);
+          this.toastService.show('Plato creado correctamente', 'success');
+          this.resetForm();
+          this.loading.set(false);
+          bootstrap.Modal.getInstance(document.getElementById('createDishModal')!)?.hide();
+        },
+        error: (error) => {
+          this.toastService.show('No se pudo crear: ' + error.error?.message, 'danger');
+          this.loading.set(false);
+        },
+        complete: () => {
+          this.loading.set(false);
+        },
+      });
   }
 }

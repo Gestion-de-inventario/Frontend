@@ -58,6 +58,21 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
       this.missingProducts.set(missingProducts);
 
       this.buildDraft();
+      return;
+    }
+
+    const draftPurchase = this.purchaseOrderState.draftPurchase();
+
+    if (draftPurchase.length > 0) {
+      this.purchaseDetails.set(
+        draftPurchase.map((detail) => ({
+          ...detail,
+        })),
+      );
+
+      this.purchaseOrderState.clearDraftPurchase();
+
+      return;
     }
   }
 
