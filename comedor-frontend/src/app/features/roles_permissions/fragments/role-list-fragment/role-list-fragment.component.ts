@@ -41,7 +41,7 @@ export class RoleListFragmentComponent {
   loadRoles(): void {
     this.loading.set(true);
 
-    this.roleService.listRolesByStatus('ACTIVO').subscribe({
+    this.roleService.listRolesByStatus().subscribe({
       next: (roles) => {
         this.roleState.setRoles(roles);
       },

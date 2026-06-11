@@ -27,6 +27,7 @@ export class BeneficiaryDetailModalComponent {
   readonly beneficiary = computed(() => this.beneficiaryState.selectedBeneficiary());
 
   mode: 'view' | 'edit' = 'view';
+
   loading = signal<boolean>(false);
 
   readonly form = new FormGroup({
@@ -72,6 +73,7 @@ export class BeneficiaryDetailModalComponent {
 
   save(): void {
     const beneficiary = this.beneficiary();
+
     if (!beneficiary || this.loading()) return;
 
     this.loading.set(true);

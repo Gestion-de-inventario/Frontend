@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -19,27 +19,28 @@ export class CategoryDetailModalComponent {
 
   readonly category = computed(() => this.categoryState.selectedCategory());
 
-  loading = false;
+  loading = signal<boolean>(false);
 
   changeStatus(status: string): void {
     const category = this.category();
-    if (!category || this.loading) return;
+    if (!category || this.loading()) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.categoryService.changeStatus(category.id, status).subscribe({
       next: (updated) => {
         this.categoryState.updateCategory(updated);
         this.toastService.show(
           status === 'ACTIVO' ? 'Categoría activada' : 'Categoría desactivada',
-          status === 'ACTIVO' ? 'success' : 'warning'
+          status === 'ACTIVO' ? 'success' : 'warning',
         );
       },
       error: (error) => {
         this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

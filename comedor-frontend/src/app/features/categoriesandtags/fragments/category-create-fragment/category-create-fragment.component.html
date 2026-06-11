@@ -1,6 +1,11 @@
 <div class="mb-3">
-  <button class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2" (click)="openModal()">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+  <button
+    class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
+    (click)="openModal()"
+  >
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+    </svg>
     Nueva Categoría
   </button>
 </div>
@@ -10,8 +15,24 @@
     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
       <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
         <div class="d-flex align-items-center gap-3">
-          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"></path></svg>
+          <div
+            class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+            style="width: 40px; height: 40px"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
+              ></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"></path>
+            </svg>
           </div>
           <h5 class="modal-title fw-bold text-dark mb-0">Nueva Categoría</h5>
         </div>
@@ -21,10 +42,16 @@
       <div class="modal-body px-4 py-4">
         <form [formGroup]="form" class="d-flex flex-column gap-3">
           <div>
-            <label class="form-label fw-semibold text-dark small">Nombre <span class="text-danger">*</span></label>
-            <input type="text" class="form-control custom-input" formControlName="name"
+            <label class="form-label fw-semibold text-dark small"
+              >Nombre <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control custom-input"
+              formControlName="name"
               [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
-              placeholder="Ej: Lácteos, Carnes, Verduras..." />
+              placeholder="Ej: Lácteos, Carnes, Verduras..."
+            />
             @if (form.controls.name.touched && form.controls.name.invalid) {
               <small class="text-danger">Este campo es obligatorio</small>
             }
@@ -33,9 +60,23 @@
       </div>
 
       <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-medium" data-bs-dismiss="modal">Cancelar</button>
-        <button class="btn btn-primary rounded-pill px-4 fw-medium" [disabled]="form.invalid || loading" (click)="create()">
-          @if (loading) { <span class="spinner-border spinner-border-sm"></span> Creando... } @else { Crear }
+        <button
+          type="button"
+          class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </button>
+        <button
+          class="btn btn-primary rounded-pill px-4 fw-medium"
+          [disabled]="form.invalid || loading()"
+          (click)="create()"
+        >
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm"></span> Creando...
+          } @else {
+            Crear
+          }
         </button>
       </div>
     </div>

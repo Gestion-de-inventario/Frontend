@@ -135,14 +135,14 @@
                 [(ngModel)]="permissionSearch"
               />
             </div>
-            @if (loading) {
+            @if (loading()) {
               <div class="d-flex justify-content-center py-5">
                 <div class="spinner-border text-primary"></div>
               </div>
             }
 
             <!-- ACCORDION -->
-            @if (!loading) {
+            @if (!loading()) {
               <div class="accordion" id="permissionsAccordion">
                 @for (group of permissionGroups; track group.module; let i = $index) {
                   <div class="accordion-item">
@@ -225,10 +225,10 @@
             @if (role.status === 'ACTIVO') {
               <button
                 class="btn btn-warning"
-                [disabled]="loading"
+                [disabled]="loading()"
                 (click)="changeStatus('DESACTIVAR')"
               >
-                @if (loading) {
+                @if (loading()) {
                   <span class="spinner-border spinner-border-sm"></span>
                 }
 
@@ -237,10 +237,10 @@
             } @else {
               <button
                 class="btn btn-success"
-                [disabled]="loading"
+                [disabled]="loading()"
                 (click)="changeStatus('ACTIVAR')"
               >
-                @if (loading) {
+                @if (loading()) {
                   <span class="spinner-border spinner-border-sm"></span>
                 }
 
@@ -260,10 +260,10 @@
           @if (mode === 'edit') {
             <button
               class="btn btn-success d-flex align-items-center gap-2"
-              [disabled]="form.invalid || loading"
+              [disabled]="form.invalid || loading()"
               (click)="save()"
             >
-              @if (loading) {
+              @if (loading()) {
                 <span class="spinner-border spinner-border-sm"></span>
 
                 Guardando...
@@ -277,10 +277,10 @@
           @if (mode === 'permissions') {
             <button
               class="btn btn-success d-flex align-items-center gap-2"
-              [disabled]="loading"
+              [disabled]="loading()"
               (click)="savePermissions()"
             >
-              @if (loading) {
+              @if (loading()) {
                 <span class="spinner-border spinner-border-sm"></span>
 
                 Cargando...

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CategoryApiService } from '@features/categoriesandtags/services/category-api.service';
@@ -12,14 +12,14 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './category-create-fragment.component.html',
-  styleUrl: './category-create-fragment.scss'
+  styleUrl: './category-create-fragment.scss',
 })
 export class CategoryCreateFragmentComponent {
   private readonly categoryService = inject(CategoryApiService);
   private readonly categoryState = inject(CategoryStateService);
   private readonly toastService = inject(ToastService);
 
-  loading = false;
+  loading = signal<boolean>(false);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
@@ -34,8 +34,8 @@ export class CategoryCreateFragmentComponent {
   }
 
   create(): void {
-    if (this.form.invalid || this.loading) return;
-    this.loading = true;
+    if (this.form.invalid || this.loading()) return;
+    this.loading.set(true);
 
     this.categoryService.create(this.form.getRawValue()).subscribe({
       next: (created) => {
@@ -46,9 +46,10 @@ export class CategoryCreateFragmentComponent {
       },
       error: (error) => {
         this.toastService.show('No se pudo crear: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }
