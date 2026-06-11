@@ -258,7 +258,7 @@
           </button>
           <button
             class="btn btn-primary rounded-pill px-4 fw-medium"
-            [disabled]="form.invalid || loading"
+            [disabled]="form.invalid || loading()"
             (click)="save()"
           >
             @if (loading()) {

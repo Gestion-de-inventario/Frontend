@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProductApiService } from '@features/products/services/product-api.service';
@@ -16,7 +16,7 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './product-create-fragment.component.html',
-  styleUrl:'./product-create-fragment.component.scss'
+  styleUrl: './product-create-fragment.component.scss',
 })
 export class ProductCreateFragmentComponent {
   private readonly productService = inject(ProductApiService);
@@ -27,7 +27,7 @@ export class ProductCreateFragmentComponent {
 
   categories: CategoryResponse[] = [];
   tags: TagResponse[] = [];
-  loading = false;
+  loading = signal<boolean>(false);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
@@ -72,37 +72,40 @@ export class ProductCreateFragmentComponent {
   }
 
   create(): void {
-    if (this.form.invalid || this.loading) return;
+    if (this.form.invalid || this.loading()) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
-    this.productService.create({
-      name: this.form.getRawValue().name,
-      categoryId: this.form.getRawValue().categoryId!,
-      tagId: this.form.getRawValue().tagId ?? null,
-      unit: this.form.getRawValue().unit!,
-      stock: this.form.getRawValue().stock!,
-      reorderPoint: this.form.getRawValue().reorderPoint!,
-    }).subscribe({
-      next: (created) => {
-        this.productState.addProduct(created);
-        this.toastService.show('Producto creado correctamente', 'success');
-        this.form.reset({
-          name: '',
-          categoryId: null,
-          tagId: null,
-          unit: null,
-          stock: null,
-          reorderPoint: null,
-        });
-        bootstrap.Modal.getInstance(document.getElementById('createProductModal')!)?.hide();
-      },
-      error: (error) => {
-        this.toastService.show('No se pudo crear: ' + error.error.message, 'danger');
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+    this.productService
+      .create({
+        name: this.form.getRawValue().name,
+        categoryId: this.form.getRawValue().categoryId!,
+        tagId: this.form.getRawValue().tagId ?? null,
+        unit: this.form.getRawValue().unit!,
+        stock: this.form.getRawValue().stock!,
+        reorderPoint: this.form.getRawValue().reorderPoint!,
+      })
+      .subscribe({
+        next: (created) => {
+          this.productState.addProduct(created);
+          this.toastService.show('Producto creado correctamente', 'success');
+          this.form.reset({
+            name: '',
+            categoryId: null,
+            tagId: null,
+            unit: null,
+            stock: null,
+            reorderPoint: null,
+          });
+          bootstrap.Modal.getInstance(document.getElementById('createProductModal')!)?.hide();
+        },
+        error: (error) => {
+          this.toastService.show('No se pudo crear: ' + error.error.message, 'danger');
+          this.loading.set(false);
+        },
+        complete: () => {
+          this.loading.set(false);
+        },
+      });
   }
 }

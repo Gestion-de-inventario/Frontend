@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
@@ -27,7 +27,7 @@ export class ProductDetailModalComponent {
   readonly product = computed(() => this.productState.selectedProduct());
 
   mode: 'view' | 'edit' = 'view';
-  loading = false;
+  loading = signal<boolean>(false);
   tieneTransacciones = false;
 
   categories: CategoryResponse[] = [];
@@ -71,50 +71,54 @@ export class ProductDetailModalComponent {
 
   save(): void {
     const product = this.product();
-    if (!product || this.loading) return;
+    if (!product || this.loading()) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
-    this.productService.edit(product.id, {
-      name: this.form.value.name ?? undefined,
-      categoryId: this.form.value.categoryId ?? undefined,
-      tagId: this.form.value.tagId ?? undefined,
-      unit: this.form.value.unit ?? undefined,
-      reorderPoint: this.form.value.reorderPoint ?? undefined,
-    }).subscribe({
-      next: (updated) => {
-        this.productState.updateProduct(updated);
-        this.toastService.show('Producto actualizado', 'success');
-        this.mode = 'view';
-      },
-      error: (error) => {
-        this.toastService.show('No se pudo actualizar: ' + error.error.message, 'danger');
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+    this.productService
+      .edit(product.id, {
+        name: this.form.value.name ?? undefined,
+        categoryId: this.form.value.categoryId ?? undefined,
+        tagId: this.form.value.tagId ?? undefined,
+        unit: this.form.value.unit ?? undefined,
+        reorderPoint: this.form.value.reorderPoint ?? undefined,
+      })
+      .subscribe({
+        next: (updated) => {
+          this.productState.updateProduct(updated);
+          this.toastService.show('Producto actualizado', 'success');
+          this.mode = 'view';
+        },
+        error: (error) => {
+          this.toastService.show('No se pudo actualizar: ' + error.error.message, 'danger');
+          this.loading.set(false);
+        },
+        complete: () => {
+          this.loading.set(false);
+        },
+      });
   }
 
   changeStatus(status: string): void {
     const product = this.product();
-    if (!product || this.loading) return;
+    if (!product || this.loading()) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.productService.changeStatus(product.id, status).subscribe({
       next: (updated) => {
         this.productState.updateProduct(updated);
         this.toastService.show(
           status === 'ACTIVO' ? 'Producto activado' : 'Producto desactivado',
-          status === 'ACTIVO' ? 'success' : 'warning'
+          status === 'ACTIVO' ? 'success' : 'warning',
         );
       },
       error: (error) => {
         this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

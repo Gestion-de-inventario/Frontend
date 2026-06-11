@@ -117,6 +117,7 @@ export class ListPurchaseFragmentComponent {
 
       error: (error) => {
         this.toastService.show(error.error.message, 'danger');
+        this.changeStatusLoading.set(false);
       },
 
       complete: () => {

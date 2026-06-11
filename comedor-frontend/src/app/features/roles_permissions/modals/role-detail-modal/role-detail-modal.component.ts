@@ -1,4 +1,4 @@
-import { Component, computed, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, computed, inject, ChangeDetectorRef, signal } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -46,7 +46,7 @@ export class RoleDetailModalComponent {
 
   mode: 'view' | 'edit' | 'permissions' = 'view';
 
-  loading = false;
+  loading = signal<boolean>(false);
 
   permissions: PermissionResponse[] = [];
 
@@ -99,7 +99,7 @@ export class RoleDetailModalComponent {
 
     this.permissionSearch = '';
 
-    this.loading = true;
+    this.loading.apply(true);
 
     this.permissionService.getAllPermissions().subscribe({
       next: (permissions) => {
@@ -114,20 +114,17 @@ export class RoleDetailModalComponent {
           },
           {} as Record<string, PermissionResponse[]>,
         );
-        this.cdr.detectChanges();
+
         this.permissionGroups = Object.entries(grouped).map(([module, permissions]) => ({
           module,
           permissions,
         }));
 
-        this.loading = false;
-
-        this.cdr.detectChanges();
+        this.loading.apply(false);
       },
       error: (error) => {
-        this.loading = false;
-        this.cdr.detectChanges(); // También en el error por seguridad
         this.toastService.show(error.error?.message || 'Error al cargar permisos', 'danger');
+        this.loading.apply(false);
         this.mode = 'view';
       },
     });
@@ -164,11 +161,11 @@ export class RoleDetailModalComponent {
   changeStatus(status: 'ACTIVAR' | 'DESACTIVAR'): void {
     const role = this.role();
 
-    if (!role || this.loading) {
+    if (!role || this.loading()) {
       return;
     }
 
-    this.loading = true;
+    this.loading.apply(true);
 
     this.roleService.changeStatus(role.role_id, status).subscribe({
       next: (updated) => {
@@ -182,10 +179,11 @@ export class RoleDetailModalComponent {
 
       error: (error) => {
         this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+        this.loading.apply(false);
       },
 
       complete: () => {
-        this.loading = false;
+        this.loading.apply(false);
       },
     });
   }
@@ -193,11 +191,11 @@ export class RoleDetailModalComponent {
   savePermissions(): void {
     const role = this.role();
 
-    if (!role || this.loading) {
+    if (!role || this.loading()) {
       return;
     }
 
-    this.loading = true;
+    this.loading.apply(true);
 
     this.roleService
       .assignPermissions(role.role_id, {
@@ -206,18 +204,18 @@ export class RoleDetailModalComponent {
       .subscribe({
         next: (updatedRole) => {
           this.roleState.updateRole(updatedRole);
-
           this.toastService.show('Permisos actualizados', 'success');
-
           this.mode = 'view';
+          this.loading.apply(false);
         },
 
         error: (error) => {
           this.toastService.show(error.error.message, 'danger');
+          this.loading.apply(false);
         },
 
         complete: () => {
-          this.loading = false;
+          this.loading.apply(false);
         },
       });
   }
@@ -229,11 +227,11 @@ export class RoleDetailModalComponent {
   save(): void {
     const role = this.role();
 
-    if (!role || this.form.invalid || this.loading) {
+    if (!role || this.form.invalid || this.loading()) {
       return;
     }
 
-    this.loading = true;
+    this.loading.apply(true);
 
     this.roleService.editRole(role.role_id, this.form.getRawValue()).subscribe({
       next: (updatedRole) => {
@@ -246,10 +244,11 @@ export class RoleDetailModalComponent {
 
       error: (error) => {
         this.toastService.show(error.error.message, 'danger');
+        this.loading.apply(false);
       },
 
       complete: () => {
-        this.loading = false;
+        this.loading.apply(false);
       },
     });
   }

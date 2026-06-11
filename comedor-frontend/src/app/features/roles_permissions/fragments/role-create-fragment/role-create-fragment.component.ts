@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -38,7 +38,7 @@ export class RoleCreateFragmentComponent {
 
   permissions: PermissionResponse[] = [];
 
-  loading = false;
+  loading = signal<boolean>(false);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
@@ -84,11 +84,11 @@ export class RoleCreateFragmentComponent {
   }
 
   create(): void {
-    if (this.form.invalid || this.loading) {
+    if (this.form.invalid || this.loading()) {
       return;
     }
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.roleService
       .createRole({
@@ -112,10 +112,11 @@ export class RoleCreateFragmentComponent {
 
         error: (error) => {
           this.toastService.show(error.error.message, 'danger');
+          this.loading.set(false);
         },
 
         complete: () => {
-          this.loading = false;
+          this.loading.set(false);
         },
       });
   }

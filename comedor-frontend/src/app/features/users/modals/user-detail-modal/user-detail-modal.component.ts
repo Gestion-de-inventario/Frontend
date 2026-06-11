@@ -171,6 +171,7 @@ export class UserDetailModalComponent {
 
         error: (error) => {
           this.toastService.show('No se pudo actualizar : ' + error.error.message, 'danger');
+          this.loading.set(false);
         },
 
         complete: () => {
@@ -203,6 +204,7 @@ export class UserDetailModalComponent {
 
       error: (error) => {
         this.toastService.show('No se pudo activar: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
         this.loading.set(false);
@@ -234,6 +236,7 @@ export class UserDetailModalComponent {
 
       error: (error) => {
         this.toastService.show('No se pudo desactivar: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
         this.loading.set(false);

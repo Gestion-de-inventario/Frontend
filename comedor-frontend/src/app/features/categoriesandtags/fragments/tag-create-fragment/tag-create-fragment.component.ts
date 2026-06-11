@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TagApiService } from '@features/categoriesandtags/services/tag-api.service';
@@ -12,14 +12,14 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './tag-create-fragment.component.html',
-  styleUrl:'./tag-create-fragment.component.scss'
+  styleUrl: './tag-create-fragment.component.scss',
 })
 export class TagCreateFragmentComponent {
   private readonly tagService = inject(TagApiService);
   private readonly tagState = inject(TagStateService);
   private readonly toastService = inject(ToastService);
 
-  loading = false;
+  loading = signal<boolean>(false);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
@@ -34,8 +34,8 @@ export class TagCreateFragmentComponent {
   }
 
   create(): void {
-    if (this.form.invalid || this.loading) return;
-    this.loading = true;
+    if (this.form.invalid || this.loading()) return;
+    this.loading.set(true);
 
     this.tagService.create(this.form.getRawValue()).subscribe({
       next: (created) => {
@@ -46,9 +46,10 @@ export class TagCreateFragmentComponent {
       },
       error: (error) => {
         this.toastService.show('No se pudo crear: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

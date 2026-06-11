@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -19,27 +19,28 @@ export class TagDetailModalComponent {
 
   readonly tag = computed(() => this.tagState.selectedTag());
 
-  loading = false;
+  loading = signal<boolean>(false);
 
   changeStatus(status: string): void {
     const tag = this.tag();
-    if (!tag || this.loading) return;
+    if (!tag || this.loading()) return;
 
-    this.loading = true;
+    this.loading.set(true);
 
     this.tagService.changeStatus(tag.id, status).subscribe({
       next: (updated) => {
         this.tagState.updateTag(updated);
         this.toastService.show(
           status === 'ACTIVO' ? 'Etiqueta activada' : 'Etiqueta desactivada',
-          status === 'ACTIVO' ? 'success' : 'warning'
+          status === 'ACTIVO' ? 'success' : 'warning',
         );
       },
       error: (error) => {
         this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
+        this.loading.set(false);
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
       },
     });
   }

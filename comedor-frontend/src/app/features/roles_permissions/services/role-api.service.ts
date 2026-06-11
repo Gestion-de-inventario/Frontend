@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { environment } from '@env/environment';
 import { API_ENDPOINTS } from '@core/constants/api-endpoints';
@@ -17,11 +17,18 @@ export class RoleService {
 
   constructor(private http: HttpClient) {}
 
-  listRolesByStatus(status: string) {
-    return this.http.get<RoleResponse[]>(
-      `${this.apiUrl}${API_ENDPOINTS.ROLE.LIST_BY_STATUS}?status=${status}`,
-    );
+  listRolesByStatus(status?: string) {
+    let params = new HttpParams();
+
+    if (status) {
+      params = params.set('status', status);
+    }
+
+    return this.http.get<RoleResponse[]>(`${this.apiUrl}${API_ENDPOINTS.ROLE.LIST_BY_STATUS}`, {
+      params,
+    });
   }
+
   listMinRolesByStatus(status: string) {
     return this.http.get<MinRoleResponse[]>(
       `${this.apiUrl}${API_ENDPOINTS.ROLE.LIST_BY_STATUS}?status=${status}`,
