@@ -308,6 +308,8 @@
               >
                 Marcar como recibido
               </button>
+            } @else if (purchase.status == 'RECIBIDO' && canCreate) {
+              <button class="btn btn-success" (click)="createSameOrder()">Crear nueva orden</button>
             }
 
             <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -31,7 +31,8 @@ export const routes: Routes = [
 
         loadComponent: () =>
           import('@features/dashboard/pages/dashboard-principal.component').then(
-            (m) => m.DashboardPrincipalComponent),
+            (m) => m.DashboardPrincipalComponent,
+          ),
       },
 
       {
@@ -152,7 +153,7 @@ export const routes: Routes = [
 
       {
         path: 'beneficiaries-control',
-        title: 'Control de Salida',
+        title: 'Orden de Salida',
         loadComponent: () =>
           import('@features/beneficiaries-control/pages/beneficiary-control/beneficiary-control').then(
             (m) => m.BeneficiaryControl,
@@ -268,7 +269,6 @@ export const routes: Routes = [
           },
         ],
       },
-      
     ],
   },
 ];

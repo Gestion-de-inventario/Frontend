@@ -18,7 +18,6 @@ export class MenuReportApiService {
   private readonly apiUrl = `${environment.apiUrl}/menu_report`;
   private readonly dishMenuUrl = `${environment.apiUrl}/dish-menus`;
 
-  // Listar los platos disponibles
   getDishMenus(): Observable<DishMenuResponse[]> {
     return this.http.get<DishMenuResponse[]>(this.dishMenuUrl);
   }
