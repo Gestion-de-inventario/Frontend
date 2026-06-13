@@ -1,85 +1,88 @@
-import { Component, computed, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModificationsService } from '@features/transactions_modifications/services/modification/modifications-api.service';
 import { ModificationsStateService } from '@features/transactions_modifications/services/modification/modifications-state.service';
 import { ModificationsResponse } from '@features/transactions_modifications/interfaces/modifications/modifications.response';
+import { AuthStateService } from '@core/auth/services/auth-state.service';
+import { FormsModule } from '@angular/forms';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-modifications-fragment',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './modifications-fragment.component.html',
 })
-export class ModificationsFragmentComponent implements OnInit {
+export class ModificationsFragmentComponent {
+  readonly authState = inject(AuthStateService);
   private readonly modificationsService = inject(ModificationsService);
   private readonly modificationsState = inject(ModificationsStateService);
-  private readonly cdr = inject(ChangeDetectorRef); // 2. Inyectamos el detector
 
+  canList = this.authState.hasPermission('MODIFICATION_LIST_ALL');
   readonly modifications = computed(() => this.modificationsState.modifications());
   modalModifications: ModificationsResponse[] = [];
-  loading = false;
+  loading = signal<boolean>(false);
   modalPage = 0;
   modalSize = 10;
 
-  ngOnInit(): void {
-    this.loadPreview();
+  pageSize = signal(3);
+
+  page = signal(0);
+
+  totalPages = signal(0);
+
+  totalElements = signal(0);
+
+  constructor() {
+    if (!this.canList) return;
+
+    this.loadModifications();
   }
 
-  loadPreview(): void {
-    this.loading = true;
-    this.modificationsService.list(0, 3).subscribe({
-      next: (data) => {
-        this.modificationsState.set(data.content);
-        this.loading = false;
-        this.cdr.detectChanges();
+  loadModifications(): void {
+    this.loading.set(true);
+    this.modificationsService.list(this.page(), this.pageSize()).subscribe({
+      next: (response) => {
+        this.modificationsState.set(response.content);
+
+        this.totalPages.set(response.totalPages);
+
+        this.totalElements.set(response.totalElements);
+
+        this.loading.set(false);
       },
       error: () => {
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.loading.set(false);
       },
-    });
-  }
 
-  openModal(): void {
-    this.modalPage = 0;
-    this.modalModifications = [];
-    this.loadPage();
-
-    const modalElement = document.getElementById('modificationsModal');
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }
-  closeModal(): void {
-    this.loading = false;
-    this.modalModifications = [];
-    this.modalPage = 0;
-  }
-
-  loadPage(): void {
-    if (this.modalPage === 0) this.loading = true;
-
-    this.modificationsService.list(this.modalPage, this.modalSize).subscribe({
-      next: (data: any) => {
-        const content = data.content ?? data;
-        this.modalModifications = [...this.modalModifications, ...content];
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loading = false;
-        this.cdr.detectChanges();
+      complete: () => {
+        this.loading.set(false);
       },
     });
   }
 
   nextPage(): void {
-    if (this.loading) return;
-    this.modalPage++;
-    this.loading = true;
-    this.loadPage();
+    if (this.page() + 1 < this.totalPages()) {
+      this.page.update((v) => v + 1);
+
+      this.loadModifications();
+    }
+  }
+
+  previousPage(): void {
+    if (this.page() > 0) {
+      this.page.update((v) => v - 1);
+
+      this.loadModifications();
+    }
+  }
+
+  changePageSize(size: number): void {
+    this.pageSize.set(size);
+
+    this.page.set(0);
+
+    this.loadModifications();
   }
 }
