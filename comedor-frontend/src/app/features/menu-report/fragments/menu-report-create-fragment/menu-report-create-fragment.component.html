@@ -124,7 +124,7 @@
           </div>
 
           <div class="mb-3">
-            <strong>Cocineras:</strong>
+            <strong>Responsable:</strong>
             <div class="d-flex flex-wrap gap-2 mt-2">
               @for (cook of report()?.cocineras ?? []; track cook.id) {
                 <span class="badge bg-primary"> {{ cook.name }} {{ cook.lastname }} </span>
