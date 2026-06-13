@@ -14,6 +14,7 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './list-purchase-fragment.component.html',
+  styleUrls: ['./list-purchase-fragment.component.scss'],
 })
 export class ListPurchaseFragmentComponent {
   private readonly purchaseService = inject(PurchaseApiService);
