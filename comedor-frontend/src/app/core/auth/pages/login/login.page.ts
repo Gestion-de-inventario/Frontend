@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -38,7 +38,7 @@ export class LoginPage {
     }),
   });
 
-  isLoading = false;
+  isLoading = signal<boolean>(false);
 
   login(): void {
     if (this.form.invalid) {
@@ -47,17 +47,17 @@ export class LoginPage {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     this.authState.login(this.form.getRawValue()).subscribe({
       next: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
 
         this.router.navigate(['/dashboard']);
       },
 
       error: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
     });
   }

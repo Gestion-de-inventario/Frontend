@@ -48,13 +48,13 @@
 
         <!-- Cocineras -->
         <div>
-          <label class="form-label fw-bold">Cocineras</label>
+          <label class="form-label fw-bold">Responsables</label>
 
           <div class="position-relative">
             <input
               type="text"
               class="form-control"
-              placeholder="Buscar cocinera..."
+              placeholder="Buscar responsable..."
               [ngModel]="cookSearch()"
               (ngModelChange)="cookSearch.set($event)"
               [disabled]="!!report()"
