@@ -62,6 +62,7 @@ export const API_ENDPOINTS = {
 
   TRANSACTION: {
     LIST_ALL: '/transactions',
+    EXPORT_PDF: '/transactions/export/pdf',
   },
 
   USER: {
@@ -85,6 +86,7 @@ export const API_ENDPOINTS = {
 
   MODIFICATION: {
     LIST_ALL: '/modifications',
+    EXPORT_PDF: '/modifications/export/pdf',
   },
 
   PERMISSION: {

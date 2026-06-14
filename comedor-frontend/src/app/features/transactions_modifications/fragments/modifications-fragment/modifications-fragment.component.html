@@ -1,29 +1,73 @@
 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
   <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-        style="width: 40px; height: 40px"
-      >
-        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-          ></path>
-        </svg>
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <div
+          class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+        >
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+            ></path>
+          </svg>
+        </div>
+        <h5 class="fw-bold text-dark mb-0">Modificaciones recientes</h5>
       </div>
-      <h5 class="fw-bold text-dark mb-0">Modificaciones recientes</h5>
+
+      <button class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center" 
+              (click)="exportToPdf()" 
+              [disabled]="loading() || exporting()">
+        @if (exporting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Exportando...
+        } @else {
+          <i class="bi bi-file-earmark-pdf me-2"></i> Exportar PDF
+        }
+      </button>
     </div>
   </div>
 
   <div class="card-body px-4 pb-4">
+
+    <div class="row g-3 mb-4 align-items-end bg-light p-3 rounded-4 mx-1 mt-1">
+      <div class="col-md-4">
+        <label class="form-label fw-bold text-muted small">Filtrar por fecha</label>
+        <select class="form-select rounded-3" 
+                [ngModel]="filterOption()" 
+                (ngModelChange)="filterOption.set($event); onFilterChange()">
+          <option value="hoy">Hoy</option>
+          <option value="ayer">Ayer</option>
+          <option value="esta_semana">Esta semana</option>
+          <option value="este_mes">Este mes</option>
+          <option value="mes_pasado">Mes pasado</option>
+          <option value="custom">Rango personalizado</option>
+        </select>
+      </div>
+
+      @if (filterOption() === 'custom') {
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-muted small">Fecha Inicio</label>
+          <input type="date" class="form-control rounded-3" 
+                 [ngModel]="customStartDate()" 
+                 (ngModelChange)="customStartDate.set($event); onCustomDateChange()">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-muted small">Fecha Fin</label>
+          <input type="date" class="form-control rounded-3" 
+                 [ngModel]="customEndDate()" 
+                 (ngModelChange)="customEndDate.set($event); onCustomDateChange()">
+        </div>
+      }
+    </div>
+
     @if (loading()) {
       <div class="text-center py-5">
         <div class="spinner-border text-primary"></div>
       </div>
     } @else if (modifications().length === 0) {
-      <div class="text-center py-5 text-muted">No hay modificaciones registradas.</div>
+      <div class="text-center py-5 text-muted">No hay modificaciones registradas en estas fechas.</div>
     } @else {
       <div class="row mt-4">
         <div class="col">
