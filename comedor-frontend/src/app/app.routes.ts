@@ -1,40 +1,28 @@
 import { Routes } from '@angular/router';
-
 import { authGuard } from './core/auth/guards/auth.guard';
-
 import { appReadyGuard } from './core/auth/guards/appReadyGuard';
-
 import { guestGuard } from './core/auth/guards/guest.guard';
 import { AppShellPage } from './layout/pages/app-shell/app-shell.page';
 
 export const routes: Routes = [
   {
     path: 'login',
-
     canActivate: [guestGuard],
-
     loadComponent: () => import('@core/auth/pages/login/login.page').then((m) => m.LoginPage),
   },
-
   {
     path: '',
-
     component: AppShellPage,
-
     canActivate: [appReadyGuard, authGuard],
-
     children: [
       {
         path: 'dashboard',
-
         title: 'Dashboard',
-
         loadComponent: () =>
           import('@features/dashboard/pages/dashboard-principal.component').then(
             (m) => m.DashboardPrincipalComponent,
           ),
       },
-
       {
         path: 'management',
         title: 'Gestión de Usuarios',
@@ -42,14 +30,8 @@ export const routes: Routes = [
           import('@features/users/pages/user-managment-principal/user-management-principal.component').then(
             (m) => m.UserManagementPrincipalComponent,
           ),
-
         children: [
-          {
-            path: '',
-            redirectTo: 'users',
-            pathMatch: 'full',
-          },
-
+          { path: '', redirectTo: 'users', pathMatch: 'full' },
           {
             path: 'users',
             loadComponent: () =>
@@ -57,7 +39,6 @@ export const routes: Routes = [
                 (m) => m.UserPrincipal,
               ),
           },
-
           {
             path: 'beneficiaries',
             loadComponent: () =>
@@ -65,7 +46,6 @@ export const routes: Routes = [
                 (m) => m.BeneficiaryPrincipal,
               ),
           },
-
           {
             path: 'beneficiary-types',
             loadComponent: () =>
@@ -75,55 +55,15 @@ export const routes: Routes = [
           },
         ],
       },
-
       {
         path: 'roles',
-
         title: 'Roles',
-
         loadComponent: () =>
           import('@features/roles_permissions/pages/roles-permissions_principal/roles-permissions_principal').then(
             (m) => m.RolesPermissionsPrincipalComponent,
           ),
       },
-
-      {
-        path: '',
-
-        redirectTo: 'dashboard',
-
-        pathMatch: 'full',
-      },
-
-      {
-        path: 'products',
-
-        title: 'Productos',
-
-        loadComponent: () =>
-          import('@features/products/pages/product_principal/product_principal').then(
-            (m) => m.ProductPrincipal,
-          ),
-      },
-
-      {
-        path: 'beneficiaries',
-        title: 'Beneficiarios',
-        loadComponent: () =>
-          import('@features/beneficiaries/pages/beneficiary_principal/beneficiary_principal').then(
-            (m) => m.BeneficiaryPrincipal,
-          ),
-      },
-
-      {
-        path: 'categories',
-        title: 'Categorías y Etiquetas',
-        loadComponent: () =>
-          import('@features/categoriesandtags/pages/category_principal/category_principal').then(
-            (m) => m.CategoryPrincipal,
-          ),
-      },
-
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'profile',
         title: 'Mi perfil',
@@ -132,7 +72,6 @@ export const routes: Routes = [
             (m) => m.ProfilePrincipal,
           ),
       },
-
       {
         path: 'transactions-modifications',
         title: 'Transacciones y Modificaciones',
@@ -141,7 +80,6 @@ export const routes: Routes = [
             (m) => m.TransactionsModificationsPrincipalComponent,
           ),
       },
-
       {
         path: 'menu-report',
         title: 'Orden de producción',
@@ -150,7 +88,6 @@ export const routes: Routes = [
             (m) => m.MenuReportPrincipal,
           ),
       },
-
       {
         path: 'beneficiaries-control',
         title: 'Orden de Salida',
@@ -159,7 +96,6 @@ export const routes: Routes = [
             (m) => m.BeneficiaryControl,
           ),
       },
-
       {
         path: 'menu-report-summary',
         title: 'Resumen diario',
@@ -168,7 +104,6 @@ export const routes: Routes = [
             (m) => m.MenuReportSummary,
           ),
       },
-
       {
         path: 'purchase-order',
         title: 'Órdenes de compra',
@@ -176,7 +111,6 @@ export const routes: Routes = [
           import('@features/purchase-order/pages/purchase-order-principal/purchase-orden').then(
             (m) => m.PurchaseOrden,
           ),
-
         children: [
           {
             path: '',
@@ -185,7 +119,6 @@ export const routes: Routes = [
                 (m) => m.ListPurchaseFragmentComponent,
               ),
           },
-
           {
             path: 'create',
             loadComponent: () =>
@@ -195,7 +128,6 @@ export const routes: Routes = [
           },
         ],
       },
-
       {
         path: 'inventory',
         title: 'Inventario',
@@ -204,11 +136,7 @@ export const routes: Routes = [
             (m) => m.InventoryPrincipalComponent,
           ),
         children: [
-          {
-            path: '',
-            redirectTo: 'products',
-            pathMatch: 'full',
-          },
+          { path: '', redirectTo: 'products', pathMatch: 'full' },
           {
             path: 'products',
             loadComponent: () =>
@@ -223,9 +151,23 @@ export const routes: Routes = [
                 (m) => m.DishPrincipal,
               ),
           },
+          // AQUI ESTÁN LAS NUEVAS RUTAS DE CATEGORIAS Y ETIQUETAS
+          {
+            path: 'categories',
+            loadComponent: () =>
+              import('@features/categoriesandtags/pages/category_principal/category_principal').then(
+                (m) => m.CategoryPrincipal,
+              ),
+          },
+          {
+            path: 'tags',
+            loadComponent: () =>
+              import('@features/categoriesandtags/pages/tag_principal/tag_principal').then(
+                (m) => m.TagPrincipal,
+              ),
+          }
         ],
       },
-
       {
         path: 'reports',
         title: 'Reportes',
@@ -234,11 +176,7 @@ export const routes: Routes = [
             (m) => m.ReportsPrincipalComponent,
           ),
         children: [
-          {
-            path: '',
-            redirectTo: 'transactions',
-            pathMatch: 'full',
-          },
+          { path: '', redirectTo: 'transactions', pathMatch: 'full' },
           {
             path: 'transactions',
             loadComponent: () =>

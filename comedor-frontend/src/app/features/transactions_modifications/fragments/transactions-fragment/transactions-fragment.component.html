@@ -1,23 +1,67 @@
 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
   <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
-    <div class="d-flex align-items-center gap-3">
-      <div
-        class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-        style="width: 40px; height: 40px"
-      >
-        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-          ></path>
-        </svg>
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-3">
+        <div
+          class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+          style="width: 40px; height: 40px"
+        >
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+            ></path>
+          </svg>
+        </div>
+        <h5 class="fw-bold text-dark mb-0">Transacciones recientes</h5>
       </div>
-      <h5 class="fw-bold text-dark mb-0">Transacciones recientes</h5>
+      
+      <button class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center" 
+              (click)="exportToPdf()" 
+              [disabled]="loading() || exporting()">
+        @if (exporting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Exportando...
+        } @else {
+          <i class="bi bi-file-earmark-pdf me-2"></i> Exportar PDF
+        }
+      </button>
     </div>
   </div>
 
   <div class="card-body">
+    
+    <div class="row g-3 mb-4 align-items-end bg-light p-3 rounded-4 mx-1">
+      <div class="col-md-4">
+        <label class="form-label fw-bold text-muted small">Filtrar por fecha</label>
+        <select class="form-select rounded-3" 
+                [ngModel]="filterOption()" 
+                (ngModelChange)="filterOption.set($event); onFilterChange()">
+          <option value="hoy">Hoy</option>
+          <option value="ayer">Ayer</option>
+          <option value="esta_semana">Esta semana</option>
+          <option value="este_mes">Este mes</option>
+          <option value="mes_pasado">Mes pasado</option>
+          <option value="custom">Rango personalizado</option>
+        </select>
+      </div>
+
+      @if (filterOption() === 'custom') {
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-muted small">Fecha Inicio</label>
+          <input type="date" class="form-control rounded-3" 
+                 [ngModel]="customStartDate()" 
+                 (ngModelChange)="customStartDate.set($event); onCustomDateChange()">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-muted small">Fecha Fin</label>
+          <input type="date" class="form-control rounded-3" 
+                 [ngModel]="customEndDate()" 
+                 (ngModelChange)="customEndDate.set($event); onCustomDateChange()">
+        </div>
+      }
+    </div>
+
     @if (loading()) {
       <div class="text-center py-5">
         <div class="spinner-border text-primary"></div>
@@ -104,98 +148,3 @@
     }
   </div>
 </div>
-
-<!-- MODAL 
-<div class="modal fade" id="transactionsModal" tabindex="-1" data-bs-backdrop="static">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
-        <div class="d-flex align-items-center gap-3">
-          <div
-            class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-            style="width: 40px; height: 40px"
-          >
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              width="20"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-              ></path>
-            </svg>
-          </div>
-          <h5 class="modal-title fw-bold text-dark mb-0">Historial de Transacciones</h5>
-        </div>
-        <button
-          class="btn-close shadow-none"
-          data-bs-dismiss="modal"
-          (click)="closeModal()"
-        ></button>
-      </div>
-
-      <div class="modal-body px-4 py-4">
-        <div class="d-flex flex-column gap-2">
-          @for (t of modalTransactions; track t.id) {
-            <div class="border rounded-3 px-3 py-3">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <span class="fw-semibold text-dark">{{ $index + 1 }}. {{ t.productName }}</span>
-                  <span class="ms-2 text-muted small">{{ t.dateTime | date: 'short' }}</span>
-                </div>
-                <span
-                  class="badge rounded-pill"
-                  [class]="
-                    t.type === 'SALIDA'
-                      ? 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'
-                      : 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
-                  "
-                >
-                  {{ t.type }}
-                </span>
-              </div>
-              <div class="mt-2 d-flex gap-3 flex-wrap">
-                <small class="text-muted"
-                  ><span class="fw-medium">Cantidad:</span> {{ t.amount }}</small
-                >
-                <small class="text-muted"
-                  ><span class="fw-medium">Usuario:</span> {{ t.userName }} — {{ t.personaName }}
-                  {{ t.personaLastName }}</small
-                >
-                <small class="text-muted"
-                  ><span class="fw-medium">Stock:</span> {{ t.currentStock }} →
-                  {{ t.finalStock }}</small
-                >
-              </div>
-            </div>
-          }
-          @if (loading()) {
-            <div class="text-center py-3">
-              <div class="spinner-border text-primary"></div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <div
-        class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between align-items-center"
-      >
-        <small class="text-muted">{{ modalTransactions.length }} transacciones cargadas</small>
-        <button
-          class="btn btn-primary rounded-pill px-4 fw-medium"
-          (click)="nextPage()"
-          [disabled]="loading()"
-        >
-          @if (loading()) {
-            <span class="spinner-border spinner-border-sm"></span>
-          }
-          Siguiente pagina
-        </button>
-      </div>
-    </div>
-  </div>
-</div>-->

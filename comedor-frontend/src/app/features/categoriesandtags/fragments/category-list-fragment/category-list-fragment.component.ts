@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoryApiService } from '@features/categoriesandtags/services/category-api.service';
 import { CategoryStateService } from '@features/categoriesandtags/services/category-state.service';
-import { CategoryDetailModalComponent } from '../category-detail-modal/category-detail-modal.component';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-category-list-fragment',
   standalone: true,
-  imports: [CommonModule, FormsModule, CategoryDetailModalComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './category-list-fragment.component.html',
 })
 export class CategoryListFragmentComponent {
