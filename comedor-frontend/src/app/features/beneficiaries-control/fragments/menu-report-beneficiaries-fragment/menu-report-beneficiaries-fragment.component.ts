@@ -59,6 +59,8 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   listLoading = signal(false);
 
+  updatingBeneficiaryId = signal<number | null>(null);
+
   ngOnInit(): void {
     this.initReport();
   }
@@ -259,5 +261,61 @@ export class MenuReportBeneficiariesFragmentComponent {
     this.payMethod.set('EFECTIVO');
     this.pago.set(false);
     this.entregado.set(false);
+  }
+
+  private updateBeneficiaryStatus(
+    record: BeneficiaryRecordResponse,
+    changes: Partial<BeneficiaryRecordResponse>,
+    rollback: () => void,
+  ): void {
+    this.updatingBeneficiaryId.set(record.id);
+
+    const request = {
+      beneficiarioId: record.id,
+      pago: changes.pago ?? record.pago,
+      entregado: changes.entregado ?? record.entregado,
+      payMethod: record.metodoPago,
+      menusAmount: record.cantidad,
+      menuPrice: record.total / record.cantidad,
+    };
+
+    this.beneficiaryControlService
+      .editBeneficiary(this.report()!.id, record.id, request)
+      .pipe(
+        finalize(() => {
+          this.updatingBeneficiaryId.set(null);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.show('Estado actualizado', 'success');
+        },
+        error: () => {
+          rollback();
+          this.toastService.show('No se pudo actualizar', 'danger');
+        },
+      });
+  }
+
+  togglePago(record: BeneficiaryRecordResponse, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const oldValue = record.pago;
+
+    record.pago = checked;
+
+    this.updateBeneficiaryStatus(record, { pago: checked }, () => (record.pago = oldValue));
+  }
+
+  toggleEntregado(record: BeneficiaryRecordResponse, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const oldValue = record.entregado;
+
+    record.entregado = checked;
+
+    this.updateBeneficiaryStatus(
+      record,
+      { entregado: checked },
+      () => (record.entregado = oldValue),
+    );
   }
 }
