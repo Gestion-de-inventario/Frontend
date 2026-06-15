@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
     EDIT_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     REMOVE_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     EXPORT_PDF: '/menu_report/{id}/export/pdf',
+    RANGE_EXPORT_PDF: '/menu_report/export/pdf',
     EXPORT_EXCEL: '/menu_report/{id}/export/excel',
   },
 

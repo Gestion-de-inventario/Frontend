@@ -1,100 +1,91 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 import { MenuReportApiService } from '@features/menu-report/services/menu-report-api.service';
-import { MenuReportStateService } from '@features/menu-report/services/menu-report-state.service';
-import { MenuReportSummaryResponse } from '@features/menu-report-summary/interfaces/menu-report-summary-response';
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { switchMap } from 'rxjs/internal/operators/switchMap';
+import { ListMenuReportDetailResponse } from '@features/menu-report/interfaces/menu-report.response';
+
+import { finalize } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-const LocalToday = new Date();
-
-const localDate =
-  LocalToday.getFullYear() +
-  '-' +
-  String(LocalToday.getMonth() + 1).padStart(2, '0') +
-  '-' +
-  String(LocalToday.getDate()).padStart(2, '0');
+const today = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Lima',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).format(new Date());
 
 @Component({
   selector: 'app-menu-report-summary-fragment',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './menu-report-summary-fragment.component.html',
 })
 export class MenuReportSummaryFragmentComponent {
   private readonly menuReportService = inject(MenuReportApiService);
-  private readonly menuReportState = inject(MenuReportStateService);
 
-  //readonly report = this.menuReportState.report;
-  readonly reportId = signal<number | null>(null);
-  summary = signal<MenuReportSummaryResponse | null>(null);
-  loadingSummary = signal(false);
+  summary = signal<ListMenuReportDetailResponse | null>(null);
 
-  private lastDate: string | null = null;
+  loading = signal(false);
+
+  generatingPdf = signal(false);
+
+  startDate = signal(today);
+  endDate = signal('');
 
   constructor() {
-    effect(() => {
-      if (this.lastDate === localDate) return;
-
-      this.lastDate = localDate;
-
-      this.loadSummary(localDate);
-    });
+    this.search();
   }
 
-  loadSummary(date: string): void {
-    /*
-    this.loadingSummary.set(true);
+  search(): void {
+    this.loading.set(true);
 
-    this.menuReportState
-      .getOrLoadTodayReport(date)
+    this.menuReportService
+      .getByDate(this.startDate() || undefined, this.endDate() || undefined)
       .pipe(
-        switchMap((report) => {
-          if (!report?.id) {
-            throw new Error('No report found');
-          }
-
-          this.reportId.set(report.id);
-
-          return this.menuReportService.getSummary(report.id);
-        }),
-
         catchError(() => {
           this.summary.set(null);
           return of(null);
         }),
-
         finalize(() => {
-          this.loadingSummary.set(false);
+          this.loading.set(false);
         }),
       )
-      .subscribe((summary) => {
-        this.summary.set(summary);
-      });*/
+      .subscribe((response) => {
+        if (response) {
+          this.summary.set(response);
+        }
+      });
+  }
+
+  clearFilters(): void {
+    this.startDate.set('');
+    this.endDate.set('');
+
+    this.search();
   }
 
   refreshSummary(): void {
-    const id = this.reportId();
+    this.search();
+  }
+  exportarResumen() {
+    this.generatingPdf.set(true);
+    this.menuReportService.exportPdf(this.startDate(), this.endDate()).subscribe((file) => {
+      const blob = new Blob([file], { type: 'application/pdf' });
 
-    if (!id) return;
+      const url = window.URL.createObjectURL(blob);
 
-    this.loadingSummary.set(true);
+      const a = document.createElement('a');
 
-    /*this.menuReportService
-      .getSummary(id)
-      .pipe(
-        catchError(() => {
-          this.summary.set(null);
-          return of(null);
-        }),
-        finalize(() => {
-          this.loadingSummary.set(false);
-        }),
-      )
-      .subscribe((summary) => {
-        this.summary.set(summary);
-      }); */
+      a.href = url;
+
+      a.download = `reporte.pdf`;
+
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+      this.generatingPdf.set(false);
+    });
   }
 }

@@ -188,7 +188,7 @@
     @if (
       authState.hasPermission('TRANSACTION_LIST_ALL') ||
       authState.hasPermission('MODIFICATION_LIST_ALL') ||
-      authState.hasPermission('MENU_REPORT_GET_SUMMARY') ||
+      authState.hasPermission('MENU_REPORT_GET_BY_DATE') ||
       authState.hasPermission('MENU_REPORT_EXPORT')
     ) {
       <a class="sidebar-link" (click)="navigateAndClose('/reports')">

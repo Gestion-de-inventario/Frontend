@@ -11,5 +11,5 @@ import { inject } from '@angular/core';
 })
 export class MenuReportSummary {
   readonly authState = inject(AuthStateService);
-  readonly canGetResumen = this.authState.hasPermission('MENU_REPORT_GET_SUMMARY');
+  readonly canGetResumen = this.authState.hasPermission('MENU_REPORT_GET_BY_DATE');
 }

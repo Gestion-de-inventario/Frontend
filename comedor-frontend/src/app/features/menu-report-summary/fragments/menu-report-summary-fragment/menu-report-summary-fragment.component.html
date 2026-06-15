@@ -5,66 +5,139 @@
         class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
         style="width: 40px; height: 40px"
       >
-        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
-          ></path>
-        </svg>
+        📊
       </div>
-      <h5 class="fw-bold text-dark mb-0">Resumen del día</h5>
+
+      <h5 class="fw-bold text-dark mb-0">Resumen de Reportes</h5>
     </div>
   </div>
 
   <div class="card-body px-4 pb-4">
-    @if (loadingSummary()) {
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label"> Fecha inicio </label>
+
+        <input
+          type="date"
+          class="form-control"
+          [ngModel]="startDate()"
+          (ngModelChange)="startDate.set($event)"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label"> Fecha fin </label>
+
+        <input
+          type="date"
+          class="form-control"
+          [ngModel]="endDate()"
+          (ngModelChange)="endDate.set($event)"
+        />
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+      <button class="btn btn-outline-primary" (click)="search()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Buscando...
+        } @else {
+          Buscar
+        }
+      </button>
+
+      <button class="btn btn-outline-secondary" (click)="clearFilters()" [disabled]="loading()">
+        Limpiar filtros
+      </button>
+    </div>
+
+    @if (loading()) {
       <div class="text-center py-5">
         <span class="spinner-border text-primary"></span>
       </div>
     } @else if (summary()) {
-      <div class="d-flex flex-column gap-3 mt-2">
+      <div class="d-flex flex-column gap-3">
         <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
-          <span class="text-muted small fw-medium">💰 Ingresos</span>
-          <strong class="text-success">S/. {{ summary()!.totalEarned }}</strong>
+          <span class="text-muted small fw-medium"> 💰 Ingresos </span>
+
+          <strong class="text-success"> S/. {{ summary()!.totalEarned }} </strong>
         </div>
+
         <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
-          <span class="text-muted small fw-medium">🛒 Egresos</span>
-          <strong class="text-danger">S/. {{ summary()!.totalSpent }}</strong>
+          <span class="text-muted small fw-medium"> 🛒 Egresos </span>
+
+          <strong class="text-danger"> S/. {{ summary()!.totalSpent }} </strong>
         </div>
+
         <div
           class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2"
           [class]="
-            summary()!.neto >= 0
+            summary()!.net >= 0
               ? 'border-success border-opacity-50'
               : 'border-danger border-opacity-50'
           "
         >
-          <span class="text-muted small fw-medium">📈 Balance neto</span>
-          <strong [class]="summary()!.neto >= 0 ? 'text-success' : 'text-danger'"
-            >S/. {{ summary()!.neto }}</strong
-          >
+          <span class="text-muted small fw-medium"> 📈 Balance neto </span>
+
+          <strong [class]="summary()!.net >= 0 ? 'text-success' : 'text-danger'">
+            S/. {{ summary()!.net }}
+          </strong>
         </div>
+
         <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
-          <span class="text-muted small fw-medium">👥 Total beneficiarios</span>
-          <strong>{{ summary()!.beneficiariosCount }}</strong>
+          <span class="text-muted small fw-medium"> 👥 Beneficiarios únicos </span>
+
+          <strong>
+            {{ summary()!.uniqueBeneficiaryCount }}
+          </strong>
         </div>
+
         <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
-          <span class="text-muted small fw-medium">💳 Método más usado</span>
-          <span class="badge bg-primary bg-opacity-10 text-primary border fw-normal px-3 py-2">{{
-            summary()!.mostUsedPaymentMethod
-          }}</span>
+          <span class="text-muted small fw-medium"> 💳 Método más usado </span>
+
+          <span class="badge bg-primary bg-opacity-10 text-primary border fw-normal px-3 py-2">
+            {{ summary()!.mostUsedPaymentMethod }}
+          </span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center border rounded-3 px-3 py-2">
+          <span class="text-muted small fw-medium"> 📋 Reportes encontrados </span>
+
+          <strong>
+            {{ summary()!.reports.length }}
+          </strong>
         </div>
       </div>
+      <!-- BU00 descomentar
       <button
         class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm"
         (click)="refreshSummary()"
       >
         🔄 Actualizar resumen
-      </button>
+      </button>-->
+      @if (generatingPdf()) {
+        <button
+          class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm"
+          (click)="exportarResumen()"
+          [disabled]="generatingPdf()"
+        >
+          <span class="spinner-border spinner-border-sm"></span>
+          Generando pdf...
+        </button>
+      } @else {
+        <button
+          class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm"
+          (click)="exportarResumen()"
+          [disabled]="generatingPdf()"
+        >
+          Exportar resumen
+        </button>
+      }
     } @else {
       <div class="text-center py-4">
         <p class="text-muted mb-3">No se pudo cargar el resumen.</p>
+
         <button
           class="btn btn-outline-primary rounded-pill px-4 fw-medium"
           (click)="refreshSummary()"
