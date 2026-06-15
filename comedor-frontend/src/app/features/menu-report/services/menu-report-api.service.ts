@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
-import { MenuReportRequest } from '../interfaces/menu-report.request';
+import { EditMenuReportRequest, MenuReportRequest } from '../interfaces/menu-report.request';
 import {
   ListMenuReportDetailResponse,
   MenuReportResponse,
@@ -89,5 +89,10 @@ export class MenuReportApiService {
       params,
       responseType: 'blob',
     });
+  }
+
+  editMenuReport(id: number, request: EditMenuReportRequest): Observable<MenuReportResponse> {
+    const endpoint = buildEndpoint(API_ENDPOINTS.MENU_REPORT.EDIT, { id });
+    return this.http.put<MenuReportResponse>(`${this.baseUrl}${endpoint}`, request);
   }
 }

@@ -43,6 +43,7 @@ export const API_ENDPOINTS = {
     GET_BY_ID: '/menu_report/{id}',
     GET_SUMMARY: '/menu_report/{id}/summary',
     ADD_BENEFICIARY: '/menu_report/{id}/beneficiaries',
+    EDIT: '/menu_report/{id}/edit',
     EDIT_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     REMOVE_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     EXPORT_PDF: '/menu_report/{id}/export/pdf',
