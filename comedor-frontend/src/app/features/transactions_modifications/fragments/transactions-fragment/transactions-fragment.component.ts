@@ -143,6 +143,17 @@ export class TransactionsFragmentComponent {
     });
   }
 
+  clearFilters(): void {
+    this.filterOption.set('este_mes');
+    this.type.set(null);
+    this.source.set(null);
+    this.name.set('');
+    this.customStartDate.set('');
+    this.customEndDate.set('');
+    this.page.set(0);
+    this.loadTransactions();
+  }
+
   // =========================
   // CARGA Y PAGINACIÓN
   // =========================

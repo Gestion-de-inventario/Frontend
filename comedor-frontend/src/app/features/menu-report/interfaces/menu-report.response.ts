@@ -47,6 +47,7 @@ export interface MenuReportResponse {
   dishName: string;
   registers: StockMovementResponse[];
   beneficiaries: BeneficiaryRecordResponse[];
+  cooks: number[];
   quantityPrepared: number;
   quantityRemaining: number;
   status: string;

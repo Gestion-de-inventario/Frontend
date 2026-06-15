@@ -230,84 +230,328 @@
 
   <div class="modal fade" id="purchaseDetailModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
         @if (selectedReport(); as report) {
-          <div class="modal-header">
-            <h5 class="modal-title">Orden #{{ report.id }}</h5>
-
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <!-- HEADER -->
+          <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
+            <div class="d-flex align-items-center gap-3">
+              <div
+                class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px"
+              >
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  width="20"
+                >
+                  <path
+                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+                  />
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                  <path d="M10 9H8" />
+                  <path d="M16 13H8" />
+                  <path d="M16 17H8" />
+                </svg>
+              </div>
+              <div>
+                <h5 class="modal-title fw-bold text-dark mb-0">
+                  {{ isEditMode() ? 'Editar orden' : 'Orden #' + report.id }}
+                </h5>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-close shadow-none"
+              data-bs-dismiss="modal"
+              [disabled]="editLoading()"
+              (click)="cancelEdit()"
+            ></button>
           </div>
 
-          <div class="modal-body">
-            <div class="row mb-4">
-              <div class="col-md-4">
-                <strong>Fecha</strong>
-                <div>{{ report.date }}</div>
-                <strong>Dia</strong>
-                <div>{{ mapearDia(report.day) }}</div>
+          <!-- BODY -->
+          <div class="modal-body px-4 py-4 d-flex flex-column gap-4">
+            @if (!isEditMode()) {
+              <!-- MODO LECTURA -->
+              <div class="row">
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold text-muted small text-uppercase">
+                    Fecha
+                  </label>
+                  <div class="fw-semibold text-dark">{{ report.date }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold text-muted small text-uppercase">
+                    Día
+                  </label>
+                  <div class="fw-semibold text-dark">{{ mapearDia(report.day) }}</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold text-muted small text-uppercase">
+                    ID Orden
+                  </label>
+                  <div class="fw-semibold text-primary">#{{ report.id }}</div>
+                </div>
               </div>
-            </div>
 
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Menu:</strong>
-                {{ report.dishName }}
+              <div>
+                <label class="form-label fw-semibold text-muted small text-uppercase"> Menú </label>
+                <div class="fw-semibold text-dark fs-5">{{ report.dishName }}</div>
               </div>
-            </div>
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Cantidad:</strong>
-              </div>
-            </div>
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Preparada:</strong>
-                {{ report.quantityPrepared }}
-              </div>
-              <div class="col">
-                <strong>Restante:</strong>
-                {{ report.quantityRemaining }}
-              </div>
-            </div>
 
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>Costo U.</th>
-                  <th>Costo T.</th>
-                </tr>
-              </thead>
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold text-muted small text-uppercase">
+                    Cantidad Preparada
+                  </label>
+                  <div class="fw-bold fs-5 text-success">{{ report.quantityPrepared }}</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold text-muted small text-uppercase">
+                    Cantidad Restante
+                  </label>
+                  <div
+                    class="fw-bold fs-5"
+                    [class.text-danger]="report.quantityRemaining > 0"
+                    [class.text-success]="report.quantityRemaining === 0"
+                  >
+                    {{ report.quantityRemaining }}
+                  </div>
+                </div>
+              </div>
 
-              <tbody>
-                @for (detail of report.registers; track detail.id) {
-                  <tr>
-                    <td>{{ detail.productName }}</td>
-                    <td>{{ detail.quantityUsed }} {{ detail.productUnit }}</td>
-                    <td>S/ {{ detail.unitCost }}</td>
-                    <td>S/ {{ detail.totalCost }}</td>
-                  </tr>
+              <!-- Tabla de detalles -->
+              @if (report.registers && report.registers.length > 0) {
+                <div>
+                  <label class="form-label fw-semibold text-muted small text-uppercase">
+                    Detalle de Productos
+                  </label>
+                  <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Producto</th>
+                          <th>Cantidad</th>
+                          <th>Costo U.</th>
+                          <th>Costo T.</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (detail of report.registers; track detail.id) {
+                          <tr>
+                            <td>{{ detail.productName }}</td>
+                            <td>{{ detail.quantityUsed }} {{ detail.productUnit }}</td>
+                            <td>S/ {{ detail.unitCost }}</td>
+                            <td>S/ {{ detail.totalCost }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              }
+            } @else {
+              @if (editLoading()) {
+                <div class="col-12 text-center py-5">
+                  <div class="spinner-border text-primary mb-3" role="status"></div>
+                  <p class="text-muted">Cargando datos...</p>
+                </div>
+              } @else {
+                <!-- MODO EDICIÓN -->
+                <div class="alert alert-info d-flex align-items-start gap-3" role="alert">
+                  <div>
+                    <strong>Modo edición</strong>
+                    <p class="mb-0 small">Actualiza los valores de esta orden.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="form-label fw-bold">Plato del día *</label>
+
+                  <select
+                    class="form-select"
+                    [ngModel]="editForm.dishMenuId()"
+                    (ngModelChange)="editForm.dishMenuId.set($event)"
+                  >
+                    @for (dish of dishMenus(); track dish.id) {
+                      @if (dish.status === 'ACTIVO') {
+                        <option [ngValue]="dish.id">
+                          {{ dish.name }}
+                        </option>
+                      }
+                    }
+                  </select>
+                </div>
+
+                <div>
+                  <label class="form-label fw-semibold text-dark small">
+                    Cantidad Preparada <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    [ngModel]="editForm.quantityPrepared()"
+                    (ngModelChange)="editForm.quantityPrepared.set($event)"
+                    placeholder="0"
+                    min="0"
+                    [disabled]="editLoading()"
+                  />
+                </div>
+                <div>
+                  <label class="form-label fw-bold">Responsables</label>
+
+                  <app-search-select
+                    [items]="availableCooks()"
+                    [displayFn]="cookDisplay"
+                    (selected)="addCook($event)"
+                  >
+                    <ng-template let-cook>
+                      <div class="fw-semibold">{{ cook.name }} {{ cook.lastname }}</div>
+                      <small class="text-muted">DNI: {{ cook.dni }}</small>
+                    </ng-template>
+                  </app-search-select>
+
+                  <div class="mt-3 d-flex flex-wrap gap-2">
+                    @for (cook of selectedCooks(); track cook.user_id) {
+                      <div class="badge bg-primary p-2 d-flex align-items-center gap-2">
+                        <span>{{ cook.name }} {{ cook.lastname }}</span>
+
+                        <button
+                          type="button"
+                          class="btn-close btn-close-white"
+                          (click)="removeCook(cook)"
+                        ></button>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="alert alert-warning d-flex align-items-start gap-3" role="alert">
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="18"
+                    style="flex-shrink: 0; margin-top: 2px"
+                  >
+                    <path
+                      d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+                    />
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                  <div>
+                    <strong>Importante</strong>
+                    <p class="mb-0 small">
+                      No es posible editar órdenes que tengan beneficiarios asociados.
+                    </p>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+
+          <!-- FOOTER -->
+          <div
+            class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-end gap-2"
+          >
+            @if (!isEditMode()) {
+              <!-- Botones en modo lectura -->
+              @if (canCreate) {
+                <button
+                  class="btn btn-success rounded-pill px-4 fw-medium"
+                  (click)="createSameOrder(report)"
+                  [disabled]="editLoading()"
+                >
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="16"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.375c0 .621-.504 1.125-1.125 1.125t-1.125-.504c0-.621.504-1.125 1.125-1.125 1.125 0 1.125.504 1.125 1.125z"
+                    ></path>
+                  </svg>
+                  Duplicar
+                </button>
+              }
+
+              @if (canEdit) {
+                <button
+                  class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
+                  (click)="editarOrden()"
+                  [disabled]="editLoading()"
+                >
+                  @if (editLoading()) {
+                    <span class="spinner-border spinner-border-sm"></span>
+                  }
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="16"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"
+                    ></path>
+                  </svg>
+                  Editar
+                </button>
+              }
+
+              <button
+                class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            } @else {
+              <!-- Botones en modo edición -->
+              <button
+                class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
+                (click)="cancelEdit()"
+                [disabled]="editLoading()"
+              >
+                Cancelar
+              </button>
+
+              <button
+                class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
+                (click)="saveEdit()"
+                [disabled]="
+                  editLoading() || !editForm.dishMenuId() || editForm.quantityPrepared() === null
+                "
+              >
+                @if (editLoading()) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                  Guardando...
+                } @else {
+                  <svg
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="16"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33A3 3 0 0116.5 19.5H6.75z"
+                    ></path>
+                  </svg>
+                  Guardar cambios
                 }
-              </tbody>
-            </table>
-          </div>
-
-          <div class="modal-footer">
-            @if (editLoading()) {
-              <button class="btn btn-success" disabled>
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                Editando...
               </button>
             }
-            @if (canCreate) {
-              <button class="btn btn-success" (click)="createSameOrder(report)">Duplicar</button>
-            }
-            @if (!canEdit) {
-              <button class="btn btn-outline-primary" (click)="editarOrden()">Editar</button>
-            }
-
-            <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
           </div>
         }
       </div>
