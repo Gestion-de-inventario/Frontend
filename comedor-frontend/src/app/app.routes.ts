@@ -111,6 +111,22 @@ export const routes: Routes = [
           import('@features/beneficiaries-control/pages/beneficiary-control/beneficiary-control').then(
             (m) => m.BeneficiaryControl,
           ),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('@features/beneficiaries-control/fragments/list-menu-report-fragment/list-menu-report-fragment.component').then(
+                (m) => m.ListMenuReportFragmentComponent,
+              ),
+          },
+          {
+            path: 'manage/:id',
+            loadComponent: () =>
+              import('@features/beneficiaries-control/fragments/menu-report-beneficiaries-fragment/menu-report-beneficiaries-fragment.component').then(
+                (m) => m.MenuReportBeneficiariesFragmentComponent,
+              ),
+          },
+        ],
       },
       {
         path: 'menu-report-summary',

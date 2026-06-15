@@ -38,13 +38,15 @@ export const API_ENDPOINTS = {
 
   MENU_REPORT: {
     CREATE: '/menu_report/create',
-    GET_BY_DATE: '/menu_report/date/{fecha}',
+    LIST: '/menu_report/list',
+    GET_BY_DATE: '/menu_report/detail/list',
+    GET_BY_ID: '/menu_report/{id}',
     GET_SUMMARY: '/menu_report/{id}/summary',
     ADD_BENEFICIARY: '/menu_report/{id}/beneficiaries',
     EDIT_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     REMOVE_BENEFICIARY: '/menu_report/{reporteId}/beneficiaries/{controlId}',
     EXPORT_PDF: '/menu_report/{id}/export/pdf',
-    EXPORT_EXCEL: '/menu_report/{id}/export/excel'
+    EXPORT_EXCEL: '/menu_report/{id}/export/excel',
   },
 
   PRODUCT: {
@@ -104,5 +106,4 @@ export const API_ENDPOINTS = {
   DASHBOARD: {
     GET_SUMMARY: '/dashboard',
   },
-
 };

@@ -43,8 +43,10 @@ export interface MenuReportResponse {
   id: number;
   date: string;
   day: string;
+  dishId: number;
   dishName: string;
   registers: StockMovementResponse[];
+  beneficiaries: BeneficiaryRecordResponse[];
   quantityPrepared: number;
   quantityRemaining: number;
   status: string;

@@ -11,17 +11,11 @@ import { BeneficiaryResponse } from '@features/beneficiaries/interfaces/benefici
 import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
 import { ToastService } from '@shared/services/toast.service';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { MenuReportResponse } from '@features/menu-report/interfaces/menu-report.response';
+import { finalize } from 'rxjs';
 
 declare const bootstrap: any;
-
-const LocalToday = new Date();
-
-const localDate =
-  LocalToday.getFullYear() +
-  '-' +
-  String(LocalToday.getMonth() + 1).padStart(2, '0') +
-  '-' +
-  String(LocalToday.getDate()).padStart(2, '0');
 
 @Component({
   selector: 'app-menu-report-beneficiaries-fragment',
@@ -30,18 +24,17 @@ const localDate =
   templateUrl: './menu-report-beneficiaries-fragment.component.html',
 })
 export class MenuReportBeneficiariesFragmentComponent {
+  private readonly route = inject(ActivatedRoute);
   private readonly beneficiaryControlService = inject(BeneficiaryControlApiService);
   private readonly menuReportService = inject(MenuReportApiService);
-  private readonly menuReportState = inject(MenuReportStateService);
+  readonly menuReportState = inject(MenuReportStateService);
   private readonly beneficiaryService = inject(BeneficiaryApiService);
   private readonly beneficiaryState = inject(BeneficiaryStateService);
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
 
-  public readonly localDate = localDate;
-
-  //readonly report = this.menuReportState.report;
+  report = signal<MenuReportResponse | null>(null);
 
   beneficiarySearch = signal('');
   menusAmount = signal<number | null>(null);
@@ -65,25 +58,41 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   initReport(): void {
-    //const cached = this.report();
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const cached = this.menuReportState.selectedReport();
+    if (cached && cached.id === id) {
+      this.report.set(cached);
 
-    //if (cached) return;
+      this.reloadReport();
+
+      return;
+    }
+
+    if (!id) {
+      this.toastService.show('Reporte inválido', 'danger');
+      this.router.navigate(['/beneficiaries-control']);
+      return;
+    }
 
     this.loadingReport.set(true);
 
-    /*this.menuReportState.getOrLoadTodayReport(localDate).subscribe({
-      next: () => {
+    this.menuReportService.getMenuReportById(id).subscribe({
+      next: (report) => {
+        this.report.set(report);
         this.loadingReport.set(false);
       },
       error: () => {
         this.loadingReport.set(false);
-        this.toastService.show('No se pudo cargar el reporte del día', 'danger');
+        this.toastService.show('No se pudo cargar la orden', 'danger');
+        this.router.navigate(['/beneficiaries-control']);
       },
-    });*/
+    });
   }
 
   readonly allBeneficiaries = this.beneficiaryState.beneficiaries;
-
+  goBack(): void {
+    this.router.navigate(['/beneficiaries-control']);
+  }
   readonly filteredBeneficiaries = computed(() => {
     const term = this.beneficiarySearch().toLowerCase();
     if (!term) return [];
@@ -136,7 +145,6 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   saveBeneficiary(): void {
-    /*
     const report = this.report();
 
     if (!report || this.loading()) return;
@@ -188,7 +196,7 @@ export class MenuReportBeneficiariesFragmentComponent {
         complete: () => {
           this.loading.set(false);
         },
-      });*/
+      });
   }
 
   cancelDelete(): void {
@@ -201,7 +209,6 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   confirmRemoveBeneficiary(): void {
-    /*
     const report = this.report();
     if (!report || !this.beneficiaryToDelete) return;
 
@@ -225,7 +232,7 @@ export class MenuReportBeneficiariesFragmentComponent {
           this.toastService.show('Error: ' + error.error.message, 'danger');
           this.deletingLoading.set(false);
         },
-      });*/
+      });
   }
 
   getBeneficiaryControlId(record?: BeneficiaryRecordResponse): number {
@@ -235,23 +242,24 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   reloadReport(): void {
-    /*
-    const date = this.report()!.date;
+    const report = this.report();
+
+    if (!report) return;
 
     this.listLoading.set(true);
 
     this.menuReportService
-      .getByDate(date)
+      .getMenuReportById(report.id)
       .pipe(
         finalize(() => {
           this.listLoading.set(false);
         }),
       )
       .subscribe({
-        next: (report) => {
-          this.menuReportState.setReport(report);
+        next: (response) => {
+          this.report.set(response);
         },
-      });*/
+      });
   }
 
   resetForm(): void {
@@ -271,7 +279,9 @@ export class MenuReportBeneficiariesFragmentComponent {
     rollback: () => void,
   ): void {
     this.updatingBeneficiaryId.set(record.id);
+    const report = this.report();
 
+    if (!report) return;
     const request = {
       beneficiarioId: record.id,
       pago: changes.pago ?? record.pago,
@@ -281,8 +291,8 @@ export class MenuReportBeneficiariesFragmentComponent {
       menuPrice: record.total / record.cantidad,
     };
 
-    /*this.beneficiaryControlService
-      .editBeneficiary(this.report()!.id, record.id, request)
+    this.beneficiaryControlService
+      .editBeneficiary(report.id, record.id, request)
       .pipe(
         finalize(() => {
           this.updatingBeneficiaryId.set(null);
@@ -296,7 +306,7 @@ export class MenuReportBeneficiariesFragmentComponent {
           rollback();
           this.toastService.show('No se pudo actualizar', 'danger');
         },
-      }); */
+      });
   }
 
   togglePago(record: BeneficiaryRecordResponse, event: Event): void {

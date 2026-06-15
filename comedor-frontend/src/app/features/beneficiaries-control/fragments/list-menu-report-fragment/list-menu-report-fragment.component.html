@@ -5,10 +5,6 @@
     <div class="card-header bg-white">
       <div class="d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Órdenes de producción</h5>
-
-        @if (canCreate) {
-          <button class="btn btn-primary" (click)="goToCreate()">Nueva orden</button>
-        }
       </div>
     </div>
 
@@ -141,18 +137,14 @@
           </div>
         </div>
 
-        <div class="row g-3 mb-4"></div>
-
         <div class="d-flex flex-column gap-3 mb-3">
           @for (report of reports(); track report.id) {
-            <div class="card border-0 shadow-sm report-card">
-              <div
-                class="card-body"
-                style="cursor: pointer"
-                (click)="openDetail(report)"
-                data-bs-toggle="modal"
-                data-bs-target="#purchaseDetailModal"
-              >
+            <div
+              class="card border-0 shadow-sm report-card"
+              style="cursor: pointer"
+              (click)="goToControl(report, report.id)"
+            >
+              <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
                     <h6 class="fw-bold mb-1">
@@ -191,11 +183,6 @@
                   </div>
                 </div>
               </div>
-              <div class="text-center p-3">
-                <button class="btn btn-outline-primary" (click)="goToOutOrder(report)">
-                  Orden de Salida
-                </button>
-              </div>
             </div>
           }
         </div>
@@ -225,92 +212,6 @@
           </button>
         </div>
       }
-    </div>
-  </div>
-
-  <div class="modal fade" id="purchaseDetailModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        @if (selectedReport(); as report) {
-          <div class="modal-header">
-            <h5 class="modal-title">Orden #{{ report.id }}</h5>
-
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-
-          <div class="modal-body">
-            <div class="row mb-4">
-              <div class="col-md-4">
-                <strong>Fecha</strong>
-                <div>{{ report.date }}</div>
-                <strong>Dia</strong>
-                <div>{{ mapearDia(report.day) }}</div>
-              </div>
-            </div>
-
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Menu:</strong>
-                {{ report.dishName }}
-              </div>
-            </div>
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Cantidad:</strong>
-              </div>
-            </div>
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Preparada:</strong>
-                {{ report.quantityPrepared }}
-              </div>
-              <div class="col">
-                <strong>Restante:</strong>
-                {{ report.quantityRemaining }}
-              </div>
-            </div>
-
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>Costo U.</th>
-                  <th>Costo T.</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                @for (detail of report.registers; track detail.id) {
-                  <tr>
-                    <td>{{ detail.productName }}</td>
-                    <td>{{ detail.quantityUsed }} {{ detail.productUnit }}</td>
-                    <td>S/ {{ detail.unitCost }}</td>
-                    <td>S/ {{ detail.totalCost }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          <div class="modal-footer">
-            @if (editLoading()) {
-              <button class="btn btn-success" disabled>
-                <span class="spinner-border spinner-border-sm me-2"></span>
-                Editando...
-              </button>
-            }
-            @if (canCreate) {
-              <button class="btn btn-success" (click)="createSameOrder(report)">Duplicar</button>
-            }
-            @if (!canEdit) {
-              <button class="btn btn-outline-primary" (click)="editarOrden()">Editar</button>
-            }
-
-            <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        }
-      </div>
     </div>
   </div>
 }

@@ -31,9 +31,11 @@ const localDate =
   standalone: true,
   imports: [CommonModule, FormsModule, SearchSelectComponent],
   templateUrl: './menu-report-create-fragment.component.html',
+  styleUrls: ['./menu-report-create-fragment.component.scss'],
 })
 export class MenuReportCreateFragmentComponent implements OnInit {
   private readonly menuReportService = inject(MenuReportApiService);
+  private readonly menuReportState = inject(MenuReportStateService);
 
   private readonly userService = inject(UserService);
   private readonly toastService = inject(ToastService);
@@ -53,9 +55,6 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   goBack(): void {
     this.router.navigate(['/menu-report/list']);
   }
-
-  //readonly report = this.menuReportState.report;
-
   // Formulario de Creación
   selectedDishMenuId = signal<number | null>(null);
   quantityPrepared = signal<number | null>(null);
@@ -95,6 +94,14 @@ export class MenuReportCreateFragmentComponent implements OnInit {
         this.dishMenus.set(dishMenus);
 
         this.loading.set(false);
+        const duplicate = this.menuReportState.duplicateSourceReport();
+        if (duplicate) {
+          this.selectedDishMenuId.set(duplicate.dishId);
+
+          this.quantityPrepared.set(duplicate.quantityPrepared);
+          this.toastService.show('Datos copiados desde la orden anterior', 'warning');
+          this.menuReportState.clearDuplicateSource();
+        }
       },
 
       error: () => {

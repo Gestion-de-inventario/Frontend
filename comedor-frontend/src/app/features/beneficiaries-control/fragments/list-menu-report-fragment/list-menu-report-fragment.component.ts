@@ -5,13 +5,12 @@ import { finalize } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
 
-import { MenuReportApiService } from '../../services/menu-report-api.service';
+import { MenuReportApiService } from '@features/menu-report/services/menu-report-api.service';
 
-import { MenuReportResponse } from '../../interfaces/menu-report.response';
+import { MenuReportResponse } from '@features/menu-report/interfaces/menu-report.response';
 
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { MenuReportStateService } from '@features/menu-report/services/menu-report-state.service';
-declare const bootstrap: any;
 
 @Component({
   selector: 'app-list-menu-report-fragment',
@@ -22,11 +21,12 @@ declare const bootstrap: any;
 })
 export class ListMenuReportFragmentComponent {
   private readonly menuReportService = inject(MenuReportApiService);
-  readonly menuReportState = inject(MenuReportStateService);
 
   private readonly router = inject(Router);
 
   readonly authState = inject(AuthStateService);
+
+  readonly menuReportState = inject(MenuReportStateService);
 
   canList = this.authState.hasPermission('MENU_REPORT_LIST_ALL');
 
@@ -129,8 +129,9 @@ export class ListMenuReportFragmentComponent {
     this.loadReports();
   }
 
-  openDetail(report: MenuReportResponse): void {
-    this.selectedReport.set(report);
+  goToControl(report: MenuReportResponse, reportId: number): void {
+    this.menuReportState.setSelectedReport(report);
+    this.router.navigate(['/beneficiaries-control', 'manage', reportId]);
   }
 
   mapearDia(day: string): string {
@@ -152,32 +153,5 @@ export class ListMenuReportFragmentComponent {
       default:
         return day;
     }
-  }
-
-  goToCreate(): void {
-    this.router.navigate(['/menu-report']);
-  }
-
-  createSameOrder(report: MenuReportResponse): void {
-    if (!report) return;
-    const modalElement = document.getElementById('purchaseDetailModal');
-
-    const modal = bootstrap.Modal.getInstance(modalElement);
-
-    modal?.hide();
-
-    this.menuReportState.setDuplicateSource(report);
-
-    this.router.navigate(['/menu-report']);
-  }
-
-  editarOrden() {
-    //proximamente
-  }
-
-  goToOutOrder(report: MenuReportResponse): void {
-    this.menuReportState.setSelectedReport(report);
-
-    this.router.navigate(['/beneficiaries-control', 'manage', report.id]);
   }
 }
