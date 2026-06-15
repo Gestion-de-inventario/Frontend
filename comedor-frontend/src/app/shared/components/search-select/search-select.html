@@ -1,0 +1,23 @@
+<div class="position-relative">
+  <input
+    class="form-control"
+    [value]="search()"
+    [placeholder]="placeholder"
+    (input)="search.set($any($event.target).value)"
+    (focus)="open.set(true)"
+  />
+
+  @if (open()) {
+    <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000">
+      @for (item of filteredItems; track $index) {
+        <button type="button" class="list-group-item list-group-item-action" (click)="select(item)">
+          @if (itemTemplate) {
+            <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }" />
+          } @else {
+            {{ displayFn(item) }}
+          }
+        </button>
+      }
+    </div>
+  }
+</div>

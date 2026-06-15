@@ -1,14 +1,18 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 import { MenuReportRequest } from '../interfaces/menu-report.request';
-import { MenuReportResponse } from '../interfaces/menu-report.response';
+import {
+  ListMenuReportDetailResponse,
+  MenuReportResponse,
+} from '../interfaces/menu-report.response';
 import { MenuReportDetailResponse } from '../interfaces/menu-report.response';
 import { BeneficiaryRecordRequest } from '@features/beneficiaries-control/interfaces/beneficiary-record-request';
 import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
 import { DishMenuResponse } from '../interfaces/menu-report.response';
 import { MenuReportSummaryResponse } from '@features/menu-report-summary/interfaces/menu-report-summary-response';
+import { MenuPageResponse } from '@features/menu-report-summary/interfaces/menu-report-page.response';
 
 @Injectable({
   providedIn: 'root',
@@ -27,13 +31,32 @@ export class MenuReportApiService {
     return this.http.post<MenuReportResponse>(`${this.apiUrl}/create`, request);
   }
 
-  // Buscar el reporte por fecha
-  getByDate(fecha: string): Observable<MenuReportDetailResponse> {
-    return this.http.get<MenuReportDetailResponse>(`${this.apiUrl}/date/${fecha}`);
+  // Lista reporte entero
+  getByDate(startDate?: string, endDate?: string): Observable<ListMenuReportDetailResponse> {
+    let params = new HttpParams();
+
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+
+    return this.http.get<ListMenuReportDetailResponse>(`${this.apiUrl}/detail/list`, { params });
   }
 
-  // Resumen final
-  getSummary(reporteId: number): Observable<MenuReportSummaryResponse> {
-    return this.http.get<MenuReportSummaryResponse>(`${this.apiUrl}/${reporteId}/summary`);
+  // lista ligera pageable
+  list(page = 0, size = 20, startDate?: string, endDate?: string) {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+
+    return this.http.get<MenuPageResponse>(`${this.apiUrl}/list`, { params });
   }
 }

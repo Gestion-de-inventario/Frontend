@@ -11,7 +11,6 @@ import { BeneficiaryResponse } from '@features/beneficiaries/interfaces/benefici
 import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
 import { ToastService } from '@shared/services/toast.service';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/internal/operators/finalize';
 
 declare const bootstrap: any;
 
@@ -42,7 +41,7 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   public readonly localDate = localDate;
 
-  readonly report = this.menuReportState.report;
+  //readonly report = this.menuReportState.report;
 
   beneficiarySearch = signal('');
   menusAmount = signal<number | null>(null);
@@ -66,13 +65,13 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   initReport(): void {
-    const cached = this.report();
+    //const cached = this.report();
 
-    if (cached) return;
+    //if (cached) return;
 
     this.loadingReport.set(true);
 
-    this.menuReportState.getOrLoadTodayReport(localDate).subscribe({
+    /*this.menuReportState.getOrLoadTodayReport(localDate).subscribe({
       next: () => {
         this.loadingReport.set(false);
       },
@@ -80,7 +79,7 @@ export class MenuReportBeneficiariesFragmentComponent {
         this.loadingReport.set(false);
         this.toastService.show('No se pudo cargar el reporte del día', 'danger');
       },
-    });
+    });*/
   }
 
   readonly allBeneficiaries = this.beneficiaryState.beneficiaries;
@@ -137,6 +136,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   saveBeneficiary(): void {
+    /*
     const report = this.report();
 
     if (!report || this.loading()) return;
@@ -188,7 +188,7 @@ export class MenuReportBeneficiariesFragmentComponent {
         complete: () => {
           this.loading.set(false);
         },
-      });
+      });*/
   }
 
   cancelDelete(): void {
@@ -201,6 +201,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   confirmRemoveBeneficiary(): void {
+    /*
     const report = this.report();
     if (!report || !this.beneficiaryToDelete) return;
 
@@ -224,7 +225,7 @@ export class MenuReportBeneficiariesFragmentComponent {
           this.toastService.show('Error: ' + error.error.message, 'danger');
           this.deletingLoading.set(false);
         },
-      });
+      });*/
   }
 
   getBeneficiaryControlId(record?: BeneficiaryRecordResponse): number {
@@ -234,6 +235,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   reloadReport(): void {
+    /*
     const date = this.report()!.date;
 
     this.listLoading.set(true);
@@ -249,7 +251,7 @@ export class MenuReportBeneficiariesFragmentComponent {
         next: (report) => {
           this.menuReportState.setReport(report);
         },
-      });
+      });*/
   }
 
   resetForm(): void {
@@ -279,7 +281,7 @@ export class MenuReportBeneficiariesFragmentComponent {
       menuPrice: record.total / record.cantidad,
     };
 
-    this.beneficiaryControlService
+    /*this.beneficiaryControlService
       .editBeneficiary(this.report()!.id, record.id, request)
       .pipe(
         finalize(() => {
@@ -294,7 +296,7 @@ export class MenuReportBeneficiariesFragmentComponent {
           rollback();
           this.toastService.show('No se pudo actualizar', 'danger');
         },
-      });
+      }); */
   }
 
   togglePago(record: BeneficiaryRecordResponse, event: Event): void {

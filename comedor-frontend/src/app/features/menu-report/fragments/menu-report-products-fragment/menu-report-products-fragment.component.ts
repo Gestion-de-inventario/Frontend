@@ -10,8 +10,8 @@ import { MenuReportStateService } from '@features/menu-report/services/menu-repo
 })
 export class MenuReportProductsFragmentComponent {
   private readonly menuReportState = inject(MenuReportStateService);
-  readonly report = this.menuReportState.report;
+  //readonly report = this.menuReportState.report;
 
-  // Ya no necesitamos métodos de edición/eliminación porque el backend 
+  // Ya no necesitamos métodos de edición/eliminación porque el backend
   // gestiona los movimientos de stock automáticamente al crear el plato.
 }

@@ -8,11 +8,12 @@ import { UserService } from '@features/users/services/user-api.service';
 import { UserResponse } from '@features/users/interfaces/user.response';
 import { ToastService } from '@shared/services/toast.service';
 import { DishMenuResponse } from '@features/menu-report/interfaces/menu-report.response';
-import { MenuReportProductsFragmentComponent } from '../menu-report-products-fragment/menu-report-products-fragment.component';
 import { Router } from '@angular/router';
 import { MissingProductsResponse } from '@features/purchase-order/interfaces/missing-products.response';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
+import { forkJoin } from 'rxjs';
+import { SearchSelectComponent } from '@shared/components/search-select/search-select';
 
 declare const bootstrap: any;
 
@@ -28,17 +29,20 @@ const localDate =
 @Component({
   selector: 'app-menu-report-create-fragment',
   standalone: true,
-  imports: [CommonModule, FormsModule, MenuReportProductsFragmentComponent],
+  imports: [CommonModule, FormsModule, SearchSelectComponent],
   templateUrl: './menu-report-create-fragment.component.html',
 })
 export class MenuReportCreateFragmentComponent implements OnInit {
   private readonly menuReportService = inject(MenuReportApiService);
-  private readonly menuReportState = inject(MenuReportStateService);
+
   private readonly userService = inject(UserService);
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
   private readonly purchaseOrderState = inject(PurchaseOrderStateService);
+  cookDisplay = (cook: UserResponse) => `${cook.name} ${cook.lastname} - DNI: ${cook.dni}`;
+
+  canCreate = this.authState.hasPermission('MENU_REPORT_CREATE_REPORT');
 
   missingProducts = signal<MissingProductsResponse[]>([]);
 
@@ -46,7 +50,11 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     this.router.navigate(['/beneficiaries-control']);
   }
 
-  readonly report = this.menuReportState.report;
+  goBack(): void {
+    this.router.navigate(['/menu-report/list']);
+  }
+
+  //readonly report = this.menuReportState.report;
 
   // Formulario de Creación
   selectedDishMenuId = signal<number | null>(null);
@@ -58,8 +66,10 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   selectedCooks = signal<UserResponse[]>([]);
   allCooks = signal<UserResponse[]>([]);
 
-  loading = signal(false);
   creating = signal(false);
+  loading = signal(true);
+
+  created = signal(false);
 
   readonly today = new Date().toLocaleDateString('es-PE', {
     weekday: 'long',
@@ -69,32 +79,29 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadTodayReport();
-    this.loadCooks();
-    this.loadDishMenus();
+    this.loadInitialData();
   }
 
-  loadTodayReport(): void {
-    if (!this.authState.hasPermission('MENU_REPORT_GET_BY_DATE')) return;
+  loadInitialData(): void {
     this.loading.set(true);
-    this.menuReportService.getByDate(localDate).subscribe({
-      next: (report) => {
-        this.menuReportState.setReport(report);
+
+    forkJoin({
+      cooks: this.userService.listActiveUsers(),
+      dishMenus: this.menuReportService.getDishMenus(),
+    }).subscribe({
+      next: ({ cooks, dishMenus }) => {
+        this.allCooks.set(cooks);
+
+        this.dishMenus.set(dishMenus);
+
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
-    });
-  }
 
-  loadDishMenus(): void {
-    this.menuReportService.getDishMenus().subscribe({
-      next: (menus) => this.dishMenus.set(menus),
-    });
-  }
+      error: () => {
+        this.loading.set(false);
 
-  loadCooks(): void {
-    this.userService.listActiveUsers().subscribe({
-      next: (users) => this.allCooks.set(users),
+        this.toastService.show('Error al cargar información inicial', 'danger');
+      },
     });
   }
 
@@ -111,25 +118,31 @@ export class MenuReportCreateFragmentComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.creating.set(false);
-          this.loading.set(false);
         }),
       )
       .subscribe({
         next: () => {
           this.toastService.show('Reporte creado', 'success');
-          this.loadTodayReport(); // Esto disparará el set(2)
-          this.creating.set(false);
+          this.created.set(true);
         },
         error: (err) => {
           if (err.status === 409 && err.error?.required) {
             this.openMissingStockModal(err.error.required);
-
             return;
           }
-
           this.toastService.show(err.error?.message || 'Error al crear', 'danger');
         },
       });
+  }
+
+  createAnother(): void {
+    this.created.set(false);
+
+    this.selectedDishMenuId.set(null);
+
+    this.quantityPrepared.set(null);
+
+    this.selectedCooks.set([]);
   }
 
   openMissingStockModal(faltantes: MissingProductsResponse[]): void {
@@ -151,9 +164,14 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     this.router.navigate(['/purchase-order/create']);
   }
   // Helpers de cocineras
-  addCook(cook: UserResponse) {
-    this.selectedCooks.update((l) => [...l, cook]);
-    this.cookSearch.set('');
+  addCook(cook: UserResponse): void {
+    this.selectedCooks.update((current) => {
+      if (current.some((c) => c.user_id === cook.user_id)) {
+        return current;
+      }
+
+      return [...current, cook];
+    });
   }
 
   removeCook(cook: UserResponse) {
@@ -172,6 +190,13 @@ export class MenuReportCreateFragmentComponent implements OnInit {
           (`${c.name} ${c.lastname}`.toLowerCase().includes(term) || c.dni.includes(term)),
       )
       .slice(0, 5);
+  });
+
+  availableCooks = computed(() => {
+    const selectedIds = new Set(this.selectedCooks().map((c) => c.user_id));
+
+    const result = this.allCooks().filter((cook) => !selectedIds.has(cook.user_id));
+    return result;
   });
 
   readonly canCreateReport = computed(() => {

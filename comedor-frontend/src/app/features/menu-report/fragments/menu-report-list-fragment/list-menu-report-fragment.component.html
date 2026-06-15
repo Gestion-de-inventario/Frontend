@@ -1,10 +1,10 @@
 @if (!canList) {
-  <div class="alert alert-danger">No tienes permiso para listar órdenes de compra.</div>
+  <div class="alert alert-danger">No tienes permiso para listar órdenes de produccion.</div>
 } @else {
   <div class="card shadow-sm border-0">
     <div class="card-header bg-white">
       <div class="d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Órdenes de compra</h5>
+        <h5 class="mb-0">Órdenes de producción</h5>
 
         @if (canCreate) {
           <button class="btn btn-primary" (click)="goToCreate()">Nueva orden</button>
@@ -34,18 +34,6 @@
             [ngModel]="endDate()"
             (ngModelChange)="endDate.set($event)"
           />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label"> Estado </label>
-
-          <select class="form-select" [ngModel]="status()" (ngModelChange)="status.set($event)">
-            <option value="">Todos</option>
-
-            <option value="PENDIENTE">Pendiente</option>
-
-            <option value="RECIBIDO">Recibido</option>
-          </select>
         </div>
       </div>
 
@@ -107,9 +95,9 @@
         <div class="text-center py-5">
           <div class="spinner-border"></div>
 
-          <div class="mt-2">Cargando órdenes de compra...</div>
+          <div class="mt-2">Cargando órdenes...</div>
         </div>
-      } @else if (purchases().length === 0) {
+      } @else if (reports().length === 0) {
         <div class="alert alert-info text-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -143,6 +131,7 @@
               [ngModel]="pageSize()"
               (ngModelChange)="changePageSize($event)"
             >
+              <option [ngValue]="1">1</option>
               <option [ngValue]="5">5</option>
               <option [ngValue]="10">10</option>
               <option [ngValue]="20">20</option>
@@ -159,37 +148,24 @@
             <tr>
               <th>Fecha</th>
 
-              <th>Estado</th>
-
-              <th>Total</th>
+              <th>Menu</th>
             </tr>
           </thead>
 
           <tbody>
-            @for (purchase of purchases(); track purchase.id) {
+            @for (report of reports(); track report.id) {
               <tr
                 style="cursor: pointer"
-                (click)="openDetail(purchase)"
+                (click)="openDetail(report)"
                 data-bs-toggle="modal"
                 data-bs-target="#purchaseDetailModal"
               >
                 <td>
-                  {{ purchase.purchaseDate }}
+                  {{ report.date }}
                 </td>
 
                 <td>
-                  <span
-                    class="badge text-black"
-                    [class.bg-warning]="purchase.status === 'PENDIENTE'"
-                    [class.bg-success]="purchase.status === 'RECIBIDO'"
-                  >
-                    {{ purchase.status }}
-                  </span>
-                </td>
-
-                <td>
-                  S/.
-                  {{ purchase.totalSpent }}
+                  {{ report.dishName }}
                 </td>
               </tr>
             }
@@ -227,9 +203,9 @@
   <div class="modal fade" id="purchaseDetailModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        @if (selectedPurchase(); as purchase) {
+        @if (selectedReport(); as report) {
           <div class="modal-header">
-            <h5 class="modal-title">Orden #{{ purchase.id }}</h5>
+            <h5 class="modal-title">Orden #{{ report.id }}</h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
@@ -238,27 +214,31 @@
             <div class="row mb-4">
               <div class="col-md-4">
                 <strong>Fecha</strong>
-                <div>{{ purchase.purchaseDate }}</div>
-              </div>
-
-              <div class="col-md-4">
-                <strong class="me-1">Estado</strong>
-                <span
-                  class="badge"
-                  [ngClass]="{
-                    'bg-warning text-dark': purchase.status === 'PENDIENTE',
-                    'bg-success': purchase.status === 'RECIBIDO',
-                  }"
-                >
-                  {{ purchase.status }}
-                </span>
+                <div>{{ report.date }}</div>
+                <strong>Dia</strong>
+                <div>{{ mapearDia(report.day) }}</div>
               </div>
             </div>
 
             <div class="row mb-4">
               <div class="col">
-                <strong>Total gastado:</strong>
-                S/ {{ purchase.totalSpent }}
+                <strong>Menu:</strong>
+                {{ report.dishName }}
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col">
+                <strong>Cantidad:</strong>
+              </div>
+            </div>
+            <div class="row mb-4">
+              <div class="col">
+                <strong>Preparada:</strong>
+                {{ report.quantityPrepared }}
+              </div>
+              <div class="col">
+                <strong>Restante:</strong>
+                {{ report.quantityRemaining }}
               </div>
             </div>
 
@@ -267,18 +247,18 @@
                 <tr>
                   <th>Producto</th>
                   <th>Cantidad</th>
-                  <th>P. Unit.</th>
-                  <th>Subtotal</th>
+                  <th>Costo U.</th>
+                  <th>Costo T.</th>
                 </tr>
               </thead>
 
               <tbody>
-                @for (detail of purchase.details; track detail.productId) {
+                @for (detail of report.registers; track detail.id) {
                   <tr>
                     <td>{{ detail.productName }}</td>
-                    <td>{{ detail.quantity }} {{ detail.productUnit }}</td>
-                    <td>S/ {{ detail.unitPrice }}</td>
-                    <td>S/ {{ detail.subTotal }}</td>
+                    <td>{{ detail.quantityUsed }} {{ detail.productUnit }}</td>
+                    <td>S/ {{ detail.unitCost }}</td>
+                    <td>S/ {{ detail.totalCost }}</td>
                   </tr>
                 }
               </tbody>
@@ -286,20 +266,14 @@
           </div>
 
           <div class="modal-footer">
-            @if (changeStatusLoading()) {
+            @if (editLoading()) {
               <button class="btn btn-success" disabled>
                 <span class="spinner-border spinner-border-sm me-2"></span>
-                Procesando...
+                Editando...
               </button>
-            } @else if (purchase.status !== 'RECIBIDO' && canChangeStatus) {
-              <button
-                class="btn btn-success"
-                (click)="confirmPurchase(purchase.id)"
-                [disabled]="changeStatusLoading()"
-              >
-                Marcar como recibido
-              </button>
-            } @else if (purchase.status == 'RECIBIDO' && canCreate) {
+            } @else if (canEdit) {
+              <button class="btn btn-success" (click)="editarOrden()">Editar</button>
+            } @else if (canCreate) {
               <button class="btn btn-success" (click)="createSameOrder()">Duplicar orden</button>
             }
 

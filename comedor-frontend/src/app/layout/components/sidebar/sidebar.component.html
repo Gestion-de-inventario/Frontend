@@ -18,7 +18,7 @@
     ></button>
   </div>
 
-      <!--  @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
+  <!--  @if (authState.hasPermission('BENEFICIARY_LIST_BY_STATUS')) {
 
       <a class="sidebar-link" (click)="navigateAndClose('/beneficiaries')">
 
@@ -97,10 +97,7 @@
       Dashboard
     </a>
 
-    @if (
-      authState.hasPermission('MENU_REPORT_CREATE_REPORT') ||
-      authState.hasPermission('MENU_REPORT_GET_BY_DATE')
-    ) {
+    @if (authState.hasPermission('MENU_REPORT_LIST_ALL')) {
       <a class="sidebar-link" (click)="navigateAndClose('/menu-report')">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path d="M2 12h20" />
@@ -109,7 +106,7 @@
           <path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8" />
         </svg>
 
-        Crear orden de producción
+        Orden de producción
       </a>
     }
     @if (authState.hasPermission('MENU_REPORT_ADD_BENEFICIARY')) {

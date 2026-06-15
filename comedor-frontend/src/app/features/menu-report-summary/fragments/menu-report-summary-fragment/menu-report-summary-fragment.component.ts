@@ -27,7 +27,7 @@ export class MenuReportSummaryFragmentComponent {
   private readonly menuReportService = inject(MenuReportApiService);
   private readonly menuReportState = inject(MenuReportStateService);
 
-  readonly report = this.menuReportState.report;
+  //readonly report = this.menuReportState.report;
   readonly reportId = signal<number | null>(null);
   summary = signal<MenuReportSummaryResponse | null>(null);
   loadingSummary = signal(false);
@@ -45,6 +45,7 @@ export class MenuReportSummaryFragmentComponent {
   }
 
   loadSummary(date: string): void {
+    /*
     this.loadingSummary.set(true);
 
     this.menuReportState
@@ -71,7 +72,7 @@ export class MenuReportSummaryFragmentComponent {
       )
       .subscribe((summary) => {
         this.summary.set(summary);
-      });
+      });*/
   }
 
   refreshSummary(): void {
@@ -81,7 +82,7 @@ export class MenuReportSummaryFragmentComponent {
 
     this.loadingSummary.set(true);
 
-    this.menuReportService
+    /*this.menuReportService
       .getSummary(id)
       .pipe(
         catchError(() => {
@@ -94,6 +95,6 @@ export class MenuReportSummaryFragmentComponent {
       )
       .subscribe((summary) => {
         this.summary.set(summary);
-      });
+      }); */
   }
 }
