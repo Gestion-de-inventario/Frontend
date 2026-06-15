@@ -2,6 +2,7 @@ export interface TransactionsResponse {
   id: number;
   dateTime: string;
   type: string;
+  source: string;
   amount: number;
   currentStock: number;
   finalStock: number;
