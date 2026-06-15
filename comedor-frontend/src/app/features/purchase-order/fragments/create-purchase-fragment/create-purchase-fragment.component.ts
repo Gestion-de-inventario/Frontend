@@ -14,11 +14,12 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { CreatePurchaseRequest } from '@features/purchase-order/interfaces/purchase.request';
 import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
+import { SearchSelectComponent } from '@shared/components/search-select/search-select';
 
 @Component({
   selector: 'app-purchase-order-create-fragment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SearchSelectComponent],
   templateUrl: './create-purchase-fragment.component.html',
 })
 export class PurchaseOrderCreateFragmentComponent implements OnInit {
@@ -29,10 +30,13 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   private readonly purchaseOrderState = inject(PurchaseOrderStateService);
 
   loading = signal(false);
+  initialLoading = signal(false);
 
   productState = inject(ProductStateService);
   missingProducts = signal<MissingProductsResponse[]>([]);
   products = this.productState.products;
+
+  productLabel = (product: ProductResponse) => `${product.name} (${product.unit})`;
 
   purchaseDetails = signal<PurchaseDetailForm[]>([]);
 
@@ -77,8 +81,16 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   }
 
   constructor() {
-    this.productService.listByStatus().subscribe((products) => {
-      this.productState.setProducts(products);
+    this.initialLoading.set(true);
+    this.productService.listByStatus().subscribe({
+      next: (products) => {
+        this.productState.setProducts(products);
+        this.initialLoading.set(false);
+      },
+      error: () => {
+        this.initialLoading.set(false);
+        this.toastService.show('Error al cargar información inicial', 'danger');
+      },
     });
   }
 

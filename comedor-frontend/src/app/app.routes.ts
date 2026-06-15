@@ -87,6 +87,22 @@ export const routes: Routes = [
           import('@features/menu-report/pages/menu_report_principal/menu_report_principal').then(
             (m) => m.MenuReportPrincipal,
           ),
+        children: [
+          {
+            path: 'list',
+            loadComponent: () =>
+              import('@features/menu-report/fragments/menu-report-list-fragment/list-menu-report-fragment.component').then(
+                (m) => m.ListMenuReportFragmentComponent,
+              ),
+          },
+          {
+            path: '',
+            loadComponent: () =>
+              import('@features/menu-report/fragments/menu-report-create-fragment/menu-report-create-fragment.component').then(
+                (m) => m.MenuReportCreateFragmentComponent,
+              ),
+          },
+        ],
       },
       {
         path: 'beneficiaries-control',
@@ -95,6 +111,22 @@ export const routes: Routes = [
           import('@features/beneficiaries-control/pages/beneficiary-control/beneficiary-control').then(
             (m) => m.BeneficiaryControl,
           ),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('@features/beneficiaries-control/fragments/list-menu-report-fragment/list-menu-report-fragment.component').then(
+                (m) => m.ListMenuReportFragmentComponent,
+              ),
+          },
+          {
+            path: 'manage/:id',
+            loadComponent: () =>
+              import('@features/beneficiaries-control/fragments/menu-report-beneficiaries-fragment/menu-report-beneficiaries-fragment.component').then(
+                (m) => m.MenuReportBeneficiariesFragmentComponent,
+              ),
+          },
+        ],
       },
       {
         path: 'menu-report-summary',
@@ -151,7 +183,6 @@ export const routes: Routes = [
                 (m) => m.DishPrincipal,
               ),
           },
-          // AQUI ESTÁN LAS NUEVAS RUTAS DE CATEGORIAS Y ETIQUETAS
           {
             path: 'categories',
             loadComponent: () =>
@@ -165,7 +196,7 @@ export const routes: Routes = [
               import('@features/categoriesandtags/pages/tag_principal/tag_principal').then(
                 (m) => m.TagPrincipal,
               ),
-          }
+          },
         ],
       },
       {

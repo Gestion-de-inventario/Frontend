@@ -1,20 +1,28 @@
 @if (loadingReport()) {
   <div class="text-center py-5">
     <div class="spinner-border text-primary"></div>
-    <p class="text-muted mt-2">Cargando reporte del día...</p>
+    <p class="text-muted mt-2">Cargando ...</p>
   </div>
 } @else if (!report()) {
-  <div class="text-center py-5">
-    <div class="alert alert-warning">
-      <p>No existe una orden de producción</p>
-      <p>para hoy.</p>
-    </div>
-
-    <button class="btn btn-primary mt-2" (click)="navigateToCreateReport()">
-      Crear orden de producción
-    </button>
-  </div>
+  <div class="alert alert-danger">No se pudo cargar la orden de producción.</div>
 } @else {
+  <button class="btn btn-outline-secondary" (click)="goBack()">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="lucide lucide-arrow-left-icon lucide-arrow-left"
+    >
+      <path d="m12 19-7-7 7-7" />
+      <path d="M19 12H5" />
+    </svg>
+  </button>
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
       <div class="d-flex justify-content-between align-items-center">
@@ -57,8 +65,17 @@
     </div>
 
     <div class="card-body px-4 pb-4">
-      <h2 class="h6 text-uppercase text-muted">
-        Menus restantes : {{ report()?.quantityRemaining }}
+      <h2 class="h6 text-muted">
+        <strong class="text-black">Menú del dia :</strong> {{ report()?.dishName }}
+      </h2>
+      <h2 class="h6 text-muted">
+        <strong class="text-black">Fecha :</strong> {{ report()?.date }}
+      </h2>
+      <h2 class="h6 text-muted">
+        <strong class="text-black">Menus preparados :</strong> {{ report()?.quantityPrepared }}
+      </h2>
+      <h2 class="h6 text-muted">
+        <strong class="text-black">Menus restantes : </strong>{{ report()?.quantityRemaining }}
       </h2>
       <div class="d-flex flex-column gap-2 mt-2">
         @if (listLoading()) {
@@ -89,7 +106,7 @@
             </div>
           }
         } @else {
-          @for (b of report()!.beneficiarios; track b.name) {
+          @for (b of report()!.beneficiaries; track b.name) {
             <div
               class="d-flex justify-content-between align-items-start border rounded-3 px-3 py-2"
             >
@@ -164,7 +181,6 @@
               </div>
 
               <div class="d-flex gap-1 ms-2">
-                <!--Editar beneficiario | editBeneficiary -->
                 @if (authState.hasPermission('MENU_REPORT_EDIT_BENEFICIARY')) {
                   <button
                     class="btn btn-sm btn-outline-primary rounded-circle p-0 d-flex align-items-center justify-content-center"
@@ -186,7 +202,6 @@
                     </svg>
                   </button>
                 }
-                <!-- //removeBeneficiary-->
 
                 @if (authState.hasPermission('MENU_REPORT_REMOVE_BENEFICIARY')) {
                   <button
@@ -213,7 +228,7 @@
             </div>
           }
 
-          @if (report()!.beneficiarios.length === 0) {
+          @if (report()!.beneficiaries.length === 0) {
             <div class="text-center py-4 text-muted">Sin beneficiarios registrados</div>
           }
         }
@@ -260,37 +275,31 @@
         <div class="modal-body px-4 py-4 d-flex flex-column gap-3">
           @if (!editingRecord) {
             <div>
-              <label class="form-label fw-semibold text-dark small">Buscar beneficiario</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Nombre o DNI"
-                [ngModel]="beneficiarySearch()"
-                (ngModelChange)="beneficiarySearch.set($event)"
-              />
-              @if (filteredBeneficiaries().length > 0 && beneficiarySearch().length > 0) {
-                <div class="card border-0 shadow-sm mt-2 p-2 d-flex flex-column gap-1">
-                  @for (b of filteredBeneficiaries(); track b.id) {
-                    <div
-                      class="p-2 rounded-3 border"
-                      style="cursor: pointer"
-                      (click)="selectBeneficiary(b)"
-                    >
-                      <span class="small fw-semibold">{{ b.name }} {{ b.lastname }}</span>
-                      <span class="text-muted small ms-1">— {{ b.dni }}</span>
-                    </div>
-                  }
-                </div>
+              <label class="form-label fw-semibold text-dark small"> Buscar beneficiario </label>
+
+              @if (!selectedBeneficiary) {
+                <app-search-select
+                  [items]="availableBeneficiaries()"
+                  placeholder="Nombre o DNI"
+                  [displayFn]="beneficiaryLabel"
+                  (selected)="selectBeneficiary($event)"
+                />
               }
+
               @if (selectedBeneficiary) {
                 <div
-                  class="mt-2 d-flex align-items-center gap-2 p-2 rounded-3 border border-primary border-opacity-25"
-                  style="background: var(--bs-primary-bg-subtle, #cfe2ff)"
+                  class="form-control bg-light d-flex justify-content-between align-items-center"
                 >
-                  <span>✅</span>
-                  <small class="text-primary fw-medium"
-                    >{{ selectedBeneficiary.name }} {{ selectedBeneficiary.lastname }}</small
-                  >
+                  <div>
+                    <div class="fw-semibold">
+                      {{ selectedBeneficiary.name }} {{ selectedBeneficiary.lastname }}
+                    </div>
+                    <small class="text-muted"> DNI: {{ selectedBeneficiary.dni }} </small>
+                  </div>
+
+                  <button class="btn btn-sm btn-outline-secondary" (click)="clearBeneficiary()">
+                    Cambiar
+                  </button>
                 </div>
               }
             </div>

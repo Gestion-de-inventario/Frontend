@@ -1,39 +1,93 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 import { MenuReportRequest } from '../interfaces/menu-report.request';
-import { MenuReportResponse } from '../interfaces/menu-report.response';
-import { MenuReportDetailResponse } from '../interfaces/menu-report.response';
-import { BeneficiaryRecordRequest } from '@features/beneficiaries-control/interfaces/beneficiary-record-request';
-import { BeneficiaryRecordResponse } from '@features/beneficiaries-control/interfaces/beneficiary-record-response';
+import {
+  ListMenuReportDetailResponse,
+  MenuReportResponse,
+} from '../interfaces/menu-report.response';
+
 import { DishMenuResponse } from '../interfaces/menu-report.response';
-import { MenuReportSummaryResponse } from '@features/menu-report-summary/interfaces/menu-report-summary-response';
+import { buildEndpoint } from '@shared/utils/api.utils';
+import { MenuPageResponse } from '@features/menu-report-summary/interfaces/menu-report-page.response';
+import { API_ENDPOINTS } from '@core/constants/api-endpoints';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MenuReportApiService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/menu_report`;
-  private readonly dishMenuUrl = `${environment.apiUrl}/dish-menus`;
+  private readonly baseUrl = `${environment.apiUrl}`;
 
   getDishMenus(): Observable<DishMenuResponse[]> {
-    return this.http.get<DishMenuResponse[]>(this.dishMenuUrl);
+    return this.http.get<DishMenuResponse[]>(`${this.baseUrl}${API_ENDPOINTS.DISH_MENU.LIST_ALL}`);
   }
 
   // Crear reporte enviando dishMenuId y quantityPrepared
   create(request: MenuReportRequest): Observable<MenuReportResponse> {
-    return this.http.post<MenuReportResponse>(`${this.apiUrl}/create`, request);
+    return this.http.post<MenuReportResponse>(
+      `${this.baseUrl}${API_ENDPOINTS.MENU_REPORT.CREATE}`,
+      request,
+    );
   }
 
-  // Buscar el reporte por fecha
-  getByDate(fecha: string): Observable<MenuReportDetailResponse> {
-    return this.http.get<MenuReportDetailResponse>(`${this.apiUrl}/date/${fecha}`);
+  // Lista reporte entero
+  getByDate(startDate?: string, endDate?: string): Observable<ListMenuReportDetailResponse> {
+    let params = new HttpParams();
+
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+
+    return this.http.get<ListMenuReportDetailResponse>(
+      `${this.baseUrl}${API_ENDPOINTS.MENU_REPORT.GET_BY_DATE}`,
+      {
+        params,
+      },
+    );
   }
 
-  // Resumen final
-  getSummary(reporteId: number): Observable<MenuReportSummaryResponse> {
-    return this.http.get<MenuReportSummaryResponse>(`${this.apiUrl}/${reporteId}/summary`);
+  // lista ligera pageable
+  list(page = 0, size = 20, startDate?: string, endDate?: string) {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+
+    return this.http.get<MenuPageResponse>(`${this.baseUrl}${API_ENDPOINTS.MENU_REPORT.LIST}`, {
+      params,
+    });
+  }
+
+  //Obtener ReporteMenu por id
+  getMenuReportById(id: number) {
+    const endpoint = buildEndpoint(API_ENDPOINTS.MENU_REPORT.GET_BY_ID, { id });
+    return this.http.get<MenuReportResponse>(`${this.baseUrl}${endpoint}`, {});
+  }
+
+  exportPdf(startDate?: string, endDate?: string): Observable<Blob> {
+    let params = new HttpParams();
+
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+
+    return this.http.get(`${this.baseUrl}${API_ENDPOINTS.MENU_REPORT.RANGE_EXPORT_PDF}`, {
+      params,
+      responseType: 'blob',
+    });
   }
 }

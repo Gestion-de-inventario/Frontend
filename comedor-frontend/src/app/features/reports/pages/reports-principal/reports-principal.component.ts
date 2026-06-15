@@ -2,7 +2,6 @@ import { Component, computed, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 
-
 @Component({
   selector: 'app-reports-principal',
   standalone: true,
@@ -13,18 +12,10 @@ export class ReportsPrincipalComponent {
   private router = inject(Router);
   private authState = inject(AuthStateService);
 
-  canViewTransactions = computed(() =>
-    this.authState.hasPermission('TRANSACTION_LIST_ALL')
-  );
-  canViewModifications = computed(() =>
-    this.authState.hasPermission('MODIFICATION_LIST_ALL')
-  );
-  canViewSummary = computed(() =>
-    this.authState.hasPermission('MENU_REPORT_GET_SUMMARY')
-  );
-  canExport = computed(() =>
-    this.authState.hasPermission('MENU_REPORT_EXPORT')
-  );
+  canViewTransactions = computed(() => this.authState.hasPermission('TRANSACTION_LIST_ALL'));
+  canViewModifications = computed(() => this.authState.hasPermission('MODIFICATION_LIST_ALL'));
+  canViewSummary = computed(() => this.authState.hasPermission('MENU_REPORT_GET_BY_DATE'));
+  canExport = computed(() => this.authState.hasPermission('MENU_REPORT_EXPORT'));
 
   currentModule = computed(() => {
     const url = this.router.url;

@@ -43,8 +43,20 @@ export interface MenuReportResponse {
   id: number;
   date: string;
   day: string;
+  dishId: number;
   dishName: string;
+  registers: StockMovementResponse[];
+  beneficiaries: BeneficiaryRecordResponse[];
   quantityPrepared: number;
   quantityRemaining: number;
   status: string;
+}
+
+export interface ListMenuReportDetailResponse {
+  reports: MenuReportDetailResponse[];
+  totalEarned: number;
+  totalSpent: number;
+  net: number;
+  uniqueBeneficiaryCount: number;
+  mostUsedPaymentMethod: 'EFECTIVO' | 'YAPE' | 'PLIN';
 }
