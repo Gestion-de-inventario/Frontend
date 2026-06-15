@@ -42,6 +42,9 @@ export class TransactionsFragmentComponent {
   filterOption = signal<string>('este_mes'); // Por defecto 'este mes'
   customStartDate = signal<string>('');
   customEndDate = signal<string>('');
+  type = signal<string | null>(null);
+  source = signal<string | null>(null);
+  name = signal<string>('');
 
   constructor() {
     if (!this.canList) return;
@@ -54,26 +57,43 @@ export class TransactionsFragmentComponent {
 
   onFilterChange() {
     if (this.filterOption() !== 'custom') {
-      this.page.set(0);
-      this.loadTransactions();
+      this.applyFilters();
     }
+  }
+  applyFilters(): void {
+    this.page.set(0);
+    this.loadTransactions();
   }
 
   onCustomDateChange() {
     if (this.customStartDate() && this.customEndDate()) {
-      this.page.set(0);
-      this.loadTransactions();
+      this.applyFilters();
     }
   }
 
-  private calculateDates(option: string): { start: string, end: string } {
+  private buildQuery() {
+    const { start, end } = this.calculateDates(this.filterOption());
+
+    return {
+      page: this.page(),
+      size: this.pageSize(),
+      start,
+      end,
+      type: this.type() ?? undefined,
+      source: this.source() ?? undefined,
+      name: this.name() || undefined,
+    };
+  }
+
+  private calculateDates(option: string): { start: string; end: string } {
     const now = new Date();
     let start = new Date();
     let end = new Date();
     const formatDate = (d: Date) => d.toISOString().split('T')[0];
 
     switch (option) {
-      case 'hoy': break;
+      case 'hoy':
+        break;
       case 'ayer':
         start.setDate(now.getDate() - 1);
         end.setDate(now.getDate() - 1);
@@ -90,7 +110,10 @@ export class TransactionsFragmentComponent {
         end = new Date(now.getFullYear(), now.getMonth(), 0);
         break;
       case 'custom':
-        return { start: this.customStartDate(), end: this.customEndDate() };
+        return {
+          start: this.customStartDate() || formatDate(new Date()),
+          end: this.customEndDate() || formatDate(new Date()),
+        };
     }
     return { start: formatDate(start), end: formatDate(end) };
   }
@@ -104,20 +127,19 @@ export class TransactionsFragmentComponent {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const fileName = start && end 
-          ? `transacciones_${start}_al_${end}.pdf` 
-          : `transacciones_historico.pdf`;
+        const fileName =
+          start && end ? `transacciones_${start}_al_${end}.pdf` : `transacciones_historico.pdf`;
         a.download = fileName;
-        
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
+
         this.toastService.show('PDF exportado correctamente', 'success');
       },
       error: () => this.toastService.show('Error al exportar PDF', 'danger'),
-      complete: () => this.exporting.set(false)
+      complete: () => this.exporting.set(false),
     });
   }
 
@@ -127,23 +149,30 @@ export class TransactionsFragmentComponent {
 
   loadTransactions(): void {
     this.loading.set(true);
-    const { start, end } = this.calculateDates(this.filterOption());
 
-    // Actualizamos al método getTransactions para enviar las fechas
-    this.transactionService.getTransactions(this.page(), this.pageSize(), start, end).subscribe({
-      next: (response) => {
-        this.transactionState.set(response.content);
-        this.totalPages.set(response.totalPages);
-        this.totalElements.set(response.totalElements);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-      },
-      complete: () => {
-        this.loading.set(false);
-      },
-    });
+    const q = this.buildQuery();
+
+    this.transactionService
+      .getTransactions(q.page, q.size, q.start, q.end, q.type, q.source, q.name)
+      .subscribe({
+        next: (response) => {
+          this.transactionState.set(response.content);
+
+          this.totalPages.set(response.totalPages);
+          this.totalElements.set(response.totalElements);
+
+          this.page.set(response.number);
+        },
+
+        error: () => {
+          this.toastService.show('Error al cargar transacciones', 'danger');
+          this.loading.set(false);
+        },
+
+        complete: () => {
+          this.loading.set(false);
+        },
+      });
   }
 
   nextPage(): void {

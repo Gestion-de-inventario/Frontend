@@ -16,10 +16,12 @@
         </div>
         <h5 class="fw-bold text-dark mb-0">Transacciones recientes</h5>
       </div>
-      
-      <button class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center" 
-              (click)="exportToPdf()" 
-              [disabled]="loading() || exporting()">
+
+      <button
+        class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center"
+        (click)="exportToPdf()"
+        [disabled]="loading() || exporting()"
+      >
         @if (exporting()) {
           <span class="spinner-border spinner-border-sm me-2"></span> Exportando...
         } @else {
@@ -30,13 +32,15 @@
   </div>
 
   <div class="card-body">
-    
     <div class="row g-3 mb-4 align-items-end bg-light p-3 rounded-4 mx-1">
-      <div class="col-md-4">
+      <!-- FILTRO FECHA -->
+      <div class="col-md-3">
         <label class="form-label fw-bold text-muted small">Filtrar por fecha</label>
-        <select class="form-select rounded-3" 
-                [ngModel]="filterOption()" 
-                (ngModelChange)="filterOption.set($event); onFilterChange()">
+        <select
+          class="form-select rounded-3"
+          [ngModel]="filterOption()"
+          (ngModelChange)="filterOption.set($event); onFilterChange()"
+        >
           <option value="hoy">Hoy</option>
           <option value="ayer">Ayer</option>
           <option value="esta_semana">Esta semana</option>
@@ -46,18 +50,69 @@
         </select>
       </div>
 
+      <!-- TIPO MOVIMIENTO -->
+      <div class="col-md-3">
+        <label class="form-label fw-bold text-muted small">Tipo</label>
+        <select
+          class="form-select rounded-3"
+          [ngModel]="type()"
+          (ngModelChange)="type.set($event); applyFilters()"
+        >
+          <option [ngValue]="null">Todos</option>
+          <option value="ENTRADA">Entrada</option>
+          <option value="SALIDA">Salida</option>
+        </select>
+      </div>
+
+      <!-- FUENTE -->
+      <div class="col-md-3">
+        <label class="form-label fw-bold text-muted small">Fuente</label>
+        <select
+          class="form-select rounded-3"
+          [ngModel]="source()"
+          (ngModelChange)="source.set($event); applyFilters()"
+        >
+          <option [ngValue]="null">Todas</option>
+          <option value="COMPRA">Compra</option>
+          <option value="DONACION">Donación</option>
+          <option value="TRANSFERENCIA">Transferencia</option>
+          <option value="INVENTARIO">Inventario</option>
+        </select>
+      </div>
+
+      <!-- BUSCAR POR PRODUCTO -->
+      <div class="col-md-3">
+        <label class="form-label fw-bold text-muted small">Producto</label>
+        <input
+          type="text"
+          class="form-control rounded-3"
+          placeholder="Buscar producto..."
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)"
+          (keyup.enter)="applyFilters()"
+        />
+      </div>
+
+      <!-- FECHAS CUSTOM -->
       @if (filterOption() === 'custom') {
-        <div class="col-md-4">
-          <label class="form-label fw-bold text-muted small">Fecha Inicio</label>
-          <input type="date" class="form-control rounded-3" 
-                 [ngModel]="customStartDate()" 
-                 (ngModelChange)="customStartDate.set($event); onCustomDateChange()">
+        <div class="col-md-3">
+          <label class="form-label fw-bold text-muted small">Inicio</label>
+          <input
+            type="date"
+            class="form-control rounded-3"
+            [ngModel]="customStartDate()"
+            (ngModelChange)="customStartDate.set($event); onCustomDateChange()"
+          />
         </div>
-        <div class="col-md-4">
-          <label class="form-label fw-bold text-muted small">Fecha Fin</label>
-          <input type="date" class="form-control rounded-3" 
-                 [ngModel]="customEndDate()" 
-                 (ngModelChange)="customEndDate.set($event); onCustomDateChange()">
+
+        <div class="col-md-3">
+          <label class="form-label fw-bold text-muted small">Fin</label>
+          <input
+            type="date"
+            class="form-control rounded-3"
+            [ngModel]="customEndDate()"
+            (ngModelChange)="customEndDate.set($event); onCustomDateChange()"
+          />
         </div>
       }
     </div>
@@ -105,6 +160,9 @@
               >
                 {{ t.type }}
               </span>
+            </div>
+            <div class="mt-2 d-flex gap-3 flex-wrap">
+              <span> Fuente de producto : {{ t.source }} </span>
             </div>
             <div class="mt-2 d-flex gap-3 flex-wrap">
               <small class="text-muted">
