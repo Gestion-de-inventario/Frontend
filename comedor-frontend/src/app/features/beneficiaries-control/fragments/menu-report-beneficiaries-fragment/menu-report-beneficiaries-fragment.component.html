@@ -275,37 +275,31 @@
         <div class="modal-body px-4 py-4 d-flex flex-column gap-3">
           @if (!editingRecord) {
             <div>
-              <label class="form-label fw-semibold text-dark small">Buscar beneficiario</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Nombre o DNI"
-                [ngModel]="beneficiarySearch()"
-                (ngModelChange)="beneficiarySearch.set($event)"
-              />
-              @if (filteredBeneficiaries().length > 0 && beneficiarySearch().length > 0) {
-                <div class="card border-0 shadow-sm mt-2 p-2 d-flex flex-column gap-1">
-                  @for (b of filteredBeneficiaries(); track b.id) {
-                    <div
-                      class="p-2 rounded-3 border"
-                      style="cursor: pointer"
-                      (click)="selectBeneficiary(b)"
-                    >
-                      <span class="small fw-semibold">{{ b.name }} {{ b.lastname }}</span>
-                      <span class="text-muted small ms-1">— {{ b.dni }}</span>
-                    </div>
-                  }
-                </div>
+              <label class="form-label fw-semibold text-dark small"> Buscar beneficiario </label>
+
+              @if (!selectedBeneficiary) {
+                <app-search-select
+                  [items]="availableBeneficiaries()"
+                  placeholder="Nombre o DNI"
+                  [displayFn]="beneficiaryLabel"
+                  (selected)="selectBeneficiary($event)"
+                />
               }
+
               @if (selectedBeneficiary) {
                 <div
-                  class="mt-2 d-flex align-items-center gap-2 p-2 rounded-3 border border-primary border-opacity-25"
-                  style="background: var(--bs-primary-bg-subtle, #cfe2ff)"
+                  class="form-control bg-light d-flex justify-content-between align-items-center"
                 >
-                  <span>✅</span>
-                  <small class="text-primary fw-medium"
-                    >{{ selectedBeneficiary.name }} {{ selectedBeneficiary.lastname }}</small
-                  >
+                  <div>
+                    <div class="fw-semibold">
+                      {{ selectedBeneficiary.name }} {{ selectedBeneficiary.lastname }}
+                    </div>
+                    <small class="text-muted"> DNI: {{ selectedBeneficiary.dni }} </small>
+                  </div>
+
+                  <button class="btn btn-sm btn-outline-secondary" (click)="clearBeneficiary()">
+                    Cambiar
+                  </button>
                 </div>
               }
             </div>

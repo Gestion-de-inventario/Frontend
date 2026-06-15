@@ -14,13 +14,14 @@ import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { MenuReportResponse } from '@features/menu-report/interfaces/menu-report.response';
 import { finalize } from 'rxjs';
+import { SearchSelectComponent } from '@shared/components/search-select/search-select';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-menu-report-beneficiaries-fragment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SearchSelectComponent],
   templateUrl: './menu-report-beneficiaries-fragment.component.html',
 })
 export class MenuReportBeneficiariesFragmentComponent {
@@ -33,6 +34,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
+  beneficiaryLabel = (b: BeneficiaryResponse) => `${b.name} ${b.lastname} - DNI: ${b.dni}`;
 
   report = signal<MenuReportResponse | null>(null);
 
@@ -103,6 +105,13 @@ export class MenuReportBeneficiariesFragmentComponent {
     );
   });
 
+  readonly availableBeneficiaries = computed(() => {
+    const selectedId = this.selectedBeneficiary?.id;
+    return this.allBeneficiaries()
+      .filter((b) => b.status === 'ACTIVO')
+      .filter((b) => b.id !== selectedId);
+  });
+
   constructor() {
     this.beneficiaryService.listByStatus('ACTIVO').subscribe((list) => {
       this.beneficiaryState.setBeneficiaries(list);
@@ -136,8 +145,6 @@ export class MenuReportBeneficiariesFragmentComponent {
     this.selectedBeneficiary = beneficiary;
 
     this.menuPrice.set(beneficiary.menu_cost);
-
-    this.beneficiarySearch.set('');
   }
 
   navigateToCreateReport(): void {
@@ -329,5 +336,10 @@ export class MenuReportBeneficiariesFragmentComponent {
       { entregado: checked },
       () => (record.entregado = oldValue),
     );
+  }
+
+  clearBeneficiary(): void {
+    this.selectedBeneficiary = null;
+    this.beneficiarySearch.set('');
   }
 }

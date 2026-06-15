@@ -41,7 +41,7 @@ export class SearchSelectComponent<T> {
     const term = this.search().toLowerCase();
 
     if (!term) {
-      return this.items.slice(0, 5);
+      return this.items.slice(0, 3);
     }
 
     return this.items.filter((item) => this.displayFn(item).toLowerCase().includes(term));
