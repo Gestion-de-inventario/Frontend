@@ -1,217 +1,143 @@
 @if (!canList) {
-  <div class="alert alert-danger">No tienes permiso para listar órdenes de produccion.</div>
+  <div class="alert alert-danger m-3 rounded-4">No tienes permiso para listar órdenes de salida.</div>
 } @else {
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-white">
-      <div class="d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Órdenes de producción</h5>
-      </div>
-    </div>
-
-    <div class="card-body">
-      <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <label class="form-label"> Fecha inicio </label>
-
-          <input
-            type="date"
-            class="form-control"
-            [ngModel]="startDate()"
-            (ngModelChange)="startDate.set($event)"
-          />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label"> Fecha fin </label>
-
-          <input
-            type="date"
-            class="form-control"
-            [ngModel]="endDate()"
-            (ngModelChange)="endDate.set($event)"
-          />
-        </div>
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-3">
+      
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.8rem;">Filtrar Salidas</h6>
       </div>
 
-      <div class="d-flex gap-2 mb-4">
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <div class="form-floating">
+            <input
+              type="date"
+              class="form-control rounded-3"
+              id="startDateOut"
+              [ngModel]="startDate()"
+              (ngModelChange)="startDate.set($event)"
+            />
+            <label for="startDateOut" class="text-muted small">Fecha inicio</label>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-floating">
+            <input
+              type="date"
+              class="form-control rounded-3"
+              id="endDateOut"
+              [ngModel]="endDate()"
+              (ngModelChange)="endDate.set($event)"
+            />
+            <label for="endDateOut" class="text-muted small">Fecha fin</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
         <button
-          class="btn btn-outline-primary align-items-center gap-2"
+          class="btn btn-primary rounded-3 flex-grow-1 d-flex align-items-center justify-content-center gap-2"
           (click)="search()"
           [disabled]="loading()"
         >
           @if (loading()) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            <p class="mb-0">Buscando...</p>
+            <span class="spinner-border spinner-border-sm"></span>
           } @else {
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-search"
-            >
-              <path d="m21 21-4.34-4.34" />
-              <circle cx="11" cy="11" r="8" />
-            </svg>
-            Buscar
+            <i class="bi bi-search"></i> Buscar
           }
         </button>
 
         <button
-          class="btn btn-outline-secondary d-flex align-items-center gap-2"
+          class="btn btn-light border rounded-3 flex-grow-1 text-muted d-flex align-items-center justify-content-center gap-2"
           [disabled]="loading()"
           (click)="clearFilters()"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M3 2v6h6" />
-            <path d="M21 12A9 9 0 0 0 6 5.3L3 8" />
-            <path d="M21 22v-6h-6" />
-            <path d="M3 12a9 9 0 0 0 15 6.7L21 16" />
-          </svg>
-          Limpiar filtros
+          <i class="bi bi-arrow-counterclockwise"></i> Limpiar
         </button>
       </div>
+    </div>
+  </div>
 
-      @if (loading()) {
-        <div class="text-center py-5">
-          <div class="spinner-border"></div>
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <div class="mt-2 text-muted">Cargando salidas...</div>
+    </div>
+  } @else if (reports().length === 0) {
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-search fs-1 mb-2 d-block"></i>
+      <p>No se encontraron órdenes de salida.</p>
+    </div>
+  } @else {
+    
+    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+      <span class="text-muted fw-medium small">Total: <span class="text-dark fw-bold">{{ totalElements() }}</span></span>
+      <div class="d-flex align-items-center gap-2">
+        <label class="text-muted small mb-0 d-none d-sm-block">Mostrar:</label>
+        <select
+          class="form-select form-select-sm border-0 bg-white shadow-sm rounded-3"
+          style="width: 70px;"
+          [ngModel]="pageSize()"
+          (ngModelChange)="changePageSize($event)"
+        >
+          <option [ngValue]="1">1</option>
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+        </select>
+      </div>
+    </div>
 
-          <div class="mt-2">Cargando órdenes...</div>
-        </div>
-      } @else if (reports().length === 0) {
-        <div class="alert alert-info text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-search"
-          >
-            <path d="m21 21-4.34-4.34" />
-            <circle cx="11" cy="11" r="8" />
-          </svg>
-          No se encontraron órdenes de producción.
-        </div>
-      } @else {
-        <div class="text-muted mb-3">
-          Total de órdenes:
-          <strong>{{ totalElements() }}</strong>
-        </div>
-        <div class="row mt-2">
-          <div class="col">
-            <label class="form-label"> Por página </label>
-          </div>
-          <div class="col">
-            <select
-              class="form-select"
-              [ngModel]="pageSize()"
-              (ngModelChange)="changePageSize($event)"
-            >
-              <option [ngValue]="1">1</option>
-              <option [ngValue]="5">5</option>
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="20">20</option>
-              <option [ngValue]="50">50</option>
-              <option [ngValue]="100">100</option>
-            </select>
-          </div>
-        </div>
+    <div class="d-flex flex-column gap-3 mb-4">
+      @for (report of reports(); track report.id) {
+        <div
+          class="card border border-light shadow-sm rounded-4 overflow-hidden"
+          style="cursor: pointer"
+          (click)="goToControl(report, report.id)"
+        >
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <h6 class="fw-bold text-dark mb-0 pe-2">{{ report.dishName }}</h6>
+              <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 flex-shrink-0">#{{ report.id }}</span>
+            </div>
+            <p class="text-muted small mb-3">
+              <i class="bi bi-calendar-event me-1"></i> {{ report.date }}
+            </p>
 
-        <div class="d-flex flex-column gap-3 mb-3">
-          @for (report of reports(); track report.id) {
-            <div
-              class="card border-0 shadow-sm report-card"
-              style="cursor: pointer"
-              (click)="goToControl(report, report.id)"
-            >
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div>
-                    <h6 class="fw-bold mb-1">
-                      {{ report.dishName }}
-                    </h6>
-
-                    <small class="text-muted">
-                      {{ report.date }}
-                    </small>
-                  </div>
-
-                  <span class="badge bg-primary"> #{{ report.id }} </span>
-                </div>
-
-                <hr />
-
-                <div class="row text-center">
-                  <div class="col">
-                    <small class="text-muted d-block"> Preparados </small>
-
-                    <span class="fw-bold">
-                      {{ report.quantityPrepared }}
-                    </span>
-                  </div>
-
-                  <div class="col">
-                    <small class="text-muted d-block"> Restantes </small>
-
-                    <span
-                      class="fw-bold"
-                      [class.text-danger]="report.quantityRemaining > 0"
-                      [class.text-success]="report.quantityRemaining === 0"
-                    >
-                      {{ report.quantityRemaining }}
-                    </span>
-                  </div>
-                </div>
+            <div class="d-flex bg-light rounded-3 p-2 border">
+              <div class="w-50 text-center border-end border-2 border-white">
+                <span class="d-block text-muted small" style="font-size: 0.7rem;">Preparados</span>
+                <span class="fw-bold text-dark fs-5">{{ report.quantityPrepared }}</span>
+              </div>
+              <div class="w-50 text-center">
+                <span class="d-block text-muted small" style="font-size: 0.7rem;">Restantes</span>
+                <span
+                  class="fw-bold fs-5"
+                  [class.text-danger]="report.quantityRemaining > 0"
+                  [class.text-success]="report.quantityRemaining === 0"
+                >
+                  {{ report.quantityRemaining }}
+                </span>
               </div>
             </div>
-          }
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center">
-          <button
-            class="btn btn-outline-secondary"
-            [disabled]="page() === 0"
-            (click)="previousPage()"
-          >
-            Anterior
-          </button>
-
-          <span>
-            Página
-            {{ page() + 1 }}
-            de
-            {{ totalPages() }}
-          </span>
-
-          <button
-            class="btn btn-outline-secondary"
-            [disabled]="page() + 1 >= totalPages()"
-            (click)="nextPage()"
-          >
-            Siguiente
-          </button>
+          </div>
+          <div class="bg-primary bg-opacity-10 py-2 text-center border-top">
+            <span class="text-primary small fw-medium">Ver detalles <i class="bi bi-arrow-right ms-1"></i></span>
+          </div>
         </div>
       }
     </div>
-  </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+      <button class="btn btn-light rounded-circle shadow-sm" [disabled]="page() === 0" (click)="previousPage()" style="width: 40px; height: 40px;">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <span class="text-muted small fw-medium">Pág {{ page() + 1 }} de {{ totalPages() }}</span>
+      <button class="btn btn-light rounded-circle shadow-sm" [disabled]="page() + 1 >= totalPages()" (click)="nextPage()" style="width: 40px; height: 40px;">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  }
 }
