@@ -56,7 +56,7 @@
         <select
           class="form-select rounded-3"
           [ngModel]="type()"
-          (ngModelChange)="type.set($event); applyFilters()"
+          (ngModelChange)="onTypeChange($event)"
         >
           <option [ngValue]="null">Todos</option>
           <option value="ENTRADA">Entrada</option>
@@ -73,10 +73,12 @@
           (ngModelChange)="source.set($event); applyFilters()"
         >
           <option [ngValue]="null">Todas</option>
-          <option value="COMPRA">Compra</option>
-          <option value="DONACION">Donación</option>
-          <option value="TRANSFERENCIA">Transferencia</option>
-          <option value="INVENTARIO">Inventario</option>
+
+          @for (option of sourceOptions(); track option.value) {
+            <option [value]="option.value">
+              {{ option.label }}
+            </option>
+          }
         </select>
       </div>
 

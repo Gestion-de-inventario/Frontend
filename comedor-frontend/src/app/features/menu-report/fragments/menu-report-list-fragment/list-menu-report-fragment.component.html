@@ -355,6 +355,11 @@
               @if (editLoading()) {
                 <div class="col-12 text-center py-5">
                   <div class="spinner-border text-primary mb-3" role="status"></div>
+                  <p class="text-muted">Editando datos...</p>
+                </div>
+              } @else if (informationLoading()) {
+                <div class="col-12 text-center py-5">
+                  <div class="spinner-border text-primary mb-3" role="status"></div>
                   <p class="text-muted">Cargando datos...</p>
                 </div>
               } @else {
@@ -515,42 +520,45 @@
                 Cerrar
               </button>
             } @else {
-              <!-- Botones en modo edición -->
-              <button
-                class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
-                (click)="cancelEdit()"
-                [disabled]="editLoading()"
-              >
-                Cancelar
-              </button>
+              @if (informationLoading()) {
+              } @else {
+                <!-- Botones en modo edición -->
+                <button
+                  class="btn btn-outline-secondary rounded-pill px-4 fw-medium"
+                  (click)="cancelEdit()"
+                  [disabled]="editLoading()"
+                >
+                  Cancelar
+                </button>
 
-              <button
-                class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
-                (click)="saveEdit()"
-                [disabled]="
-                  editLoading() || !editForm.dishMenuId() || editForm.quantityPrepared() === null
-                "
-              >
-                @if (editLoading()) {
-                  <span class="spinner-border spinner-border-sm"></span>
-                  Guardando...
-                } @else {
-                  <svg
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    viewBox="0 0 24 24"
-                    width="16"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33A3 3 0 0116.5 19.5H6.75z"
-                    ></path>
-                  </svg>
-                  Guardar cambios
-                }
-              </button>
+                <button
+                  class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
+                  (click)="saveEdit()"
+                  [disabled]="
+                    editLoading() || !editForm.dishMenuId() || editForm.quantityPrepared() === null
+                  "
+                >
+                  @if (editLoading()) {
+                    <span class="spinner-border spinner-border-sm"></span>
+                    Guardando...
+                  } @else {
+                    <svg
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      viewBox="0 0 24 24"
+                      width="16"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33A3 3 0 0116.5 19.5H6.75z"
+                      ></path>
+                    </svg>
+                    Guardar cambios
+                  }
+                </button>
+              }
             }
           </div>
         }
