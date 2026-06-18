@@ -21,7 +21,7 @@ export class TransactionService {
     fechaFin?: string,
     type?: string,
     source?: string,
-    name?: string,
+    productName?: string,
   ) {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
 
@@ -41,8 +41,8 @@ export class TransactionService {
       params = params.set('source', source);
     }
 
-    if (name) {
-      params = params.set('name', name);
+    if (productName) {
+      params = params.set('productName', productName);
     }
 
     return this.http.get<TransactionPageResponse>(
