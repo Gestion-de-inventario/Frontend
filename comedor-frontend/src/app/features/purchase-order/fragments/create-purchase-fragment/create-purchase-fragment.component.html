@@ -1,92 +1,52 @@
 @if (!canCreate) {
-  <div class="alert alert-danger">No tienes permiso para crear órdenes de compra.</div>
+  <div class="alert alert-danger m-3 rounded-4 shadow-sm">No tienes permiso para crear órdenes de compra.</div>
 } @else {
+  
   @if (purchaseCreated()) {
-    <div class="card shadow-sm border-0">
-      <div class="card-body text-center py-5">
-        <h4 class="text-success mb-3">Orden de compra creada correctamente</h4>
-
-        <p class="text-muted">
-          La orden #{{ createdPurchaseId() }}
-          fue registrada exitosamente.
-        </p>
-
-        <div class="container mt-4">
-          <div class="row mt-4">
-            <button class="btn btn-primary" (click)="goToMenuReport()">Volver a crear menú</button>
-          </div>
-          <div class="row mt-4">
-            <button class="btn btn-success" (click)="createAnotherPurchase()">
-              Crear otra orden
-            </button>
-          </div>
-          <div class="row mt-4">
-            <button class="btn btn-outline-secondary" (click)="goBackToList()">
-              Volver a la lista
-            </button>
-          </div>
-        </div>
+    <div class="card border-0 shadow-sm rounded-4 m-2 text-center p-4">
+      <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 72px; height: 72px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h4 class="fw-bold text-dark mb-2">Orden Creada</h4>
+      <p class="text-muted small mb-4">La orden #{{ createdPurchaseId() }} fue registrada con éxito.</p>
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-primary rounded-pill py-2.5 fw-medium" (click)="createAnotherPurchase()">Crear otra orden</button>
+        <button class="btn btn-outline-primary rounded-pill py-2.5 fw-medium" (click)="goToMenuReport()">Volver a crear menú</button>
+        <button class="btn btn-outline-secondary rounded-pill py-2.5 fw-medium" (click)="goBackToList()">Volver a la lista</button>
       </div>
     </div>
   } @else {
+    
     @if (initialLoading()) {
-      <div class="card shadow-sm border-0">
-        <!-- Header -->
-        <div class="card-header bg-white d-flex align-items-center">
-          <span class="placeholder rounded" style="width: 38px; height: 38px"></span>
-
-          <div class="flex-grow-1 text-center">
-            <span
-              class="placeholder"
-              style="width: 180px; height: 24px; display: inline-block"
-            ></span>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <!-- Alert -->
-          <div class="placeholder-glow mb-4">
-            <span class="placeholder d-block rounded" style="height: 50px"></span>
-          </div>
-          <!-- Botones -->
-          <div class="d-flex gap-2">
-            <span class="placeholder rounded flex-grow-1" style="height: 61px"></span>
-
-            <span class="placeholder rounded flex-grow-1" style="height: 61px"></span>
-          </div>
+      <div class="card shadow-sm border-0 rounded-4 m-2 p-4">
+        <div class="placeholder-glow">
+          <span class="placeholder col-12 rounded-3 mb-3" style="height: 50px"></span>
+          <span class="placeholder col-12 rounded-3 mb-3" style="height: 120px"></span>
+          <span class="placeholder col-12 rounded-pill" style="height: 50px"></span>
         </div>
       </div>
     } @else {
-      <div class="card shadow-sm border-0">
-        <div class="card-header bg-white d-flex align-items-center">
-          <button class="btn btn-outline-secondary" (click)="goBackToList()">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-arrow-left-icon lucide-arrow-left"
-            >
-              <path d="m12 19-7-7 7-7" />
-              <path d="M19 12H5" />
-            </svg>
+      <div class="container-fluid px-2 py-2">
+        
+        <div class="d-flex align-items-center gap-3 mb-3 px-1">
+          <button class="btn btn-light rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;" (click)="goBackToList()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
           </button>
-          <h5 class="mb-0 flex-grow-1 text-center">Orden de compra</h5>
+          <h5 class="fw-bold text-dark mb-0">Nueva Orden de Compra</h5>
         </div>
 
-        <div class="card-body">
+        <div class="d-flex flex-column gap-3 mb-4">
           @if (purchaseDetails().length === 0) {
-            <div class="alert alert-info">No hay productos agregados.</div>
+            <div class="text-center py-5 text-muted">
+              <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+              No hay productos agregados.
+            </div>
           }
 
-          @for (detail of purchaseDetails(); track $index; let detailIndex = $index) {
-            <div class="row g-2 mb-3 align-items-end">
-              <div class="col-md-4 position-relative overflow-visible">
+          @for (detail of purchaseDetails(); track $index) {
+            <div class="card border border-light shadow-sm rounded-4 p-3">
+              <div class="mb-3">
+                <label class="form-label fw-bold text-muted small text-uppercase">Producto</label>
                 @if (!detail.productId) {
                   <app-search-select
                     [items]="products()"
@@ -94,83 +54,49 @@
                     [displayFn]="productLabel"
                     (selected)="selectProduct($index, $event)"
                   />
-                }
-
-                @if (detail.productId) {
-                  <div
-                    class="form-control bg-light d-flex justify-content-between align-items-center"
-                  >
-                    <span>
-                      {{ detail.productName }}
-                      ({{ detail.productUnit }})
-                    </span>
-
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-secondary"
-                      (click)="clearProduct($index)"
-                    >
-                      Cambiar
-                    </button>
+                } @else {
+                  <div class="form-control bg-primary bg-opacity-10 border-primary border-opacity-25 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-primary">{{ detail.productName }} ({{ detail.productUnit }})</span>
+                    <button class="btn btn-sm btn-outline-primary" (click)="clearProduct($index)">Cambiar</button>
                   </div>
                 }
               </div>
-              <div class="col-md-3">
-                <label class="form-label"> Cantidad </label>
 
-                <input
-                  type="number"
-                  class="form-control"
-                  [ngModel]="detail.quantity"
-                  (ngModelChange)="updateQuantity($index, $event)"
-                />
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label fw-bold text-muted small text-uppercase">Cantidad</label>
+                  <input type="number" class="form-control rounded-3" [ngModel]="detail.quantity" (ngModelChange)="updateQuantity($index, $event)" />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold text-muted small text-uppercase">Precio Unit.</label>
+                  <input type="number" class="form-control rounded-3" [ngModel]="detail.unitPrice" (ngModelChange)="updatePrice($index, $event)" />
+                </div>
               </div>
 
-              <div class="col-md-3">
-                <label class="form-label"> Precio unitario </label>
-
-                <input
-                  type="number"
-                  class="form-control"
-                  [ngModel]="detail.unitPrice"
-                  (ngModelChange)="updatePrice($index, $event)"
-                />
-              </div>
-
-              <div class="col-md-2">
-                <button class="btn btn-outline-danger w-100" (click)="removeDetail($index)">
-                  Eliminar
-                </button>
-              </div>
+              <button class="btn btn-outline-danger btn-sm mt-3 w-100 rounded-pill" (click)="removeDetail($index)">
+                Eliminar producto
+              </button>
             </div>
           }
+        </div>
+
+        <div class="d-flex flex-column gap-2 mb-4">
+          <button class="btn btn-outline-primary rounded-pill py-2.5 fw-medium" (click)="addEmptyRow()">
+            + Agregar otro producto
+          </button>
+
           @if (hasDuplicateProducts()) {
-            <div class="alert alert-warning mt-3 mb-3">
-              Existen productos repetidos en la orden de compra.
-            </div>
+            <div class="alert alert-warning mb-0 rounded-3 small">Existen productos repetidos.</div>
           }
-          <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary" (click)="addEmptyRow()">
-              Agregar producto
-            </button>
 
-            <button
-              class="btn btn-success"
-              (click)="createPurchase()"
-              [disabled]="
-                loading() ||
-                purchaseDetails().length === 0 ||
-                hasDuplicateProducts() ||
-                purchaseDetails().some((d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0)
-              "
-            >
-              @if (loading()) {
-                <span class="spinner-border spinner-border-sm me-2"></span>
-              }
-
-              Crear orden de compra
-            </button>
-          </div>
+          <button
+            class="btn btn-success rounded-pill py-3 fw-bold shadow-sm"
+            (click)="createPurchase()"
+            [disabled]="loading() || purchaseDetails().length === 0 || hasDuplicateProducts() || purchaseDetails().some((d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0)"
+          >
+            @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            Confirmar Orden de Compra
+          </button>
         </div>
       </div>
     }

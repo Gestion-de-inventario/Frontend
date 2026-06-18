@@ -1,11 +1,20 @@
-<div class="card border-0 shadow-sm rounded-4">
-  <div class="card-header bg-white">
-    <h5 class="fw-bold mb-3">Tipos de beneficiario</h5>
-
-    <div class="d-flex gap-3">
-      <input class="form-control" placeholder="Buscar..." (input)="onSearch($event)" />
-
-      <select class="form-select" style="max-width: 150px" (change)="onStatusChange($event)">
+<div class="container-fluid px-2 py-2">
+  
+  <div class="bg-white rounded-4 shadow-sm p-3 mb-3 border-0">
+    <h5 class="fw-bold text-dark mb-3">Tipos de beneficiario</h5>
+    
+    <div class="d-flex flex-column flex-sm-row gap-2">
+      <input 
+        class="form-control form-control-lg rounded-3 border-0 bg-light shadow-none flex-grow-1" 
+        placeholder="Buscar..." 
+        (input)="onSearch($event)" 
+      />
+      
+      <select 
+        class="form-select form-select-lg rounded-3 border-0 bg-light shadow-none flex-shrink-0" 
+        style="min-width: 140px;" 
+        (change)="onStatusChange($event)"
+      >
         <option value="TODOS">Todos</option>
         <option value="ACTIVO">Activos</option>
         <option value="INACTIVO">Inactivos</option>
@@ -13,36 +22,65 @@
     </div>
   </div>
 
-  <div class="card-body">
+  <div class="d-flex flex-column gap-2">
+    
     @if (loading()) {
-      <div class="text-center py-5">
-        <div class="spinner-border"></div>
-      </div>
-    } @else {
-      @for (type of types(); track type.id) {
-        <div class="border rounded p-3 mb-2" style="cursor: pointer" (click)="openType(type)">
-          <div class="d-flex justify-content-between">
-            <div>
-              <strong>{{ type.name }}</strong>
-
-              <div class="text-muted small">
-                {{ type.desc }}
-              </div>
+      @for (i of [1,2,3]; track i) {
+        <div class="card rounded-4 border-0 shadow-sm p-3 placeholder-glow mb-1">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="flex-grow-1">
+              <span class="placeholder col-5 rounded mb-2 d-block"></span>
+              <span class="placeholder col-9 rounded d-block mb-1"></span>
+              <span class="placeholder col-7 rounded d-block"></span>
             </div>
+            <div class="placeholder col-3 rounded-pill py-2 flex-shrink-0"></div>
           </div>
-          <span
-            class="badge rounded-pill mt-2"
-            [class]="
-              type.status === 'ACTIVO'
-                ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
-                : 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'
-            "
-          >
-            {{ type.status }}
-          </span>
         </div>
-      } @empty {
-        <div class="text-center text-muted py-4">No hay registros</div>
+      }
+    } 
+    
+    @else {
+      @for (type of types(); track type.id) {
+        <div 
+          class="card border border-light shadow-sm rounded-4 p-3 mb-1" 
+          style="cursor: pointer;" 
+          (click)="openType(type)"
+        >
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            
+            <div class="flex-grow-1 overflow-hidden">
+              <h6 class="fw-bold text-dark mb-1 text-truncate">{{ type.name }}</h6>
+              <p 
+                class="text-muted small mb-0 lh-sm" 
+                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+              >
+                {{ type.desc }}
+              </p>
+            </div>
+
+            <div class="flex-shrink-0 mt-1">
+              <span
+                class="badge rounded-pill px-2 py-1 border"
+                [class]="
+                  type.status === 'ACTIVO'
+                    ? 'bg-success bg-opacity-10 text-success border-success border-opacity-25'
+                    : 'bg-danger bg-opacity-10 text-danger border-danger border-opacity-25'
+                "
+              >
+                {{ type.status }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+      } 
+      
+      @empty {
+        <div class="text-center py-5 mt-4">
+          <i class="bi bi-tags fs-1 text-muted opacity-50 d-block mb-2"></i>
+          <h6 class="text-dark fw-bold mb-1">No hay registros</h6>
+          <p class="text-muted small">Intenta buscar con otros términos o cambia el filtro de estado.</p>
+        </div>
       }
     }
   </div>

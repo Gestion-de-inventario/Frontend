@@ -1,253 +1,207 @@
 @if (!canList) {
-  <div class="alert alert-danger">No tienes permiso para listar órdenes de compra.</div>
+  <div class="alert alert-danger m-3 rounded-4 shadow-sm">No tienes permiso para listar órdenes de compra.</div>
 } @else {
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-white">
-      <div class="d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Órdenes de compra</h5>
+  <div class="container-fluid px-1 py-2">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+      <div class="card-body p-3">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.8rem;">Órdenes de Compra</h6>
+          @if (canCreate) {
+            <button class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1" (click)="goToCreate()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              Nueva
+            </button>
+          }
+        </div>
 
-        @if (canCreate) {
-          <button class="btn btn-primary" (click)="goToCreate()">Nueva orden</button>
-        }
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <div class="form-floating">
+              <input
+                type="date"
+                class="form-control rounded-3"
+                id="startDateBuy"
+                [ngModel]="startDate()"
+                (ngModelChange)="startDate.set($event)"
+              />
+              <label for="startDateBuy" class="text-muted small">Fecha inicio</label>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-floating">
+              <input
+                type="date"
+                class="form-control rounded-3"
+                id="endDateBuy"
+                [ngModel]="endDate()"
+                (ngModelChange)="endDate.set($event)"
+              />
+              <label for="endDateBuy" class="text-muted small">Fecha fin</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-floating">
+              <select class="form-select rounded-3" id="statusBuy" [ngModel]="status()" (ngModelChange)="status.set($event)">
+                <option value="">Todos los estados</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="RECIBIDO">Recibido</option>
+              </select>
+              <label for="statusBuy" class="text-muted small">Estado de la orden</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-primary rounded-3 flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+            (click)="search()"
+            [disabled]="loading()"
+          >
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm"></span>
+              <span>Buscando...</span>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+              <span>Buscar</span>
+            }
+          </button>
+
+          <button
+            class="btn btn-light border rounded-3 flex-grow-1 text-muted d-flex align-items-center justify-content-center gap-2"
+            [disabled]="loading()"
+            (click)="clearFilters()"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7L21 16"/></svg>
+            <span>Limpiar</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="card-body">
-      <div class="row g-3 mb-4">
-        <div class="col-md-4">
-          <label class="form-label"> Fecha inicio </label>
-
-          <input
-            type="date"
-            class="form-control"
-            [ngModel]="startDate()"
-            (ngModelChange)="startDate.set($event)"
-          />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label"> Fecha fin </label>
-
-          <input
-            type="date"
-            class="form-control"
-            [ngModel]="endDate()"
-            (ngModelChange)="endDate.set($event)"
-          />
-        </div>
-
-        <div class="col-md-4">
-          <label class="form-label"> Estado </label>
-
-          <select class="form-select" [ngModel]="status()" (ngModelChange)="status.set($event)">
-            <option value="">Todos</option>
-
-            <option value="PENDIENTE">Pendiente</option>
-
-            <option value="RECIBIDO">Recibido</option>
+    @if (loading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <div class="mt-2 text-muted">Cargando órdenes de compra...</div>
+      </div>
+    } @else if (purchases().length === 0) {
+      <div class="text-center py-5 text-muted bg-white rounded-4 shadow-sm border border-light">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        <p class="mb-0">No se encontraron órdenes de compra.</p>
+      </div>
+    } @else {
+      
+      <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+        <span class="text-muted fw-medium small">Total: <span class="text-dark fw-bold">{{ totalElements() }}</span></span>
+        <div class="d-flex align-items-center gap-2">
+          <label class="text-muted small mb-0">Mostrar:</label>
+          <select
+            class="form-select form-select-sm border-0 bg-white shadow-sm rounded-3"
+            style="width: 70px;"
+            [ngModel]="pageSize()"
+            (ngModelChange)="changePageSize($event)"
+          >
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+            <option [ngValue]="100">100</option>
           </select>
         </div>
       </div>
 
-      <div class="d-flex gap-2 mb-4">
-        <button
-          class="btn btn-outline-primary align-items-center gap-2"
-          (click)="search()"
-          [disabled]="loading()"
-        >
-          @if (loading()) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            <p class="mb-0">Buscando...</p>
-          } @else {
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-search"
-            >
-              <path d="m21 21-4.34-4.34" />
-              <circle cx="11" cy="11" r="8" />
-            </svg>
-            Buscar
-          }
-        </button>
-
-        <button
-          class="btn btn-outline-secondary d-flex align-items-center gap-2"
-          [disabled]="loading()"
-          (click)="clearFilters()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+      <div class="d-flex flex-column gap-3 mb-4">
+        @for (purchase of purchases(); track purchase.id) {
+          <div 
+            class="card border border-light shadow-sm rounded-4 overflow-hidden"
+            style="cursor: pointer"
+            (click)="openDetail(purchase)"
+            data-bs-toggle="modal"
+            data-bs-target="#purchaseDetailModal"
           >
-            <path d="M3 2v6h6" />
-            <path d="M21 12A9 9 0 0 0 6 5.3L3 8" />
-            <path d="M21 22v-6h-6" />
-            <path d="M3 12a9 9 0 0 0 15 6.7L21 16" />
-          </svg>
-          Limpiar filtros
-        </button>
+            <div class="card-body p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-1 flex-shrink-0">
+                  Orden #{{ purchase.id }}
+                </span>
+                
+                <span
+                  class="badge rounded-pill px-2 py-1 border fw-medium"
+                  [ngClass]="{
+                    'bg-warning bg-opacity-10 text-dark border-warning border-opacity-50': purchase.status === 'PENDIENTE',
+                    'bg-success bg-opacity-10 text-success border-success border-opacity-25': purchase.status === 'RECIBIDO'
+                  }"
+                >
+                  @if (purchase.status === 'PENDIENTE') { ⏳ }
+                  @if (purchase.status === 'RECIBIDO') { ✓ }
+                  {{ purchase.status }}
+                </span>
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-end mt-3">
+                <div class="text-muted small d-flex align-items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                  {{ purchase.purchaseDate }}
+                </div>
+                <div class="text-end">
+                  <small class="text-muted d-block lh-1" style="font-size: 0.65rem;">TOTAL</small>
+                  <span class="fw-bold fs-5 text-dark">S/ {{ purchase.totalSpent }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
       </div>
 
-      @if (loading()) {
-        <div class="text-center py-5">
-          <div class="spinner-border"></div>
-
-          <div class="mt-2">Cargando órdenes de compra...</div>
-        </div>
-      } @else if (purchases().length === 0) {
-        <div class="alert alert-info text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-search"
-          >
-            <path d="m21 21-4.34-4.34" />
-            <circle cx="11" cy="11" r="8" />
-          </svg>
-          No se encontraron órdenes de compra.
-        </div>
-      } @else {
-        <div class="text-muted mb-3">
-          Total de órdenes:
-          <strong>{{ totalElements() }}</strong>
-        </div>
-        <div class="row mt-2">
-          <div class="col">
-            <label class="form-label"> Por página </label>
-          </div>
-          <div class="col">
-            <select
-              class="form-select"
-              [ngModel]="pageSize()"
-              (ngModelChange)="changePageSize($event)"
-            >
-              <option [ngValue]="5">5</option>
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="20">20</option>
-              <option [ngValue]="50">50</option>
-              <option [ngValue]="100">100</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row g-3 mb-4"></div>
-
-        <table class="table table-hover align-middle">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-
-              <th>Estado</th>
-
-              <th>Total</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            @for (purchase of purchases(); track purchase.id) {
-              <tr
-                style="cursor: pointer"
-                (click)="openDetail(purchase)"
-                data-bs-toggle="modal"
-                data-bs-target="#purchaseDetailModal"
-              >
-                <td>
-                  {{ purchase.purchaseDate }}
-                </td>
-
-                <td>
-                  <span
-                    class="badge text-black"
-                    [class.bg-warning]="purchase.status === 'PENDIENTE'"
-                    [class.bg-success]="purchase.status === 'RECIBIDO'"
-                  >
-                    {{ purchase.status }}
-                  </span>
-                </td>
-
-                <td>
-                  S/.
-                  {{ purchase.totalSpent }}
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center">
-          <button
-            class="btn btn-outline-secondary"
-            [disabled]="page() === 0"
-            (click)="previousPage()"
-          >
-            Anterior
-          </button>
-
-          <span>
-            Página
-            {{ page() + 1 }}
-            de
-            {{ totalPages() }}
-          </span>
-
-          <button
-            class="btn btn-outline-secondary"
-            [disabled]="page() + 1 >= totalPages()"
-            (click)="nextPage()"
-          >
-            Siguiente
-          </button>
-        </div>
-      }
-    </div>
+      <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <button
+          class="btn btn-light rounded-circle shadow-sm d-flex justify-content-center align-items-center"
+          [disabled]="page() === 0"
+          (click)="previousPage()"
+          style="width: 40px; height: 40px;"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="text-muted small fw-medium">Pág {{ page() + 1 }} de {{ totalPages() }}</span>
+        <button
+          class="btn btn-light rounded-circle shadow-sm d-flex justify-content-center align-items-center"
+          [disabled]="page() + 1 >= totalPages()"
+          (click)="nextPage()"
+          style="width: 40px; height: 40px;"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    }
   </div>
 
   <div class="modal fade" id="purchaseDetailModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered px-2">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
         @if (selectedPurchase(); as purchase) {
-          <div class="modal-header">
-            <h5 class="modal-title">Orden #{{ purchase.id }}</h5>
-
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          
+          <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4 d-flex align-items-center gap-3">
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <h5 class="modal-title fw-bold text-dark mb-0">Detalle Orden #{{ purchase.id }}</h5>
+            <button type="button" class="btn-close shadow-none ms-auto" data-bs-dismiss="modal"></button>
           </div>
 
-          <div class="modal-body">
-            <div class="row mb-4">
-              <div class="col-md-4">
-                <strong>Fecha</strong>
-                <div>{{ purchase.purchaseDate }}</div>
+          <div class="modal-body px-4 py-4">
+            
+            <div class="d-flex bg-light rounded-3 p-3 border mb-4">
+              <div class="w-50 border-end border-2 border-white">
+                <span class="d-block text-muted fw-bold small text-uppercase mb-1" style="font-size: 0.7rem;">Fecha</span>
+                <span class="fw-semibold text-dark">{{ purchase.purchaseDate }}</span>
               </div>
-
-              <div class="col-md-4">
-                <strong class="me-1">Estado</strong>
+              <div class="w-50 ps-3">
+                <span class="d-block text-muted fw-bold small text-uppercase mb-1" style="font-size: 0.7rem;">Estado</span>
                 <span
-                  class="badge"
+                  class="badge rounded-pill fw-medium"
                   [ngClass]="{
-                    'bg-warning text-dark': purchase.status === 'PENDIENTE',
-                    'bg-success': purchase.status === 'RECIBIDO',
+                    'bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50': purchase.status === 'PENDIENTE',
+                    'bg-success bg-opacity-10 text-success border border-success border-opacity-25': purchase.status === 'RECIBIDO'
                   }"
                 >
                   {{ purchase.status }}
@@ -255,55 +209,66 @@
               </div>
             </div>
 
-            <div class="row mb-4">
-              <div class="col">
-                <strong>Total gastado:</strong>
-                S/ {{ purchase.totalSpent }}
+            <div class="mb-4">
+              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Artículos comprados</label>
+              <div class="table-responsive rounded-3 border">
+                <table class="table table-hover table-sm mb-0 align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="py-2 px-3 fw-semibold text-muted" style="font-size: 0.8rem;">Producto</th>
+                      <th class="py-2 px-3 fw-semibold text-muted text-center" style="font-size: 0.8rem;">Cant.</th>
+                      <th class="py-2 px-3 fw-semibold text-muted text-end" style="font-size: 0.8rem;">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (detail of purchase.details; track detail.productId) {
+                      <tr>
+                        <td class="px-3 py-2">
+                          <span class="fw-semibold text-dark d-block" style="font-size: 0.9rem;">{{ detail.productName }}</span>
+                          <small class="text-muted" style="font-size: 0.75rem;">S/ {{ detail.unitPrice }} c/u</small>
+                        </td>
+                        <td class="px-3 py-2 text-center fw-medium" style="font-size: 0.9rem;">
+                          {{ detail.quantity }} <span class="text-muted small">{{ detail.productUnit }}</span>
+                        </td>
+                        <td class="px-3 py-2 text-end fw-bold text-dark" style="font-size: 0.9rem;">
+                          S/ {{ detail.subTotal }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>P. Unit.</th>
-                  <th>Subtotal</th>
-                </tr>
-              </thead>
+            <div class="d-flex justify-content-between align-items-center bg-primary bg-opacity-10 border border-primary border-opacity-25 rounded-4 p-3">
+              <span class="fw-bold text-primary text-uppercase" style="font-size: 0.85rem;">Total Gastado</span>
+              <span class="fw-bold fs-4 text-primary">S/ {{ purchase.totalSpent }}</span>
+            </div>
 
-              <tbody>
-                @for (detail of purchase.details; track detail.productId) {
-                  <tr>
-                    <td>{{ detail.productName }}</td>
-                    <td>{{ detail.quantity }} {{ detail.productUnit }}</td>
-                    <td>S/ {{ detail.unitPrice }}</td>
-                    <td>S/ {{ detail.subTotal }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
           </div>
 
-          <div class="modal-footer">
+          <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex flex-column gap-2">
             @if (changeStatusLoading()) {
-              <button class="btn btn-success" disabled>
+              <button class="btn btn-success w-100 rounded-pill py-2.5 fw-bold shadow-sm" disabled>
                 <span class="spinner-border spinner-border-sm me-2"></span>
                 Procesando...
               </button>
             } @else if (purchase.status !== 'RECIBIDO' && canChangeStatus) {
               <button
-                class="btn btn-success"
+                class="btn btn-success w-100 rounded-pill py-2.5 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2"
                 (click)="confirmPurchase(purchase.id)"
                 [disabled]="changeStatusLoading()"
               >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
                 Marcar como recibido
               </button>
             } @else if (purchase.status == 'RECIBIDO' && canCreate) {
-              <button class="btn btn-success" (click)="createSameOrder()">Duplicar orden</button>
+              <button class="btn btn-primary w-100 rounded-pill py-2.5 fw-bold shadow-sm d-flex justify-content-center align-items-center gap-2" (click)="createSameOrder()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Duplicar orden
+              </button>
             }
-
-            <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium mt-1" data-bs-dismiss="modal">Cerrar detalle</button>
           </div>
         }
       </div>
