@@ -24,7 +24,7 @@ export class ModificationsFragmentComponent {
   canList = this.authState.hasPermission('MODIFICATION_LIST_ALL');
   readonly modifications = computed(() => this.modificationsState.modifications());
   modalModifications: ModificationsResponse[] = [];
-  
+
   loading = signal<boolean>(false);
   exporting = signal<boolean>(false);
 
@@ -62,33 +62,47 @@ export class ModificationsFragmentComponent {
     }
   }
 
-  private calculateDates(option: string): { start: string, end: string } {
+  private calculateDates(option: string): { start: string; end: string } {
     const now = new Date();
+
     let start = new Date();
     let end = new Date();
-    const formatDate = (d: Date) => d.toISOString().split('T')[0];
 
     switch (option) {
-      case 'hoy': break;
+      case 'hoy':
+        break;
+
       case 'ayer':
         start.setDate(now.getDate() - 1);
         end.setDate(now.getDate() - 1);
         break;
+
       case 'esta_semana':
         const firstDay = now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1);
+
         start.setDate(firstDay);
         break;
+
       case 'este_mes':
         start = new Date(now.getFullYear(), now.getMonth(), 1);
         break;
+
       case 'mes_pasado':
         start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         end = new Date(now.getFullYear(), now.getMonth(), 0);
         break;
+
       case 'custom':
-        return { start: this.customStartDate(), end: this.customEndDate() };
+        return {
+          start: this.customStartDate() || this.formatLocalDate(now),
+          end: this.customEndDate() || this.formatLocalDate(now),
+        };
     }
-    return { start: formatDate(start), end: formatDate(end) };
+
+    return {
+      start: this.formatLocalDate(start),
+      end: this.formatLocalDate(end),
+    };
   }
 
   exportToPdf() {
@@ -100,20 +114,19 @@ export class ModificationsFragmentComponent {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const fileName = start && end 
-          ? `modificaciones_${start}_al_${end}.pdf` 
-          : `modificaciones_historico.pdf`;
+        const fileName =
+          start && end ? `modificaciones_${start}_al_${end}.pdf` : `modificaciones_historico.pdf`;
         a.download = fileName;
-        
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
+
         this.toastService.show('PDF exportado correctamente', 'success');
       },
       error: () => this.toastService.show('Error al exportar PDF', 'danger'),
-      complete: () => this.exporting.set(false)
+      complete: () => this.exporting.set(false),
     });
   }
 
@@ -159,5 +172,15 @@ export class ModificationsFragmentComponent {
     this.pageSize.set(size);
     this.page.set(0);
     this.loadModifications();
+  }
+
+  private formatLocalDate(date: Date): string {
+    return (
+      date.getFullYear() +
+      '-' +
+      String(date.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(date.getDate()).padStart(2, '0')
+    );
   }
 }

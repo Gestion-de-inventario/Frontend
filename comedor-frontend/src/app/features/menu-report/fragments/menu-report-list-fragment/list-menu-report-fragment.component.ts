@@ -51,6 +51,8 @@ export class ListMenuReportFragmentComponent {
 
   editLoading = signal(false);
 
+  informationLoading = signal(false);
+
   isEditMode = signal(false);
 
   pageSize = signal(5);
@@ -70,7 +72,7 @@ export class ListMenuReportFragmentComponent {
   selectedCooks = signal<UserResponse[]>([]);
 
   private loadEditData(report: MenuReportResponse): void {
-    this.editLoading.set(true);
+    this.informationLoading.set(true);
 
     forkJoin({
       cooks: this.userService.listActiveUsers(),
@@ -78,11 +80,13 @@ export class ListMenuReportFragmentComponent {
     })
       .pipe(
         finalize(() => {
+          this.informationLoading.set(false);
           this.editLoading.set(false);
         }),
       )
       .subscribe({
         next: ({ cooks, dishMenus }) => {
+          this.editLoading.set(true);
           this.allCooks.set(cooks);
           this.dishMenus.set(dishMenus);
 
