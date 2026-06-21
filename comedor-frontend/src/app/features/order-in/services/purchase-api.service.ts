@@ -7,8 +7,8 @@ import { environment } from '@env/environment';
 
 import { buildEndpoint } from '@shared/utils/api.utils';
 
-import { CreatePurchaseRequest } from '../interfaces/purchase.request';
-import { PurchaseResponse } from '../interfaces/purchase.response';
+import { CreatePurchaseRequest } from '../interfaces/purchase/purchase.request';
+import { PurchaseResponse } from '../interfaces/purchase/purchase.response';
 import { PurchasePageResponse } from '../interfaces/list-purchases/purchase-page.response';
 import { API_ENDPOINTS } from '@core/constants/api-endpoints';
 
@@ -40,6 +40,12 @@ export class PurchaseApiService {
     }
 
     return this.http.get<PurchasePageResponse>(this.apiUrl, { params });
+  }
+
+  getById(id: number): Observable<PurchaseResponse> {
+    const endpoint = buildEndpoint(API_ENDPOINTS.PURCHASE.GET_BY_ID, { id });
+
+    return this.http.get<PurchaseResponse>(`${this.apiUrl}${endpoint}`);
   }
 
   confirmPurchase(id: number) {

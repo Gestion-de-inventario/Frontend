@@ -13,5 +13,5 @@ export class PurchaseOrden {
 
   canAccess =
     this.authState.hasPermission('PURCHASE_LIST_ALL') ||
-    this.authState.hasPermission('PURCHASE_CREATE');
+    this.authState.hasPermission('CREATE_ORDER_IN');
 }
