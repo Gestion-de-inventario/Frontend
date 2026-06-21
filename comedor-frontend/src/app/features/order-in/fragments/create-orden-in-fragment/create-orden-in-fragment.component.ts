@@ -2,32 +2,38 @@ import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MissingProductsResponse } from '@features/purchase-order/interfaces/missing-products.response';
+import { MissingProductsResponse } from '@features/order-in/interfaces/missing-products.response';
 
 import { ProductStateService } from '@features/products/services/product-state.service';
-import { PurchaseDetailForm } from '@features/purchase-order/interfaces/purchase-detail-form.request';
+import { PurchaseDetailForm } from '@features/order-in/interfaces/purchase-detail-form.request';
 import { ProductResponse } from '@features/products/interfaces/product.response';
-import { PurchaseApiService } from '@features/purchase-order/services/purchase-api.service';
+import { PurchaseApiService } from '@features/order-in/services/purchase-api.service';
 import { ProductApiService } from '@features/products/services/product-api.service';
 import { ToastService } from '@shared/services/toast.service';
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { CreatePurchaseRequest } from '@features/purchase-order/interfaces/purchase.request';
-import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
+import { CreatePurchaseRequest } from '@features/order-in/interfaces/purchase/purchase.request';
+import { InventoryOrderStateService } from '@features/order-in/services/inventary-order-state.service';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { SearchSelectComponent } from '@shared/components/search-select/search-select';
+import { OrderSource } from '@features/order-in/interfaces/order.source';
+import { DonationApiService } from '@features/order-in/services/donation-api.service';
+import { CreateDonationRequest } from '@features/order-in/interfaces/donation/donation.request';
 
 @Component({
   selector: 'app-purchase-order-create-fragment',
   standalone: true,
   imports: [CommonModule, FormsModule, SearchSelectComponent],
-  templateUrl: './create-purchase-fragment.component.html',
+  templateUrl: './create-orden-in-fragment.component.html',
 })
-export class PurchaseOrderCreateFragmentComponent implements OnInit {
+export class InventoryOrderCreateFragmentComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly donationService = inject(DonationApiService);
   private readonly purchaseService = inject(PurchaseApiService);
   private readonly productService = inject(ProductApiService);
   private readonly toastService = inject(ToastService);
-  private readonly purchaseOrderState = inject(PurchaseOrderStateService);
+  private readonly inventoryOrderState = inject(InventoryOrderStateService);
+
+  readonly orderType = this.inventoryOrderState.orderType;
 
   loading = signal(false);
   initialLoading = signal(false);
@@ -42,11 +48,13 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
 
   readonly authState = inject(AuthStateService);
 
-  canCreate = this.authState.hasPermission('PURCHASE_CREATE');
+  canCreate = this.authState.hasPermission('CREATE_ORDER_IN');
 
-  purchaseCreated = signal(false);
+  orderCreated = signal(false);
 
-  createdPurchaseId = signal<number | null>(null);
+  createdOrderType = signal<OrderSource | null>(null);
+
+  createdOrderId = signal<number | null>(null);
 
   openDropdown = signal<number | null>(null);
 
@@ -56,7 +64,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const missingProducts = this.purchaseOrderState.missingProducts();
+    const missingProducts = this.inventoryOrderState.missingProducts();
 
     if (missingProducts.length > 0) {
       this.missingProducts.set(missingProducts);
@@ -65,7 +73,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
       return;
     }
 
-    const draftPurchase = this.purchaseOrderState.draftPurchase();
+    const draftPurchase = this.inventoryOrderState.draftOrder();
 
     if (draftPurchase.length > 0) {
       this.purchaseDetails.set(
@@ -74,7 +82,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
         })),
       );
 
-      this.purchaseOrderState.clearDraftPurchase();
+      this.inventoryOrderState.clearDraftOrder();
 
       return;
     }
@@ -96,7 +104,7 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
 
   buildDraft(): void {
     this.purchaseDetails.set(
-      this.purchaseOrderState.missingProducts().map((product) => ({
+      this.inventoryOrderState.missingProducts().map((product) => ({
         productId: product.productId,
         productName: product.productName,
         quantity: product.quantityNeeded,
@@ -163,6 +171,15 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
     ]);
   }
 
+  createOrder(): void {
+    if (this.orderType() === 'COMPRA') {
+      this.createPurchase();
+      return;
+    }
+
+    this.createDonation();
+  }
+
   createPurchase(): void {
     if (this.loading()) return;
 
@@ -188,13 +205,47 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
       .subscribe({
         next: (purchase) => {
           this.toastService.show('Compra creada exitosamente');
-          this.createdPurchaseId.set(purchase.id);
 
-          this.purchaseCreated.set(true);
+          this.createdOrderId.set(purchase.id);
+
+          this.createdOrderType.set('COMPRA');
+
+          this.orderCreated.set(true);
         },
         error: (error) => {
           console.error(error);
           this.toastService.show('Error al crear la compra');
+        },
+      });
+  }
+
+  private createDonation(): void {
+    const request: CreateDonationRequest = {
+      details: this.purchaseDetails().map((d) => ({
+        productId: d.productId!,
+        quantity: d.quantity,
+      })),
+    };
+
+    this.loading.set(true);
+
+    this.donationService
+      .create(request)
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        }),
+      )
+      .subscribe({
+        next: (donation) => {
+          this.toastService.show('Donacion creada exitosamente');
+          this.createdOrderId.set(donation.id);
+          this.createdOrderType.set('DONACION');
+          this.orderCreated.set(true);
+        },
+        error: (error) => {
+          console.error(error);
+          this.toastService.show('Error al crear la orden');
         },
       });
   }
@@ -263,9 +314,10 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
     this.router.navigate(['/purchase-order']);
   }
   createAnotherPurchase(): void {
-    this.purchaseCreated.set(false);
+    this.orderCreated.set(false);
 
-    this.createdPurchaseId.set(null);
+    this.createdOrderId.set(null);
+    this.createdOrderType.set(null);
 
     this.missingProducts.set([]);
 
@@ -279,5 +331,35 @@ export class PurchaseOrderCreateFragmentComponent implements OnInit {
         search: '',
       },
     ]);
+  }
+  changeOrderType(source: OrderSource): void {
+    this.inventoryOrderState.setOrderType(source);
+
+    if (source === 'DONACION') {
+      this.purchaseDetails.update((details) =>
+        details.map((detail) => ({
+          ...detail,
+          unitPrice: 0,
+        })),
+      );
+    }
+  }
+
+  isFormInvalid(): boolean {
+    if (this.purchaseDetails().length === 0) {
+      return true;
+    }
+
+    if (this.hasDuplicateProducts()) {
+      return true;
+    }
+
+    if (this.orderType() === 'COMPRA') {
+      return this.purchaseDetails().some(
+        (d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0,
+      );
+    }
+
+    return this.purchaseDetails().some((d) => !d.productId || d.quantity <= 0);
   }
 }

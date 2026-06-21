@@ -101,8 +101,17 @@ export const API_ENDPOINTS = {
     STOCK_MIN: '/alerts/stock-min',
   },
 
+  ORDER_IN: {
+    LIST_ALL: '/orders-in',
+  },
+
   PURCHASE: {
     CHANGE_STATUS: '/{id}/confirm',
+    GET_BY_ID: '/{id}',
+  },
+  DONATION: {
+    CHANGE_STATUS: '/{id}/confirm',
+    GET_BY_ID: '/{id}',
   },
 
   DASHBOARD: {

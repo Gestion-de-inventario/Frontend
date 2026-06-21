@@ -9,9 +9,9 @@ import { UserResponse } from '@features/users/interfaces/user.response';
 import { ToastService } from '@shared/services/toast.service';
 import { DishMenuResponse } from '@features/menu-report/interfaces/menu-report.response';
 import { Router } from '@angular/router';
-import { MissingProductsResponse } from '@features/purchase-order/interfaces/missing-products.response';
+import { MissingProductsResponse } from '@features/order-in/interfaces/missing-products.response';
 import { finalize } from 'rxjs/internal/operators/finalize';
-import { PurchaseOrderStateService } from '@features/purchase-order/services/purchase-state.service';
+import { InventoryOrderStateService } from '@features/order-in/services/inventary-order-state.service';
 import { forkJoin } from 'rxjs';
 import { SearchSelectComponent } from '@shared/components/search-select/search-select';
 
@@ -41,7 +41,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
-  private readonly purchaseOrderState = inject(PurchaseOrderStateService);
+  private readonly iventoryOrderState = inject(InventoryOrderStateService);
   cookDisplay = (cook: UserResponse) => `${cook.name} ${cook.lastname} - DNI: ${cook.dni}`;
 
   canCreate = this.authState.hasPermission('MENU_REPORT_CREATE_REPORT');
@@ -166,7 +166,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     const modal = bootstrap.Modal.getInstance(modalElement);
 
     modal?.hide();
-    this.purchaseOrderState.setMissingProducts(this.missingProducts());
+    this.iventoryOrderState.setMissingProducts(this.missingProducts());
 
     this.router.navigate(['/purchase-order/create']);
   }

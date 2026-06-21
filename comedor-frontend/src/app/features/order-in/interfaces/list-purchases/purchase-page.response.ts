@@ -1,4 +1,4 @@
-import { PurchaseResponse } from '../purchase.response';
+import { PurchaseResponse } from '../purchase/purchase.response';
 
 export interface PurchasePageResponse {
   content: PurchaseResponse[];

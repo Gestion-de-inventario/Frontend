@@ -138,24 +138,24 @@ export const routes: Routes = [
       },
       {
         path: 'purchase-order',
-        title: 'Órdenes de compra',
+        title: 'Órdenes de entrada',
         loadComponent: () =>
-          import('@features/purchase-order/pages/purchase-order-principal/purchase-orden').then(
+          import('@features/order-in/pages/purchase-order-principal/purchase-orden').then(
             (m) => m.PurchaseOrden,
           ),
         children: [
           {
             path: '',
             loadComponent: () =>
-              import('@features/purchase-order/fragments/list-purchase-fragment/list-purchase-fragment.component').then(
+              import('@features/order-in/fragments/list-purchase-fragment/list-purchase-fragment.component').then(
                 (m) => m.ListPurchaseFragmentComponent,
               ),
           },
           {
             path: 'create',
             loadComponent: () =>
-              import('@features/purchase-order/fragments/create-purchase-fragment/create-purchase-fragment.component').then(
-                (m) => m.PurchaseOrderCreateFragmentComponent,
+              import('@features/order-in/fragments/create-orden-in-fragment/create-orden-in-fragment.component').then(
+                (m) => m.InventoryOrderCreateFragmentComponent,
               ),
           },
         ],

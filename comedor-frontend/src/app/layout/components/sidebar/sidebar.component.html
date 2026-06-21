@@ -122,7 +122,7 @@
       </a>
     }
 
-    @if (authState.hasPermission('PURCHASE_CREATE')) {
+    @if (authState.hasPermission('CREATE_ORDER_IN')) {
       <a class="sidebar-link" (click)="navigateAndClose('/purchase-order')">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path d="m15 11-1 9" />
@@ -133,7 +133,7 @@
           <path d="m5 11 4-7" />
           <path d="m9 11 1 9" />
         </svg>
-        Orden de compra
+        Orden de entrada
       </a>
     }
 
