@@ -1,21 +1,46 @@
 @if (!canCreate) {
-  <div class="alert alert-danger m-3 rounded-4">No tienes permiso para crear órdenes de compra.</div>
+  <div class="alert alert-danger m-3 rounded-4">
+    No tienes permiso para crear órdenes de compra.
+  </div>
 }
 
 @if (created()) {
   <div class="card shadow-sm border-0 rounded-4 overflow-hidden m-2">
     <div class="card-body text-center py-5 px-4">
-      <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 72px; height: 72px;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      <div
+        class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+        style="width: 72px; height: 72px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="36"
+          height="36"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
       </div>
       <h4 class="fw-bold text-dark mb-2">¡Orden Creada!</h4>
-      <p class="text-muted small mb-4">La orden de producción se ha registrado correctamente en el sistema.</p>
+      <p class="text-muted small mb-4">
+        La orden de producción se ha registrado correctamente en el sistema.
+      </p>
 
       <div class="d-flex flex-column gap-2 max-width-mobile mx-auto">
-        <button class="btn btn-primary rounded-pill py-2.5 fw-medium w-100 shadow-sm" (click)="createAnother()">
+        <button
+          class="btn btn-primary rounded-pill py-2.5 fw-medium w-100 shadow-sm"
+          (click)="createAnother()"
+        >
           Crear otra orden
         </button>
-        <button class="btn btn-outline-secondary rounded-pill py-2.5 fw-medium w-100" (click)="goBack()">
+        <button
+          class="btn btn-outline-secondary rounded-pill py-2.5 fw-medium w-100"
+          (click)="goBack()"
+        >
           Volver a la lista
         </button>
       </div>
@@ -47,11 +72,14 @@
     </div>
   } @else {
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden m-2">
-      
-      <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-3 d-flex align-items-center gap-2">
-        <button class="btn btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" 
-                (click)="goBack()" 
-                style="width: 40px; height: 40px; min-width: 40px;">
+      <div
+        class="card-header bg-white border-bottom-0 pt-4 pb-2 px-3 d-flex align-items-center gap-2"
+      >
+        <button
+          class="btn btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+          (click)="goBack()"
+          style="width: 40px; height: 40px; min-width: 40px"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -69,19 +97,24 @@
         </button>
 
         <div class="overflow-hidden">
-          <h5 class="fw-bold text-dark mb-0 text-truncate" style="font-size: 1.15rem;">Nueva orden de producción</h5>
-          <small class="text-muted d-block" style="font-size: 0.75rem;">{{ today }}</small>
+          <h5 class="fw-bold text-dark mb-0 text-truncate" style="font-size: 1.15rem">
+            Nueva orden de producción
+          </h5>
+          <small class="text-muted d-block" style="font-size: 0.75rem">{{ today }}</small>
         </div>
       </div>
 
       <div class="card-body px-3 pb-4 pt-3">
         <div class="d-flex flex-column gap-4">
-          
           <div>
-            <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing: 0.5px;">Plato Producto Boom *</label>
+            <label
+              class="form-label fw-bold text-muted small text-uppercase mb-2"
+              style="letter-spacing: 0.5px"
+              >Plato Producto Boom *</label
+            >
             <select
               class="form-select form-select-lg rounded-3 border-light-subtle shadow-sm"
-              style="font-size: 0.95rem; height: 50px;"
+              style="font-size: 0.95rem; height: 50px"
               [ngModel]="selectedDishMenuId()"
               (ngModelChange)="selectedDishMenuId.set($event)"
             >
@@ -97,11 +130,15 @@
           </div>
 
           <div>
-            <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing: 0.5px;">Cantidad a preparar *</label>
+            <label
+              class="form-label fw-bold text-muted small text-uppercase mb-2"
+              style="letter-spacing: 0.5px"
+              >Cantidad a preparar *</label
+            >
             <input
               type="number"
               class="form-control form-control-lg rounded-3 border-light-subtle shadow-sm"
-              style="font-size: 0.95rem; height: 50px;"
+              style="font-size: 0.95rem; height: 50px"
               placeholder="Ingrese la cantidad"
               [ngModel]="quantityPrepared()"
               (ngModelChange)="quantityPrepared.set($event)"
@@ -109,7 +146,11 @@
           </div>
 
           <div>
-            <label class="form-label fw-bold text-muted small text-uppercase mb-2" style="letter-spacing: 0.5px;">Encargados</label>
+            <label
+              class="form-label fw-bold text-muted small text-uppercase mb-2"
+              style="letter-spacing: 0.5px"
+              >Encargados</label
+            >
             <div class="position-relative">
               <app-search-select
                 [items]="availableCooks()"
@@ -124,15 +165,19 @@
 
               <div class="mt-3 d-flex flex-column gap-2">
                 @for (cook of selectedCooks(); track cook.user_id) {
-                  <div class="d-flex align-items-center justify-content-between p-2.5 px-3 rounded-3 bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 shadow-sm">
+                  <div
+                    class="d-flex align-items-center justify-content-between p-2.5 px-3 rounded-3 bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 shadow-sm"
+                  >
                     <div class="d-flex flex-column overflow-hidden pe-2">
-                      <span class="fw-semibold small text-truncate text-dark">{{ cook.name }} {{ cook.lastname }}</span>
-                      <span class="text-muted" style="font-size: 0.7rem;">DNI: {{ cook.dni }}</span>
+                      <span class="fw-semibold small text-truncate text-dark"
+                        >{{ cook.name }} {{ cook.lastname }}</span
+                      >
+                      <span class="text-muted" style="font-size: 0.7rem">DNI: {{ cook.dni }}</span>
                     </div>
                     <button
                       type="button"
                       class="btn-close shadow-none flex-shrink-0"
-                      style="font-size: 0.75rem;"
+                      style="font-size: 0.75rem"
                       (click)="removeCook(cook)"
                     ></button>
                   </div>
@@ -140,45 +185,114 @@
               </div>
             </div>
           </div>
+          <div>
+            <label
+              class="form-label fw-bold text-muted small text-uppercase mb-2"
+              style="letter-spacing: 0.5px"
+            >
+              Fecha *
+            </label>
+
+            <input
+              type="date"
+              class="form-control form-control-lg rounded-3 border-light-subtle shadow-sm"
+              style="font-size: 0.95rem; height: 50px"
+              [ngModel]="createdDate()"
+              (ngModelChange)="createdDate.set($event)"
+              [min]="minDate()"
+              [max]="maxDate()"
+            />
+
+            <small class="text-muted d-block mt-1">
+              Solo se permite seleccionar desde hoy hasta el 31/12/{{ maxDate().slice(0, 4) }}.
+            </small>
+          </div>
 
           <div class="pt-2">
-            <button 
-              class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" 
-              (click)="createReport()" 
+            <button
+              class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2"
+              (click)="createReport()"
               [disabled]="!canCreateReport()"
-              style="height: 52px; font-size: 1rem;"
+              style="height: 52px; font-size: 1rem"
             >
               @if (creating()) {
                 <span class="spinner-border spinner-border-sm"></span>
                 <span>Creando orden...</span>
               } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
                 <span>Crear reporte</span>
               }
             </button>
           </div>
-
         </div>
 
         <div class="modal fade" id="missingStockModal" tabindex="-1" data-bs-backdrop="static">
           <div class="modal-dialog modal-dialog-centered px-3">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-              
-              <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4 d-flex align-items-center gap-3">
-                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12" y1="17" y2="17"/></svg>
+              <div
+                class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4 d-flex align-items-center gap-3"
+              >
+                <div
+                  class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                  style="width: 40px; height: 40px"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"
+                    />
+                    <line x1="12" x2="12" y1="9" y2="13" />
+                    <line x1="12" x2="12" y1="17" y2="17" />
+                  </svg>
                 </div>
-                <h5 class="modal-title fw-bold text-dark mb-0" style="font-size: 1.1rem;">Stock insuficiente</h5>
+                <h5 class="modal-title fw-bold text-dark mb-0" style="font-size: 1.1rem">
+                  Stock insuficiente
+                </h5>
               </div>
 
               <div class="modal-body px-4 py-3">
-                <p class="text-muted small mb-3">No existe el stock requerido en inventario para procesar la preparación de este menú. Faltan los siguientes insumos:</p>
+                <p class="text-muted small mb-3">
+                  No existe el stock requerido en inventario para procesar la preparación de este
+                  menú. Faltan los siguientes insumos:
+                </p>
 
-                <div class="d-flex flex-column gap-2 max-height-modal-list overflow-auto" style="max-height: 200px;">
+                <div
+                  class="d-flex flex-column gap-2 max-height-modal-list overflow-auto"
+                  style="max-height: 200px"
+                >
                   @for (item of missingProducts(); track item.productId) {
-                    <div class="d-flex justify-content-between align-items-center p-2.5 px-3 rounded-3 bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10 shadow-sm">
-                      <span class="fw-semibold small text-dark text-truncate pe-2">{{ item.productName }}</span>
-                      <span class="badge bg-danger rounded-pill fw-normal flex-shrink-0" style="font-size: 0.75rem;">
+                    <div
+                      class="d-flex justify-content-between align-items-center p-2.5 px-3 rounded-3 bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10 shadow-sm"
+                    >
+                      <span class="fw-semibold small text-dark text-truncate pe-2">{{
+                        item.productName
+                      }}</span>
+                      <span
+                        class="badge bg-danger rounded-pill fw-normal flex-shrink-0"
+                        style="font-size: 0.75rem"
+                      >
                         Faltan {{ item.quantityNeeded }} {{ item.productUnit }}
                       </span>
                     </div>
@@ -186,19 +300,26 @@
                 </div>
               </div>
 
-              <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex flex-column gap-2 w-100">
-                <button class="btn btn-primary w-100 rounded-pill py-2.5 fw-medium shadow-sm" (click)="goToCreatePurchase()" data-bs-dismiss="modal">
+              <div
+                class="modal-footer bg-light border-top-0 px-4 py-3 d-flex flex-column gap-2 w-100"
+              >
+                <button
+                  class="btn btn-primary w-100 rounded-pill py-2.5 fw-medium shadow-sm"
+                  (click)="goToCreatePurchase()"
+                  data-bs-dismiss="modal"
+                >
                   Crear orden de compra
                 </button>
-                <button class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium" data-bs-dismiss="modal">
+                <button
+                  class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium"
+                  data-bs-dismiss="modal"
+                >
                   Cancelar
                 </button>
               </div>
-
             </div>
           </div>
         </div>
-
       </div>
     </div>
   }

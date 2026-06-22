@@ -1,6 +1,6 @@
 @if (loadingReport()) {
   <div class="text-center py-5 my-5">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem" role="status"></div>
     <p class="text-muted mt-3 fw-medium">Cargando detalles de la orden...</p>
   </div>
 } @else if (!report()) {
@@ -11,26 +11,41 @@
     </div>
   </div>
 } @else {
-  
   <div class="container-fluid px-2 py-2">
-    
     <div class="d-flex align-items-center justify-content-between mb-3 px-1">
       <div class="d-flex align-items-center gap-3">
-        <button class="btn btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" 
-                (click)="goBack()" 
-                style="width: 42px; height: 42px; min-width: 42px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+        <button
+          class="btn btn-light rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+          (click)="goBack()"
+          style="width: 42px; height: 42px; min-width: 42px"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+          </svg>
         </button>
         <div>
           <h5 class="fw-bold text-dark mb-0">Orden de salida</h5>
-          <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-0">#{{ report()?.id }}</span>
+          <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-0"
+            >#{{ report()?.id }}</span
+          >
         </div>
       </div>
 
       @if (authState.hasPermission('MENU_REPORT_ADD_BENEFICIARY')) {
         <button
           class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-          style="width: 46px; height: 46px;"
+          style="width: 46px; height: 46px"
           (click)="openAddModal()"
         >
           <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="24">
@@ -44,30 +59,40 @@
       <div class="card-body p-3">
         <div class="d-flex justify-content-between align-items-start mb-3">
           <div>
-            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Menú del día</small>
+            <small
+              class="text-muted text-uppercase fw-bold"
+              style="font-size: 0.7rem; letter-spacing: 0.5px"
+              >Menú del día</small
+            >
             <h6 class="fw-bold text-dark mb-0 fs-5">{{ report()?.dishName }}</h6>
           </div>
           <div class="text-end">
-            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Fecha</small>
+            <small
+              class="text-muted text-uppercase fw-bold"
+              style="font-size: 0.7rem; letter-spacing: 0.5px"
+              >Fecha</small
+            >
             <div class="fw-semibold text-dark small">{{ report()?.date }}</div>
           </div>
         </div>
 
         <div class="d-flex bg-light rounded-3 p-2 border">
           <div class="w-50 text-center border-end border-2 border-white">
-            <span class="d-block text-muted fw-semibold" style="font-size: 0.7rem;">PREPARADOS</span>
+            <span class="d-block text-muted fw-semibold" style="font-size: 0.7rem">PREPARADOS</span>
             <span class="fw-bold text-dark fs-5">{{ report()?.quantityPrepared }}</span>
           </div>
           <div class="w-50 text-center">
-            <span class="d-block text-muted fw-semibold" style="font-size: 0.7rem;">RESTANTES</span>
+            <span class="d-block text-muted fw-semibold" style="font-size: 0.7rem">RESTANTES</span>
             <span class="fw-bold fs-5 text-primary">{{ report()?.quantityRemaining }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <h6 class="text-muted fw-bold mb-3 px-1 text-uppercase" style="font-size: 0.8rem;">Beneficiarios Registrados</h6>
-    
+    <h6 class="text-muted fw-bold mb-3 px-1 text-uppercase" style="font-size: 0.8rem">
+      Beneficiarios Registrados
+    </h6>
+
     <div class="d-flex flex-column gap-3 mb-4">
       @if (listLoading()) {
         @for (item of [1, 2, 3]; track item) {
@@ -79,18 +104,16 @@
               </div>
               <span class="placeholder col-4 rounded mb-3 d-block"></span>
               <div class="d-flex gap-2">
-                <span class="placeholder col-4 rounded-pill" style="height: 28px;"></span>
-                <span class="placeholder col-4 rounded-pill" style="height: 28px;"></span>
+                <span class="placeholder col-4 rounded-pill" style="height: 28px"></span>
+                <span class="placeholder col-4 rounded-pill" style="height: 28px"></span>
               </div>
             </div>
           </div>
         }
       } @else {
-        
         @for (b of report()!.beneficiaries; track b.name) {
           <div class="card border border-light shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-3">
-              
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div class="pe-2">
                   <h6 class="fw-bold text-dark mb-1 lh-sm">{{ b.name }} {{ b.lastName }}</h6>
@@ -98,10 +121,14 @@
                     <span class="badge bg-light text-dark border fw-medium px-2 py-1">
                       {{ b.cantidad }} menú(s)
                     </span>
-                    <span class="badge bg-light text-success border border-success border-opacity-25 fw-bold px-2 py-1">
+                    <span
+                      class="badge bg-light text-success border border-success border-opacity-25 fw-bold px-2 py-1"
+                    >
                       S/. {{ b.total }}
                     </span>
-                    <span class="badge rounded-pill fw-normal bg-secondary bg-opacity-10 text-secondary border">
+                    <span
+                      class="badge rounded-pill fw-normal bg-secondary bg-opacity-10 text-secondary border"
+                    >
                       {{ b.metodoPago }}
                     </span>
                   </div>
@@ -109,29 +136,60 @@
 
                 <div class="d-flex gap-2 flex-shrink-0">
                   @if (authState.hasPermission('MENU_REPORT_EDIT_BENEFICIARY')) {
-                    <button class="btn btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-primary"
-                            style="width: 36px; height: 36px"
-                            (click)="openEditModal(b)">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path></svg>
+                    <button
+                      class="btn btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-primary"
+                      style="width: 36px; height: 36px"
+                      (click)="openEditModal(b)"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="16"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"
+                        ></path>
+                      </svg>
                     </button>
                   }
                   @if (authState.hasPermission('MENU_REPORT_REMOVE_BENEFICIARY')) {
-                    <button class="btn btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-danger"
-                            style="width: 36px; height: 36px"
-                            (click)="removeBeneficiary(b)">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                    <button
+                      class="btn btn-light border rounded-circle p-0 d-flex align-items-center justify-content-center text-danger"
+                      style="width: 36px; height: 36px"
+                      (click)="removeBeneficiary(b)"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="16"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                        ></path>
+                      </svg>
                     </button>
                   }
                 </div>
               </div>
 
               <div class="d-flex flex-column flex-sm-row gap-2 border-top pt-3 mt-1">
-                
-                <div class="flex-grow-1 bg-light rounded-3 p-2 border d-flex justify-content-between align-items-center">
-                  <div class="form-check form-switch m-0 d-flex align-items-center gap-2 ps-5 position-relative">
+                <div
+                  class="flex-grow-1 bg-light rounded-3 p-2 border d-flex justify-content-between align-items-center"
+                >
+                  <div
+                    class="form-check form-switch m-0 d-flex align-items-center gap-2 ps-5 position-relative"
+                  >
                     <input
                       class="form-check-input"
-                      style="width: 2.5rem; height: 1.25rem; margin-left: -3rem; cursor: pointer;"
+                      style="width: 2.5rem; height: 1.25rem; margin-left: -3rem; cursor: pointer"
                       type="checkbox"
                       [checked]="b.pago"
                       [disabled]="updatingBeneficiaryId() === b.id"
@@ -144,8 +202,14 @@
                           <small class="text-muted">Actualizando...</small>
                         </div>
                       } @else {
-                        <span class="badge rounded-pill fw-medium"
-                              [class]="b.pago ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25' : 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'">
+                        <span
+                          class="badge rounded-pill fw-medium"
+                          [class]="
+                            b.pago
+                              ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
+                              : 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'
+                          "
+                        >
                           {{ b.pago ? '✓ Pagó' : '✗ Sin pago' }}
                         </span>
                       }
@@ -153,11 +217,15 @@
                   </div>
                 </div>
 
-                <div class="flex-grow-1 bg-light rounded-3 p-2 border d-flex justify-content-between align-items-center">
-                  <div class="form-check form-switch m-0 d-flex align-items-center gap-2 ps-5 position-relative">
+                <div
+                  class="flex-grow-1 bg-light rounded-3 p-2 border d-flex justify-content-between align-items-center"
+                >
+                  <div
+                    class="form-check form-switch m-0 d-flex align-items-center gap-2 ps-5 position-relative"
+                  >
                     <input
                       class="form-check-input"
-                      style="width: 2.5rem; height: 1.25rem; margin-left: -3rem; cursor: pointer;"
+                      style="width: 2.5rem; height: 1.25rem; margin-left: -3rem; cursor: pointer"
                       type="checkbox"
                       [checked]="b.entregado"
                       [disabled]="updatingBeneficiaryId() === b.id"
@@ -170,15 +238,20 @@
                           <small class="text-muted">Actualizando...</small>
                         </div>
                       } @else {
-                        <span class="badge rounded-pill fw-medium"
-                              [class]="b.entregado ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25' : 'bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50'">
+                        <span
+                          class="badge rounded-pill fw-medium"
+                          [class]="
+                            b.entregado
+                              ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
+                              : 'bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50'
+                          "
+                        >
                           {{ b.entregado ? '✓ Entregado' : '⏳ Pendiente' }}
                         </span>
                       }
                     </label>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -186,10 +259,29 @@
 
         @if (report()!.beneficiaries.length === 0) {
           <div class="text-center py-5 bg-white border border-light rounded-4 shadow-sm">
-            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            <div
+              class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+              style="width: 60px; height: 60px"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-muted"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" x2="19" y1="8" y2="14" />
+                <line x1="22" x2="16" y1="11" y2="11" />
+              </svg>
             </div>
-            <p class="text-muted mb-0 fw-medium">Sin beneficiarios registrados</p>
+            <p class="text-muted mb-0 fw-medium">Sin clientes registrados</p>
             <small class="text-muted">Usa el botón '+' para agregar uno.</small>
           </div>
         }
@@ -200,21 +292,44 @@
   <div class="modal fade" id="beneficiaryRecordModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered px-2">
       <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-        
-        <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4 d-flex align-items-center gap-3">
-          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px">
-            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path></svg>
+        <div
+          class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4 d-flex align-items-center gap-3"
+        >
+          <div
+            class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+            style="width: 40px; height: 40px"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+              ></path>
+            </svg>
           </div>
           <h5 class="modal-title fw-bold text-dark mb-0">
             {{ editingRecord ? 'Editar beneficiario' : 'Agregar beneficiario' }}
           </h5>
-          <button type="button" class="btn-close shadow-none ms-auto" data-bs-dismiss="modal" (click)="resetForm()"></button>
+          <button
+            type="button"
+            class="btn-close shadow-none ms-auto"
+            data-bs-dismiss="modal"
+            (click)="resetForm()"
+          ></button>
         </div>
 
         <div class="modal-body px-4 py-4 d-flex flex-column gap-4">
           @if (!editingRecord) {
             <div>
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Buscar beneficiario</label>
+              <label class="form-label fw-bold text-muted small text-uppercase mb-2"
+                >Buscar beneficiario</label
+              >
               @if (!selectedBeneficiary) {
                 <div class="position-relative">
                   <app-search-select
@@ -226,14 +341,21 @@
                 </div>
               }
               @if (selectedBeneficiary) {
-                <div class="form-control form-control-lg bg-primary bg-opacity-10 border-primary border-opacity-25 d-flex justify-content-between align-items-center">
+                <div
+                  class="form-control form-control-lg bg-primary bg-opacity-10 border-primary border-opacity-25 d-flex justify-content-between align-items-center"
+                >
                   <div>
-                    <div class="fw-bold text-primary" style="font-size: 0.95rem;">
+                    <div class="fw-bold text-primary" style="font-size: 0.95rem">
                       {{ selectedBeneficiary.name }} {{ selectedBeneficiary.lastname }}
                     </div>
-                    <small class="text-primary opacity-75">DNI: {{ selectedBeneficiary.dni }}</small>
+                    <small class="text-primary opacity-75"
+                      >DNI: {{ selectedBeneficiary.dni }}</small
+                    >
                   </div>
-                  <button class="btn btn-sm btn-light text-primary rounded-pill fw-medium" (click)="clearBeneficiary()">
+                  <button
+                    class="btn btn-sm btn-light text-primary rounded-pill fw-medium"
+                    (click)="clearBeneficiary()"
+                  >
                     Cambiar
                   </button>
                 </div>
@@ -243,18 +365,39 @@
 
           <div class="row g-3">
             <div class="col-6">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cant. Menús <span class="text-danger">*</span></label>
-              <input type="number" class="form-control form-control-lg rounded-3 text-center fw-bold" [ngModel]="menusAmount()" (ngModelChange)="menusAmount.set($event)" min="1" />
+              <label class="form-label fw-bold text-muted small text-uppercase mb-2"
+                >Cant. Menús <span class="text-danger">*</span></label
+              >
+              <input
+                type="number"
+                class="form-control form-control-lg rounded-3 text-center fw-bold"
+                [ngModel]="menusAmount()"
+                (ngModelChange)="menusAmount.set($event)"
+                min="1"
+              />
             </div>
             <div class="col-6">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Precio (S/.) <span class="text-danger">*</span></label>
-              <input type="number" class="form-control form-control-lg rounded-3 text-center fw-bold text-success" [ngModel]="menuPrice()" (ngModelChange)="menuPrice.set($event)" />
+              <label class="form-label fw-bold text-muted small text-uppercase mb-2"
+                >Precio (S/.) <span class="text-danger">*</span></label
+              >
+              <input
+                type="number"
+                class="form-control form-control-lg rounded-3 text-center fw-bold text-success"
+                [ngModel]="menuPrice()"
+                (ngModelChange)="menuPrice.set($event)"
+              />
             </div>
           </div>
 
           <div>
-            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Método de pago</label>
-            <select class="form-select form-select-lg rounded-3" [ngModel]="payMethod()" (ngModelChange)="payMethod.set($event)">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2"
+              >Método de pago</label
+            >
+            <select
+              class="form-select form-select-lg rounded-3"
+              [ngModel]="payMethod()"
+              (ngModelChange)="payMethod.set($event)"
+            >
               <option value="EFECTIVO">💵 Efectivo</option>
               <option value="YAPE">📱 Yape</option>
               <option value="PLIN">📱 Plin</option>
@@ -264,23 +407,57 @@
           <!-- Switches Grandes en el Modal -->
           <div class="d-flex flex-column gap-3 bg-light rounded-3 p-3 border mt-1">
             <div class="form-check form-switch m-0 d-flex align-items-center gap-3 ps-5">
-              <input type="checkbox" class="form-check-input" style="width: 3rem; height: 1.5rem; margin-left: -3.5rem; cursor: pointer;" [checked]="pago()" (change)="pago.set($any($event.target).checked)" />
-              <label class="form-check-label fw-bold text-dark" style="font-size: 1rem; cursor: pointer;" (click)="pago.set(!pago())">Estado: Pagó</label>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                style="width: 3rem; height: 1.5rem; margin-left: -3.5rem; cursor: pointer"
+                [checked]="pago()"
+                (change)="pago.set($any($event.target).checked)"
+              />
+              <label
+                class="form-check-label fw-bold text-dark"
+                style="font-size: 1rem; cursor: pointer"
+                (click)="pago.set(!pago())"
+                >Estado: Pagó</label
+              >
             </div>
-            <hr class="m-0 border-secondary opacity-10">
+            <hr class="m-0 border-secondary opacity-10" />
             <div class="form-check form-switch m-0 d-flex align-items-center gap-3 ps-5">
-              <input type="checkbox" class="form-check-input" style="width: 3rem; height: 1.5rem; margin-left: -3.5rem; cursor: pointer;" [checked]="entregado()" (change)="entregado.set($any($event.target).checked)" />
-              <label class="form-check-label fw-bold text-dark" style="font-size: 1rem; cursor: pointer;" (click)="entregado.set(!entregado())">Estado: Entregado</label>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                style="width: 3rem; height: 1.5rem; margin-left: -3.5rem; cursor: pointer"
+                [checked]="entregado()"
+                (change)="entregado.set($any($event.target).checked)"
+              />
+              <label
+                class="form-check-label fw-bold text-dark"
+                style="font-size: 1rem; cursor: pointer"
+                (click)="entregado.set(!entregado())"
+                >Estado: Entregado</label
+              >
             </div>
           </div>
         </div>
 
         <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex flex-column gap-2 w-100">
-          <button class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm" style="font-size: 1rem;" [disabled]="loading() || (!editingRecord && !selectedBeneficiary) || !menusAmount()" (click)="saveBeneficiary()">
-            @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          <button
+            class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm"
+            style="font-size: 1rem"
+            [disabled]="loading() || (!editingRecord && !selectedBeneficiary) || !menusAmount()"
+            (click)="saveBeneficiary()"
+          >
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
             {{ editingRecord ? 'Guardar Cambios' : 'Agregar Beneficiario' }}
           </button>
-          <button type="button" class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium" data-bs-dismiss="modal" (click)="resetForm()">
+          <button
+            type="button"
+            class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium"
+            data-bs-dismiss="modal"
+            (click)="resetForm()"
+          >
             Cancelar
           </button>
         </div>
@@ -291,33 +468,63 @@
   <div class="modal fade" id="deleteBeneficiaryModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered px-4">
       <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden text-center">
-        
         <div class="modal-body p-4 pt-5">
-          <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 72px; height: 72px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          <div
+            class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+            style="width: 72px; height: 72px"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+            </svg>
           </div>
           <h4 class="fw-bold text-dark mb-2">Eliminar Registro</h4>
-          <p class="text-muted mb-4">¿Estás seguro que deseas eliminar a este beneficiario de la orden?</p>
-          
+          <p class="text-muted mb-4">
+            ¿Estás seguro que deseas eliminar a este beneficiario de la orden?
+          </p>
+
           <div class="bg-light rounded-3 p-3 mb-2 border">
             <span class="fw-bold text-dark d-block">
-              @if (beneficiaryToDelete) { {{ beneficiaryToDelete.name }} {{ beneficiaryToDelete.lastName }} }
+              @if (beneficiaryToDelete) {
+                {{ beneficiaryToDelete.name }} {{ beneficiaryToDelete.lastName }}
+              }
             </span>
           </div>
         </div>
 
         <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex flex-column gap-2 w-100">
-          <button class="btn btn-danger w-100 rounded-pill py-2.5 fw-bold shadow-sm" [disabled]="deletingLoading()" (click)="confirmRemoveBeneficiary()">
-            @if (deletingLoading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          <button
+            class="btn btn-danger w-100 rounded-pill py-2.5 fw-bold shadow-sm"
+            [disabled]="deletingLoading()"
+            (click)="confirmRemoveBeneficiary()"
+          >
+            @if (deletingLoading()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
             Sí, eliminar registro
           </button>
-          <button type="button" class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium" data-bs-dismiss="modal" (click)="cancelDelete()" [disabled]="deletingLoading()">
+          <button
+            type="button"
+            class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium"
+            data-bs-dismiss="modal"
+            (click)="cancelDelete()"
+            [disabled]="deletingLoading()"
+          >
             Mantener registro
           </button>
         </div>
-
       </div>
     </div>
   </div>
-
 }

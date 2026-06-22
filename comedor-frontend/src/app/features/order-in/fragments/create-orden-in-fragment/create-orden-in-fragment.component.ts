@@ -58,6 +58,12 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
   openDropdown = signal<number | null>(null);
 
+  date = signal<string>(this.getPeruToday());
+
+  minDate = signal<string>(this.getPeruToday());
+
+  maxDate = signal<string>(this.getPeruEndOfYear());
+
   @HostListener('document:click')
   closeDropdown(): void {
     this.openDropdown.set(null);
@@ -184,6 +190,7 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
     if (this.loading()) return;
 
     const request: CreatePurchaseRequest = {
+      date: this.date(),
       details: this.purchaseDetails()
         .filter((d) => d.productId)
         .map((d) => ({
@@ -221,6 +228,7 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
   private createDonation(): void {
     const request: CreateDonationRequest = {
+      date: this.date(),
       details: this.purchaseDetails().map((d) => ({
         productId: d.productId!,
         quantity: d.quantity,
@@ -321,6 +329,8 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
     this.missingProducts.set([]);
 
+    this.date.set(this.getPeruToday());
+
     this.purchaseDetails.set([
       {
         productId: null,
@@ -345,6 +355,24 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
     }
   }
 
+  private getPeruToday(): string {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  }
+
+  private getPeruEndOfYear(): string {
+    const year = new Intl.DateTimeFormat('en', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+    }).format(new Date());
+
+    return `${year}-12-31`;
+  }
+
   isFormInvalid(): boolean {
     if (this.purchaseDetails().length === 0) {
       return true;
@@ -358,6 +386,10 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
       return this.purchaseDetails().some(
         (d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0,
       );
+    }
+
+    if (!this.date()) {
+      return true;
     }
 
     return this.purchaseDetails().some((d) => !d.productId || d.quantity <= 0);
