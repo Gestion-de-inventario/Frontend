@@ -17,15 +17,6 @@ import { SearchSelectComponent } from '@shared/components/search-select/search-s
 
 declare const bootstrap: any;
 
-const LocalToday = new Date();
-
-const localDate =
-  LocalToday.getFullYear() +
-  '-' +
-  String(LocalToday.getMonth() + 1).padStart(2, '0') +
-  '-' +
-  String(LocalToday.getDate()).padStart(2, '0');
-
 @Component({
   selector: 'app-menu-report-create-fragment',
   standalone: true,
@@ -59,6 +50,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   selectedDishMenuId = signal<number | null>(null);
   quantityPrepared = signal<number | null>(null);
   dishMenus = signal<DishMenuResponse[]>([]);
+  createdDate = signal<string>(this.getPeruToday());
 
   // Cocineras
   cookSearch = signal('');
@@ -69,6 +61,10 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   loading = signal(true);
 
   created = signal(false);
+
+  minDate = signal<string>(this.getPeruToday());
+
+  maxDate = signal<string>(this.getPeruEndOfYear());
 
   readonly today = new Date().toLocaleDateString('es-PE', {
     weekday: 'long',
@@ -113,7 +109,13 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
 
   createReport(): void {
-    if (!this.selectedDishMenuId() || !this.quantityPrepared() || this.creating()) return;
+    if (
+      !this.selectedDishMenuId() ||
+      !this.quantityPrepared() ||
+      this.creating() ||
+      !this.createdDate()
+    )
+      return;
     this.creating.set(true);
 
     this.menuReportService
@@ -121,6 +123,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
         dishMenuId: this.selectedDishMenuId()!,
         quantityPrepared: this.quantityPrepared()!,
         cooks: this.selectedCooks().map((c) => c.user_id),
+        createDate: this.createdDate()!,
       })
       .pipe(
         finalize(() => {
@@ -141,6 +144,23 @@ export class MenuReportCreateFragmentComponent implements OnInit {
         },
       });
   }
+  private getPeruToday(): string {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  }
+
+  private getPeruEndOfYear(): string {
+    const year = new Intl.DateTimeFormat('en', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+    }).format(new Date());
+
+    return `${year}-12-31`;
+  }
 
   createAnother(): void {
     this.created.set(false);
@@ -150,6 +170,8 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     this.quantityPrepared.set(null);
 
     this.selectedCooks.set([]);
+
+    this.createdDate.set(this.getPeruToday());
   }
 
   openMissingStockModal(faltantes: MissingProductsResponse[]): void {
@@ -211,6 +233,10 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     if (!this.selectedDishMenuId()) return false;
     if (!this.quantityPrepared() || this.quantityPrepared()! <= 0) return false;
     if (this.selectedCooks().length === 0) return false;
+    if (!this.createdDate()) return false;
+
+    if (this.createdDate() < this.minDate()) return false;
+    if (this.createdDate() > this.maxDate()) return false;
 
     return true;
   });
