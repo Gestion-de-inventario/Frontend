@@ -117,4 +117,9 @@ export const API_ENDPOINTS = {
   DASHBOARD: {
     GET_SUMMARY: '/dashboard',
   },
+
+  EMPRESA_CONFIG: {
+    GET: '/empresa-config',
+    UPDATE: '/empresa-config',
+  },
 };
