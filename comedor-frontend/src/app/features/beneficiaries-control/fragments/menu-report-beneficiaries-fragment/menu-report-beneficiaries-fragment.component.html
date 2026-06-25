@@ -127,9 +127,9 @@
                       S/. {{ b.total }}
                     </span>
                     <span
-                      class="badge rounded-pill fw-normal bg-secondary bg-opacity-10 text-secondary border"
+                      class="badge rounded-pill fw-normal bg-secondary bg-opacity-10 text-dark fw-mediums"
                     >
-                      {{ b.metodoPago }}
+                      {{ b.paymentMethod }}
                     </span>
                   </div>
                 </div>
@@ -330,7 +330,7 @@
               <label class="form-label fw-bold text-muted small text-uppercase mb-2"
                 >Buscar beneficiario</label
               >
-              @if (!selectedBeneficiary) {
+              @if (!selectedBeneficiary()) {
                 <div class="position-relative">
                   <app-search-select
                     [items]="availableBeneficiaries()"
@@ -340,16 +340,16 @@
                   />
                 </div>
               }
-              @if (selectedBeneficiary) {
+              @if (selectedBeneficiary()) {
                 <div
                   class="form-control form-control-lg bg-primary bg-opacity-10 border-primary border-opacity-25 d-flex justify-content-between align-items-center"
                 >
                   <div>
                     <div class="fw-bold text-primary" style="font-size: 0.95rem">
-                      {{ selectedBeneficiary.name }} {{ selectedBeneficiary.lastname }}
+                      {{ selectedBeneficiary()?.name }} {{ selectedBeneficiary()?.lastname }}
                     </div>
                     <small class="text-primary opacity-75"
-                      >DNI: {{ selectedBeneficiary.dni }}</small
+                      >DNI: {{ selectedBeneficiary()?.dni }}</small
                     >
                   </div>
                   <button
@@ -444,7 +444,7 @@
           <button
             class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm"
             style="font-size: 1rem"
-            [disabled]="loading() || (!editingRecord && !selectedBeneficiary) || !menusAmount()"
+            [disabled]="loading() || (!editingRecord && !selectedBeneficiary()) || !menusAmount()"
             (click)="saveBeneficiary()"
           >
             @if (loading()) {

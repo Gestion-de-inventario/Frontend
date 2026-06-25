@@ -41,10 +41,10 @@ export class MenuReportBeneficiariesFragmentComponent {
   beneficiarySearch = signal('');
   menusAmount = signal<number | null>(null);
   menuPrice = signal<number | null>(null);
-  payMethod = signal<'EFECTIVO' | 'YAPE' | 'PLIN'>('EFECTIVO');
+  payMethod = signal<string>('');
   pago = signal(false);
   entregado = signal(false);
-  selectedBeneficiary: BeneficiaryResponse | null = null;
+  selectedBeneficiary = signal<BeneficiaryResponse | null>(null);
   editingRecord: BeneficiaryRecordResponse | null = null;
   beneficiaryToDelete: BeneficiaryRecordResponse | null = null;
   deletingLoading = signal(false);
@@ -52,6 +52,8 @@ export class MenuReportBeneficiariesFragmentComponent {
   loadingReport = signal(false);
 
   listLoading = signal(false);
+
+  silentSync = signal(false);
 
   updatingBeneficiaryId = signal<number | null>(null);
 
@@ -106,9 +108,17 @@ export class MenuReportBeneficiariesFragmentComponent {
   });
 
   readonly availableBeneficiaries = computed(() => {
-    const selectedId = this.selectedBeneficiary?.id;
+    const report = this.report();
+
+    const registeredBeneficiaryIds = new Set(
+      (report?.beneficiaries ?? []).map((record) => record.beneficiaryId),
+    );
+
+    const selectedId = this.selectedBeneficiary()?.id;
+
     return this.allBeneficiaries()
       .filter((b) => b.status === 'ACTIVO')
+      .filter((b) => !registeredBeneficiaryIds.has(b.id))
       .filter((b) => b.id !== selectedId);
   });
 
@@ -128,7 +138,7 @@ export class MenuReportBeneficiariesFragmentComponent {
     this.editingRecord = record;
     this.menusAmount.set(record.cantidad);
     this.menuPrice.set(record.total / record.cantidad);
-    this.payMethod.set(record.metodoPago);
+    this.payMethod.set(record.paymentMethod);
     this.pago.set(record.pago);
     this.entregado.set(record.entregado);
     const modal = new bootstrap.Modal(document.getElementById('beneficiaryRecordModal'));
@@ -142,7 +152,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   selectBeneficiary(beneficiary: BeneficiaryResponse): void {
-    this.selectedBeneficiary = beneficiary;
+    this.selectedBeneficiary.set(beneficiary);
 
     this.menuPrice.set(beneficiary.menu_cost);
   }
@@ -155,7 +165,7 @@ export class MenuReportBeneficiariesFragmentComponent {
     const report = this.report();
 
     if (!report || this.loading()) return;
-    if (!this.editingRecord && !this.selectedBeneficiary) return;
+    if (!this.editingRecord && !this.selectedBeneficiary()) return;
     if (!this.menusAmount()) return;
 
     this.loading.set(true);
@@ -163,7 +173,7 @@ export class MenuReportBeneficiariesFragmentComponent {
     const request = {
       beneficiarioId: this.editingRecord
         ? 0 // no se usa en edit
-        : this.selectedBeneficiary!.id,
+        : this.selectedBeneficiary()!.id,
       pago: this.pago(),
       entregado: this.entregado(),
       payMethod: this.payMethod(),
@@ -186,15 +196,23 @@ export class MenuReportBeneficiariesFragmentComponent {
         }),
       )
       .subscribe({
-        next: () => {
+        next: (record) => {
+          if (this.editingRecord) {
+            this.updateRecordInReport(record);
+          } else {
+            this.addRecordToReport(record);
+          }
+
           this.toastService.show(
             this.editingRecord ? 'Beneficiario actualizado' : 'Beneficiario agregado',
             'success',
           );
-          this.reloadReport();
+
           bootstrap.Modal.getInstance(document.getElementById('beneficiaryRecordModal')!)?.hide();
+
           this.resetForm();
-          this.loading.set(false);
+
+          this.syncReportSilently();
         },
         error: (error) => {
           this.toastService.show('Error: ' + error.error.message, 'danger');
@@ -230,10 +248,14 @@ export class MenuReportBeneficiariesFragmentComponent {
       )
       .subscribe({
         next: () => {
+          const deletedId = this.beneficiaryToDelete!.id;
+
+          this.removeRecordFromReport(deletedId);
+
           this.toastService.show('Registro eliminado', 'warning');
           bootstrap.Modal.getInstance(document.getElementById('deleteBeneficiaryModal')!)?.hide();
           this.beneficiaryToDelete = null;
-          this.reloadReport();
+          this.syncReportSilently();
         },
         error: (error) => {
           this.toastService.show('Error: ' + error.error.message, 'danger');
@@ -270,7 +292,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   resetForm(): void {
-    this.selectedBeneficiary = null;
+    this.selectedBeneficiary.set(null);
     this.editingRecord = null;
     this.beneficiarySearch.set('');
     this.menusAmount.set(null);
@@ -293,7 +315,7 @@ export class MenuReportBeneficiariesFragmentComponent {
       beneficiarioId: record.id,
       pago: changes.pago ?? record.pago,
       entregado: changes.entregado ?? record.entregado,
-      payMethod: record.metodoPago,
+      payMethod: record.paymentMethod,
       menusAmount: record.cantidad,
       menuPrice: record.total / record.cantidad,
     };
@@ -339,7 +361,64 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   clearBeneficiary(): void {
-    this.selectedBeneficiary = null;
+    this.selectedBeneficiary.set(null);
     this.beneficiarySearch.set('');
+  }
+
+  private syncReportSilently(): void {
+    const report = this.report();
+
+    if (!report || this.silentSync()) return;
+
+    this.silentSync.set(true);
+
+    this.menuReportService
+      .getMenuReportById(report.id)
+      .pipe(
+        finalize(() => {
+          this.silentSync.set(false);
+        }),
+      )
+      .subscribe({
+        next: (backendReport) => {
+          this.report.set(backendReport);
+        },
+        error: () => {
+          console.warn('No se pudo sincronizar el reporte en segundo plano');
+        },
+      });
+  }
+
+  private addRecordToReport(record: BeneficiaryRecordResponse): void {
+    this.report.update((report) => {
+      if (!report) return report;
+
+      return {
+        ...report,
+        beneficiaries: [...(report.beneficiaries ?? []), record],
+      };
+    });
+  }
+
+  private updateRecordInReport(record: BeneficiaryRecordResponse): void {
+    this.report.update((report) => {
+      if (!report) return report;
+
+      return {
+        ...report,
+        beneficiaries: report.beneficiaries.map((item) => (item.id === record.id ? record : item)),
+      };
+    });
+  }
+
+  private removeRecordFromReport(recordId: number): void {
+    this.report.update((report) => {
+      if (!report) return report;
+
+      return {
+        ...report,
+        beneficiaries: report.beneficiaries.filter((item) => item.id !== recordId),
+      };
+    });
   }
 }
