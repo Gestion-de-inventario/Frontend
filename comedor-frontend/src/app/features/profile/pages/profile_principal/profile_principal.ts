@@ -1,12 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { UserService } from '@features/users/services/user-api.service';
 import { ToastService } from '@shared/services/toast.service';
 import { EditProfileRequest } from '@features/profile/interfaces/edit-profile.request';
 import { ChangePasswordRequest } from '@features/profile/interfaces/change-password.request';
-import { EmpresaConfigService } from '@features/profile/services/empresa-config.service'; 
+import { EmpresaConfigService } from '@features/profile/services/empresa-config.service';
+import { finalize } from 'rxjs';
 
 declare const bootstrap: any;
 
@@ -31,15 +39,16 @@ export class ProfilePrincipal implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly empresaConfigService = inject(EmpresaConfigService); // Inyectamos el servicio
 
-  loadingEdit = false;
-  loadingPassword = false;
-  showCurrent = false;
-  showNew = false;
-  showConfirm = false;
+  loadingEdit = signal(false);
+  loadingPassword = signal(false);
+  showCurrent = signal(false);
+  showNew = signal(false);
+  showConfirm = signal(false);
 
-  loadingEmpresaConfig = false;
-  logoPreview: string | ArrayBuffer | null = null;
-  selectedLogoFile: File | null = null;
+  loadingEmpresaConfig = signal(false);
+  logoPreview = signal<string | null>(null);
+  selectedLogoFile = signal<File | null>(null);
+  logoReading = signal(false);
 
   readonly editForm = new FormGroup({
     name: new FormControl('', { nonNullable: true }),
@@ -50,20 +59,23 @@ export class ProfilePrincipal implements OnInit {
     }),
   });
 
-  readonly passwordForm = new FormGroup({
-    currentPassword: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    newPassword: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8)],
-    }),
-    confirmPassword: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-  }, { validators: passwordMatchValidator });
+  readonly passwordForm = new FormGroup(
+    {
+      currentPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      newPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(8)],
+      }),
+      confirmPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    },
+    { validators: passwordMatchValidator },
+  );
 
   readonly empresaConfigForm = new FormGroup({
     nombre: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -93,8 +105,8 @@ export class ProfilePrincipal implements OnInit {
   }
 
   saveEdit(): void {
-    if (this.loadingEdit) return;
-    this.loadingEdit = true;
+    if (this.loadingEdit()) return;
+    this.loadingEdit.set(true);
 
     const raw = this.editForm.getRawValue();
     const request: EditProfileRequest = {
@@ -114,17 +126,17 @@ export class ProfilePrincipal implements OnInit {
       },
       error: (error) => {
         this.toastService.show('No se pudo actualizar: ' + error.error.message, 'danger');
-        this.loadingEdit = false;
+        this.loadingEdit.set(false);
       },
       complete: () => {
-        this.loadingEdit = false;
+        this.loadingEdit.set(false);
       },
     });
   }
 
   savePassword(): void {
-    if (this.passwordForm.invalid || this.loadingPassword) return;
-    this.loadingPassword = true;
+    if (this.passwordForm.invalid || this.loadingPassword()) return;
+    this.loadingPassword.set(true);
 
     const { currentPassword, newPassword } = this.passwordForm.getRawValue();
     const request: ChangePasswordRequest = { currentPassword, newPassword };
@@ -137,19 +149,19 @@ export class ProfilePrincipal implements OnInit {
       },
       error: (error) => {
         this.toastService.show('Error: ' + (error.error?.message ?? error.error), 'danger');
-        this.loadingPassword = false;
+        this.loadingPassword.set(false);
       },
       complete: () => {
-        this.loadingPassword = false;
+        this.loadingPassword.set(false);
       },
     });
   }
 
   resetPasswordForm(): void {
     this.passwordForm.reset();
-    this.showCurrent = false;
-    this.showNew = false;
-    this.showConfirm = false;
+    this.showCurrent.set(false);
+    this.showNew.set(false);
+    this.showConfirm.set(false);
   }
 
   // --- MÉTODOS PARA LA CONFIGURACIÓN DE EMPRESA ---
@@ -159,69 +171,94 @@ export class ProfilePrincipal implements OnInit {
       next: (config) => {
         this.empresaConfigForm.patchValue({
           nombre: config.nombre || '',
-          descripcion: config.descripcion || ''
+          descripcion: config.descripcion || '',
         });
         // Si ya hay un logo guardado en la BD, lo mostramos en la preview
         if (config.logoBase64) {
-           this.logoPreview = `data:image/png;base64,${config.logoBase64}`;
+          this.logoPreview.set(`data:image/png;base64,${config.logoBase64}`);
         }
       },
       error: () => {
         this.toastService.show('Error al cargar la configuración de la empresa', 'danger');
-      }
+      },
     });
   }
 
-  onLogoSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      if (!file.type.match(/image\/(png|jpeg|jpg)/)) {
-        this.toastService.show('Solo se permiten imágenes PNG o JPG', 'warning');
-        return;
-      }
-      
-      this.selectedLogoFile = file;
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-      // Generar preview local para el usuario
-      const reader = new FileReader();
-      reader.onload = e => this.logoPreview = reader.result;
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (!file.type.match(/image\/(png|jpeg|jpg)/)) {
+      this.toastService.show('Solo se permiten imágenes PNG o JPG', 'warning');
+      input.value = '';
+      return;
     }
+
+    this.logoReading.set(true);
+    this.selectedLogoFile.set(file);
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.logoPreview.set(reader.result as string);
+      this.logoReading.set(false);
+    };
+
+    reader.onerror = () => {
+      this.logoReading.set(false);
+      this.selectedLogoFile.set(null);
+      this.logoPreview.set(null);
+      this.toastService.show('No se pudo leer la imagen seleccionada', 'danger');
+    };
+
+    reader.readAsDataURL(file);
   }
 
   removeLogoPreview(): void {
-    this.selectedLogoFile = null;
-    this.logoPreview = null;
+    this.selectedLogoFile.set(null);
+    this.logoPreview.set(null);
   }
 
   saveEmpresaConfig(): void {
-    if (this.empresaConfigForm.invalid || this.loadingEmpresaConfig) return;
-    this.loadingEmpresaConfig = true;
+    if (this.empresaConfigForm.invalid || this.loadingEmpresaConfig()) return;
+    this.loadingEmpresaConfig.set(true);
 
     const formData = new FormData();
     formData.append('nombre', this.empresaConfigForm.get('nombre')?.value || '');
     formData.append('descripcion', this.empresaConfigForm.get('descripcion')?.value || '');
-    
-    if (this.selectedLogoFile) {
-      formData.append('logo', this.selectedLogoFile);
+
+    const logo = this.selectedLogoFile();
+
+    if (logo) {
+      formData.append('logo', logo);
     }
 
-    this.empresaConfigService.actualizar(formData).subscribe({
-      next: (updatedConfig) => {
-        this.loadingEmpresaConfig = false;
-        
-        this.toastService.show('Configuración de la empresa guardada exitosamente', 'success');
-        this.selectedLogoFile = null; 
-        if (updatedConfig.logoBase64) {
-           this.logoPreview = `data:image/png;base64,${updatedConfig.logoBase64}`;
-        }
-      },
-      error: (error) => {
-        this.toastService.show('No se pudo guardar la configuración: ' + (error.error?.message || 'Error desconocido'), 'danger');
-      },
-      complete: () => {
-        this.loadingEmpresaConfig = false;
-      }
-    });
+    this.empresaConfigService
+      .actualizar(formData)
+      .pipe(
+        finalize(() => {
+          this.loadingEmpresaConfig.set(false);
+        }),
+      )
+      .subscribe({
+        next: (updatedConfig) => {
+          this.loadingEmpresaConfig.set(false);
+
+          this.toastService.show('Configuración de la empresa guardada exitosamente', 'success');
+          this.selectedLogoFile.set(null);
+          if (updatedConfig.logoBase64) {
+            this.logoPreview.set(`data:image/png;base64,${updatedConfig.logoBase64}`);
+          }
+        },
+        error: (error) => {
+          this.toastService.show(
+            'No se pudo guardar la configuración: ' + (error.error?.message || 'Error desconocido'),
+            'danger',
+          );
+          this.loadingEmpresaConfig.set(false);
+        },
+      });
   }
 }

@@ -18,40 +18,40 @@ export class BeneficiaryApiService {
     if (status) params = params.set('estado', status);
     return this.http.get<BeneficiaryResponse[]>(
       `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.LIST_BY_STATUS}`,
-      { params }
+      { params },
     );
   }
 
   searchByDni(dni: string) {
     return this.http.get<BeneficiaryResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.SEARCH_BY_DNI.replace('{dni}', dni)}`
+      `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.SEARCH_BY_DNI.replace('{dni}', dni)}`,
     );
   }
 
   searchByDniReniec(dni: string) {
     return this.http.get<any>(
-      `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.SEARCH_BY_DNI_RENIEC.replace('{dni}', dni)}`
+      `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.SEARCH_BY_DNI_RENIEC.replace('{dni}', dni)}`,
     );
   }
 
   createManual(request: BeneficiaryRequest) {
     return this.http.post<BeneficiaryResponse>(
       `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.CREATE}`,
-      request
+      request,
     );
   }
 
   createByDni(dni: string) {
     return this.http.post<BeneficiaryResponse>(
       `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.CREATE_BY_DNI.replace('{dni}', dni)}`,
-      {}
+      {},
     );
   }
 
   edit(id: number, request: EditBeneficiaryRequest) {
     return this.http.put<BeneficiaryResponse>(
       `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.EDIT.replace('{id}', id.toString())}`,
-      request
+      request,
     );
   }
 
@@ -59,8 +59,7 @@ export class BeneficiaryApiService {
     return this.http.post<BeneficiaryResponse>(
       `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.CHANGE_STATUS.replace('{id}', id.toString())}`,
       null,
-      { params: new HttpParams().set('estado', status) }
+      { params: new HttpParams().set('status', status) },
     );
   }
-
 }
