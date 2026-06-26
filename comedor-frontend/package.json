@@ -19,13 +19,16 @@
     "@angular/router": "^21.2.0",
     "bootstrap": "^5.3.8",
     "dexie": "^4.4.2",
+    "intro.js": "^8.3.2",
     "rxjs": "~7.8.0",
+    "shepherd.js": "^15.2.2",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.8",
     "@angular/cli": "^21.2.8",
     "@angular/compiler-cli": "^21.2.0",
+    "@types/intro.js": "^5.1.5",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",

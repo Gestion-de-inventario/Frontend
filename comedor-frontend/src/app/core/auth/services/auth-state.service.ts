@@ -101,4 +101,6 @@ export class AuthStateService {
     const current = this._session();
     if (current) this._session.set({ ...current, ...partial });
   }
+
+  
 }

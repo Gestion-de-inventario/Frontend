@@ -23,7 +23,6 @@ export class DashboardPrincipalComponent implements OnInit {
   readonly dashboardApi = inject(DashboardApiService);
   readonly dashboardState = inject(DashboardStateService);
 
-  // Valida el permiso para ver el dashboard (ajusta el nombre según tu BD)
   readonly canView = this.authState.hasPermission('DASHBOARD_VIEW');
 
   ngOnInit(): void {

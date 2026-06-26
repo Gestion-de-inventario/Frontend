@@ -1,0 +1,51 @@
+<div class="modal fade" id="tourModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+      <div class="modal-header border-bottom-0 pt-4 pb-0 px-4">
+        <small class="text-muted fw-semibold">GUÍA DEL SISTEMA</small>
+        <button type="button" class="btn-close shadow-none" (click)="cerrar()"></button>
+      </div>
+
+      <div class="modal-body px-4 py-4 text-center">
+        <div class="tour-icon mb-3" style="font-size: 3rem;">
+          {{ pasoData.icon }}
+        </div>
+
+        <h4 class="fw-bold text-dark mb-3">{{ pasoData.titulo }}</h4>
+
+        <p class="text-muted" style="line-height: 1.6;">
+          {{ pasoData.descripcion }}
+        </p>
+
+        <!-- Indicador de pasos -->
+        <div class="d-flex justify-content-center gap-2 mt-4">
+          @for (paso of pasos; track $index) {
+            <div class="rounded-circle" style="width:8px;height:8px;transition:all 0.3s;"
+              [style.background]="$index === pasoActual() ? '#0d6efd' : '#dee2e6'">
+            </div>
+          }
+        </div>
+
+        <small class="text-muted d-block mt-2">
+          {{ pasoActual() + 1 }} de {{ pasos.length }}
+        </small>
+      </div>
+
+      <div class="modal-footer border-top-0 px-4 pb-4 d-flex justify-content-between">
+        @if (!esPrimerPaso) {
+          <button class="btn btn-outline-secondary rounded-pill px-4 fw-medium" (click)="anterior()">
+            Anterior
+          </button>
+        } @else {
+          <div></div>
+        }
+
+        <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="siguiente()">
+          {{ esUltimoPaso ? 'Entendido ✓' : 'Siguiente →' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
