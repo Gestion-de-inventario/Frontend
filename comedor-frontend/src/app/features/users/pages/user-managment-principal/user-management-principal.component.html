@@ -7,11 +7,15 @@
 
       <div class="col-md-4">
         <select class="form-select" [value]="currentModule" (change)="changeModule($event)">
-          <option value="users">Usuarios</option>
-
-          <option value="beneficiaries">Beneficiarios</option>
-
-          <option value="beneficiary-types">Tipos de Beneficiario</option>
+          @if (canListUsers || canCreateUser || canListActivedUsers) {
+            <option value="users">Usuarios</option>
+          }
+          @if (canListBeneficiaries || canCreateBeneficiary || canCreateBeneficiaryByDni) {
+            <option value="beneficiaries">Beneficiarios</option>
+          }
+          @if (canListBeneficiariesTypes || canCreateBeneficiaryType) {
+            <option value="beneficiary-types">Tipos de Beneficiario</option>
+          }
         </select>
       </div>
     </div>

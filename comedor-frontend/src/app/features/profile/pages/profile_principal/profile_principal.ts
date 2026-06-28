@@ -93,7 +93,7 @@ export class ProfilePrincipal implements OnInit {
     this.editForm.patchValue({
       name: session?.name ?? '',
       lastname: session?.lastname ?? '',
-      dni: '',
+      dni: session?.dni ?? '',
     });
     const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
     modal.show();
@@ -158,7 +158,12 @@ export class ProfilePrincipal implements OnInit {
   }
 
   resetPasswordForm(): void {
-    this.passwordForm.reset();
+    this.passwordForm.reset({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+
     this.showCurrent.set(false);
     this.showNew.set(false);
     this.showConfirm.set(false);

@@ -31,7 +31,6 @@ export const routes: Routes = [
             (m) => m.UserManagementPrincipalComponent,
           ),
         children: [
-          { path: '', redirectTo: 'users', pathMatch: 'full' },
           {
             path: 'users',
             loadComponent: () =>

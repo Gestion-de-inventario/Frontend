@@ -16,4 +16,5 @@ export class BeneficiaryPrincipal {
 
   readonly canList = this.authState.hasPermission('BENEFICIARY_LIST_BY_STATUS');
   readonly canCreate = this.authState.hasPermission('BENEFICIARY_CREATE');
+  readonly canCreateByDni = this.authState.hasPermission('BENEFICIARY_CREATE_BY_DNI');
 }
