@@ -370,6 +370,31 @@
                   </div>
                 </div>
               </div>
+              @if (selectedReport(); as report) {
+                <div>
+                  <label class="form-label fw-bold">Responsables</label>
+
+                  @if (cooksLoading()) {
+                    <div class="text-muted small d-flex align-items-center gap-2 mt-2">
+                      <span class="spinner-border spinner-border-sm"></span>
+                      Cargando responsables...
+                    </div>
+                  } @else {
+                    <div class="d-flex flex-column gap-2 mt-2">
+                      @for (cook of getReportCooks(report); track cook.user_id) {
+                        <div class="border rounded-3 px-3 py-2 bg-light">
+                          <div class="fw-semibold">{{ cook.name }} {{ cook.lastname }}</div>
+                          <small class="text-muted">DNI: {{ cook.dni }}</small>
+                        </div>
+                      } @empty {
+                        <div class="border rounded-3 px-3 py-2 bg-light text-muted small">
+                          No hay responsables registrados.
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
 
               @if (report.registers && report.registers.length > 0) {
                 <div>

@@ -53,6 +53,8 @@ export class ListMenuReportFragmentComponent {
 
   informationLoading = signal(false);
 
+  cooksLoading = signal(false);
+
   isEditMode = signal(false);
 
   pageSize = signal(5);
@@ -73,11 +75,10 @@ export class ListMenuReportFragmentComponent {
 
   private loadEditData(report: MenuReportResponse): void {
     this.informationLoading.set(true);
+    this.editLoading.set(true);
 
-    forkJoin({
-      cooks: this.userService.listActiveUsers(),
-      dishMenus: this.menuReportService.getDishMenus(),
-    })
+    this.menuReportService
+      .getDishMenus()
       .pipe(
         finalize(() => {
           this.informationLoading.set(false);
@@ -85,21 +86,40 @@ export class ListMenuReportFragmentComponent {
         }),
       )
       .subscribe({
-        next: ({ cooks, dishMenus }) => {
-          this.editLoading.set(true);
-          this.allCooks.set(cooks);
+        next: (dishMenus) => {
           this.dishMenus.set(dishMenus);
 
           this.editForm.dishMenuId.set(report.dishId);
           this.editForm.quantityPrepared.set(report.quantityPrepared);
 
-          const selected = cooks.filter((c) => report.cooks?.includes(c.user_id)) ?? [];
+          const selected = this.getReportCooks(report);
 
           this.selectedCooks.set(selected);
         },
-
         error: () => {
           this.toastService.show('Error al cargar datos para edición', 'danger');
+        },
+      });
+  }
+
+  private loadCooks(): void {
+    if (this.allCooks().length > 0 || this.cooksLoading()) return;
+
+    this.cooksLoading.set(true);
+
+    this.userService
+      .listActiveUsers()
+      .pipe(
+        finalize(() => {
+          this.cooksLoading.set(false);
+        }),
+      )
+      .subscribe({
+        next: (cooks) => {
+          this.allCooks.set(cooks);
+        },
+        error: () => {
+          this.toastService.show('No se pudo cargar la lista de responsables', 'danger');
         },
       });
   }
@@ -115,6 +135,8 @@ export class ListMenuReportFragmentComponent {
     if (!this.canList) return;
 
     this.loadReports();
+
+    this.loadCooks();
   }
 
   loadReports(): void {
@@ -312,7 +334,7 @@ export class ListMenuReportFragmentComponent {
 
     this.selectedCooks.set([]);
 
-    this.allCooks.set([]);
+    //this.allCooks.set([]);
     this.dishMenus.set([]);
   }
 
@@ -320,5 +342,11 @@ export class ListMenuReportFragmentComponent {
     this.menuReportState.setSelectedReport(report);
 
     this.router.navigate(['/beneficiaries-control', 'manage', report.id]);
+  }
+
+  getReportCooks(report: MenuReportResponse): UserResponse[] {
+    const cookIds = new Set(report.cooks ?? []);
+
+    return this.allCooks().filter((cook) => cookIds.has(cook.user_id));
   }
 }
