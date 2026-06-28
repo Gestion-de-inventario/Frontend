@@ -3,6 +3,8 @@ export interface AuthResponse {
 
   lastname: string;
 
+  dni: string;
+
   name: string;
 
   permissions: string[];

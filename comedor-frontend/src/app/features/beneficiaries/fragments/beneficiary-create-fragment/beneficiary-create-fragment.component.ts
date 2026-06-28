@@ -7,6 +7,7 @@ import { BeneficiaryStateService } from '@features/beneficiaries/services/benefi
 import { BeneficiaryTypeApiService } from '@features/beneficiaryType/services/beneficiaryType-api.service';
 import { BeneficiaryTypeStateService } from '@features/beneficiaryType/services/beneficiaryType-state.service';
 import { ToastService } from '@shared/services/toast.service';
+import { AuthStateService } from '@core/auth/services/auth-state.service';
 
 declare const bootstrap: any;
 
@@ -18,12 +19,14 @@ declare const bootstrap: any;
   styleUrl: './beneficiary-create-fragment.scss',
 })
 export class BeneficiaryCreateFragmentComponent {
+  private readonly authState = inject(AuthStateService);
   private readonly beneficiaryService = inject(BeneficiaryApiService);
   private readonly beneficiaryState = inject(BeneficiaryStateService);
   private readonly toastService = inject(ToastService);
   private readonly beneficiaryTypeApi = inject(BeneficiaryTypeApiService);
   private readonly beneficiaryTypeState = inject(BeneficiaryTypeStateService);
-
+  public canCreate = this.authState.hasPermission('BENEFICIARY_CREATE');
+  public canCreateByDni = this.authState.hasPermission('BENEFICIARY_CREATE_BY_DNI');
   readonly beneficiaryTypes = this.beneficiaryTypeState.types;
 
   loading = signal<boolean>(false);
