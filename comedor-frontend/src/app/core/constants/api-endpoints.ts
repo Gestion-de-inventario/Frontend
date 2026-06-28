@@ -49,6 +49,7 @@ export const API_ENDPOINTS = {
     EXPORT_PDF: '/menu_report/{id}/export/pdf',
     RANGE_EXPORT_PDF: '/menu_report/export/pdf',
     EXPORT_EXCEL: '/menu_report/{id}/export/excel',
+    RANGE_EXPORT_EXPORT_EXCEL: '/menu_report/export/excel',
   },
 
   PRODUCT: {

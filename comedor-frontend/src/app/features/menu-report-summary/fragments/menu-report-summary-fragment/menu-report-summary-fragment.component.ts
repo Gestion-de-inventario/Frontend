@@ -9,6 +9,8 @@ import { finalize } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
+declare const bootstrap: any;
+
 const today = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/Lima',
   year: 'numeric',
@@ -30,6 +32,8 @@ export class MenuReportSummaryFragmentComponent {
   loading = signal(false);
 
   generatingPdf = signal(false);
+
+  generatingExcel = signal(false);
 
   startDate = signal(today);
   endDate = signal('');
@@ -59,6 +63,15 @@ export class MenuReportSummaryFragmentComponent {
       });
   }
 
+  openExportModal(): void {
+    const modalElement = document.getElementById('exportSummaryModal');
+
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+  }
+
   clearFilters(): void {
     this.startDate.set('');
     this.endDate.set('');
@@ -69,23 +82,69 @@ export class MenuReportSummaryFragmentComponent {
   refreshSummary(): void {
     this.search();
   }
-  exportarResumen() {
+
+  exportarResumenPdf(): void {
+    if (this.generatingPdf()) return;
+
     this.generatingPdf.set(true);
-    this.menuReportService.exportPdf(this.startDate(), this.endDate()).subscribe((file) => {
-      const blob = new Blob([file], { type: 'application/pdf' });
 
-      const url = window.URL.createObjectURL(blob);
+    this.menuReportService
+      .exportPdf(this.startDate(), this.endDate())
+      .pipe(
+        finalize(() => {
+          this.generatingPdf.set(false);
+        }),
+      )
+      .subscribe({
+        next: (file) => {
+          this.downloadFile(file, 'application/pdf', 'reporte-menu.pdf');
 
-      const a = document.createElement('a');
+          bootstrap.Modal.getInstance(document.getElementById('exportSummaryModal')!)?.hide();
+        },
+        error: () => {
+          console.error('No se pudo generar el PDF');
+        },
+      });
+  }
 
-      a.href = url;
+  exportarResumenExcel(): void {
+    if (this.generatingExcel()) return;
 
-      a.download = `reporte.pdf`;
+    this.generatingExcel.set(true);
 
-      a.click();
+    this.menuReportService
+      .exportExcel(this.startDate(), this.endDate())
+      .pipe(
+        finalize(() => {
+          this.generatingExcel.set(false);
+        }),
+      )
+      .subscribe({
+        next: (file) => {
+          this.downloadFile(
+            file,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'reporte-menu.xlsx',
+          );
 
-      window.URL.revokeObjectURL(url);
-      this.generatingPdf.set(false);
-    });
+          bootstrap.Modal.getInstance(document.getElementById('exportSummaryModal')!)?.hide();
+        },
+        error: () => {
+          console.error('No se pudo generar el Excel');
+        },
+      });
+  }
+
+  private downloadFile(file: BlobPart, mimeType: string, fileName: string): void {
+    const blob = new Blob([file], { type: mimeType });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
   }
 }

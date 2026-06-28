@@ -91,6 +91,23 @@ export class MenuReportApiService {
     });
   }
 
+  exportExcel(startDate?: string, endDate?: string): Observable<Blob> {
+    let params = new HttpParams();
+
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+
+    return this.http.get(`${this.baseUrl}${API_ENDPOINTS.MENU_REPORT.RANGE_EXPORT_EXPORT_EXCEL}`, {
+      params,
+      responseType: 'blob',
+    });
+  }
+
   editMenuReport(id: number, request: EditMenuReportRequest): Observable<MenuReportResponse> {
     const endpoint = buildEndpoint(API_ENDPOINTS.MENU_REPORT.EDIT, { id });
     return this.http.put<MenuReportResponse>(`${this.baseUrl}${endpoint}`, request);
