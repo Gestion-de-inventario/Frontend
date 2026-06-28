@@ -3,6 +3,6 @@ export interface ProductRequest {
   categoryId: number;
   tagId?: number | null;
   unit: string;
-  stock: number;
+
   reorderPoint: number;
 }

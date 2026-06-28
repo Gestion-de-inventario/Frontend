@@ -117,23 +117,6 @@
               <div class="invalid-feedback d-block">Seleccione una unidad.</div>
             }
           </div>
-
-          <div class="col-md-4">
-            <label class="form-label fw-semibold text-dark small"
-              >Stock Inicial <span class="text-danger">*</span></label
-            >
-            <input
-              type="number"
-              class="form-control custom-input"
-              formControlName="stock"
-              placeholder="0"
-              [class.is-invalid]="form.controls.stock.touched && form.controls.stock.invalid"
-            />
-            @if (form.controls.stock.touched && form.controls.stock.invalid) {
-              <div class="invalid-feedback d-block">El stock inicial es obligatorio.</div>
-            }
-          </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold text-dark small"
               >Punto de Reorden <span class="text-danger">*</span></label
