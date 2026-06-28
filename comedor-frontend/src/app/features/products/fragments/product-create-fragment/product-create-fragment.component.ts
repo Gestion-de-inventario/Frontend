@@ -41,9 +41,6 @@ export class ProductCreateFragmentComponent {
     unit: new FormControl<string | null>(null, {
       validators: [Validators.required],
     }),
-    stock: new FormControl<number | null>(null, {
-      validators: [Validators.required],
-    }),
     reorderPoint: new FormControl<number | null>(null, {
       validators: [Validators.required],
     }),
@@ -82,7 +79,6 @@ export class ProductCreateFragmentComponent {
         categoryId: this.form.getRawValue().categoryId!,
         tagId: this.form.getRawValue().tagId ?? null,
         unit: this.form.getRawValue().unit!,
-        stock: this.form.getRawValue().stock!,
         reorderPoint: this.form.getRawValue().reorderPoint!,
       })
       .subscribe({
@@ -94,7 +90,6 @@ export class ProductCreateFragmentComponent {
             categoryId: null,
             tagId: null,
             unit: null,
-            stock: null,
             reorderPoint: null,
           });
           bootstrap.Modal.getInstance(document.getElementById('createProductModal')!)?.hide();
