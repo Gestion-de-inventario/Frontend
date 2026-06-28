@@ -116,24 +116,21 @@
       >
         🔄 Actualizar resumen
       </button>-->
-      @if (generatingPdf()) {
-        <button
-          class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm"
-          (click)="exportarResumen()"
-          [disabled]="generatingPdf()"
-        >
-          <span class="spinner-border spinner-border-sm"></span>
-          Generando pdf...
-        </button>
-      } @else {
-        <button
-          class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm"
-          (click)="exportarResumen()"
-          [disabled]="generatingPdf()"
-        >
+      <button
+        class="btn btn-outline-secondary rounded-pill w-100 mt-3 fw-medium btn-sm"
+        (click)="openExportModal()"
+        [disabled]="generatingPdf() || generatingExcel()"
+      >
+        @if (generatingPdf()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Generando PDF...
+        } @else if (generatingExcel()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Generando Excel...
+        } @else {
           Exportar resumen
-        </button>
-      }
+        }
+      </button>
     } @else {
       <div class="text-center py-4">
         <p class="text-muted mb-3">No se pudo cargar el resumen.</p>
@@ -146,5 +143,76 @@
         </button>
       </div>
     }
+  </div>
+</div>
+
+<div class="modal fade" id="exportSummaryModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
+        <div>
+          <h5 class="modal-title fw-bold text-dark mb-0">Exportar resumen</h5>
+          <small class="text-muted">Selecciona el formato de descarga</small>
+        </div>
+
+        <button
+          type="button"
+          class="btn-close shadow-none"
+          data-bs-dismiss="modal"
+          [disabled]="generatingPdf() || generatingExcel()"
+        ></button>
+      </div>
+
+      <div class="modal-body px-4 py-4">
+        <div class="d-flex flex-column gap-3">
+          <button
+            type="button"
+            class="btn btn-outline-danger rounded-4 p-3 text-start d-flex align-items-center justify-content-between"
+            (click)="exportarResumenPdf()"
+            [disabled]="generatingPdf() || generatingExcel()"
+          >
+            <div>
+              <div class="fw-bold">Exportar como PDF</div>
+              <small class="text-muted">Ideal para imprimir o presentar el resumen.</small>
+            </div>
+
+            @if (generatingPdf()) {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <span class="fw-bold">PDF</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline-success rounded-4 p-3 text-start d-flex align-items-center justify-content-between"
+            (click)="exportarResumenExcel()"
+            [disabled]="generatingPdf() || generatingExcel()"
+          >
+            <div>
+              <div class="fw-bold">Exportar como Excel</div>
+              <small class="text-muted">Ideal para revisar datos, filtrar o hacer cálculos.</small>
+            </div>
+
+            @if (generatingExcel()) {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <span class="fw-bold">XLSX</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer bg-light border-top-0 px-4 py-3">
+        <button
+          type="button"
+          class="btn btn-outline-secondary rounded-pill px-4"
+          data-bs-dismiss="modal"
+          [disabled]="generatingPdf() || generatingExcel()"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
