@@ -15,25 +15,21 @@ export class TagApiService {
 
   listByStatus(status?: string) {
     let params = new HttpParams();
-    if (status) params = params.set('estado', status);
-    return this.http.get<TagResponse[]>(
-      `${this.apiUrl}${API_ENDPOINTS.TAG.LIST_BY_STATUS}`,
-      { params }
-    );
+    if (status) params = params.set('status', status);
+    return this.http.get<TagResponse[]>(`${this.apiUrl}${API_ENDPOINTS.TAG.LIST_BY_STATUS}`, {
+      params,
+    });
   }
 
   create(request: TagRequest) {
-    return this.http.post<TagResponse>(
-      `${this.apiUrl}${API_ENDPOINTS.TAG.CREATE}`,
-      request
-    );
+    return this.http.post<TagResponse>(`${this.apiUrl}${API_ENDPOINTS.TAG.CREATE}`, request);
   }
 
   changeStatus(id: number, status: string) {
     return this.http.post<TagResponse>(
       `${this.apiUrl}${API_ENDPOINTS.TAG.CHANGE_STATUS.replace('{id}', id.toString())}`,
       null,
-      { params: new HttpParams().set('estado', status) }
+      { params: new HttpParams().set('status', status) },
     );
   }
 }

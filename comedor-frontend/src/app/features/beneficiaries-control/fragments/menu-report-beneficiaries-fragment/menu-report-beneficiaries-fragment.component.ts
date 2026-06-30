@@ -57,6 +57,12 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   updatingBeneficiaryId = signal<number | null>(null);
 
+  submitted = signal(false);
+
+  beneficiaryTouched = signal(false);
+  menusAmountTouched = signal(false);
+  menuPriceTouched = signal(false);
+
   ngOnInit(): void {
     this.initReport();
   }
@@ -152,6 +158,8 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   selectBeneficiary(beneficiary: BeneficiaryResponse): void {
+    this.beneficiaryTouched.set(true);
+
     this.selectedBeneficiary.set(beneficiary);
 
     this.menuPrice.set(beneficiary.menu_cost);
@@ -163,6 +171,11 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   saveBeneficiary(): void {
     const report = this.report();
+
+    this.submitted.set(true);
+    this.beneficiaryTouched.set(true);
+    this.menusAmountTouched.set(true);
+    this.menuPriceTouched.set(true);
 
     if (!report || this.loading()) return;
     if (!this.editingRecord && !this.selectedBeneficiary()) return;
@@ -216,10 +229,6 @@ export class MenuReportBeneficiariesFragmentComponent {
         },
         error: (error) => {
           this.toastService.show('Error: ' + error.error.message, 'danger');
-          this.loading.set(false);
-        },
-        complete: () => {
-          this.loading.set(false);
         },
       });
   }
@@ -300,6 +309,11 @@ export class MenuReportBeneficiariesFragmentComponent {
     this.payMethod.set('EFECTIVO');
     this.pago.set(false);
     this.entregado.set(false);
+
+    this.submitted.set(false);
+    this.beneficiaryTouched.set(false);
+    this.menusAmountTouched.set(false);
+    this.menuPriceTouched.set(false);
   }
 
   private updateBeneficiaryStatus(
@@ -363,6 +377,7 @@ export class MenuReportBeneficiariesFragmentComponent {
   clearBeneficiary(): void {
     this.selectedBeneficiary.set(null);
     this.beneficiarySearch.set('');
+    this.beneficiaryTouched.set(true);
   }
 
   private syncReportSilently(): void {
@@ -420,5 +435,65 @@ export class MenuReportBeneficiariesFragmentComponent {
         beneficiaries: report.beneficiaries.filter((item) => item.id !== recordId),
       };
     });
+  }
+
+  isRequiredValue(value: number | null | undefined): boolean {
+    return value === null || value === undefined || value === 0 || Number.isNaN(Number(value));
+  }
+
+  isPositiveNumber(value: number | null | undefined): boolean {
+    return Number(value) > 0;
+  }
+
+  isDecimalOrInteger(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    return /^\d+(\.\d+)?$/.test(String(value));
+  }
+
+  isMenusAmountInvalid(): boolean {
+    const value = this.menusAmount();
+
+    return (
+      this.isRequiredValue(value) ||
+      !this.isDecimalOrInteger(value) ||
+      !this.isPositiveNumber(value)
+    );
+  }
+
+  isMenuPriceInvalid(): boolean {
+    const value = this.menuPrice();
+
+    return (
+      this.isRequiredValue(value) ||
+      !this.isDecimalOrInteger(value) ||
+      !this.isPositiveNumber(value)
+    );
+  }
+
+  isBeneficiaryInvalid(): boolean {
+    return !this.editingRecord && !this.selectedBeneficiary();
+  }
+
+  isFormInvalid(): boolean {
+    if (this.isBeneficiaryInvalid()) return true;
+
+    if (this.isMenusAmountInvalid()) return true;
+
+    if (this.isMenuPriceInvalid()) return true;
+
+    return false;
+  }
+
+  shouldShowBeneficiaryError(): boolean {
+    return this.submitted() || this.beneficiaryTouched();
+  }
+
+  shouldShowMenusAmountError(): boolean {
+    return this.submitted() || this.menusAmountTouched();
+  }
+
+  shouldShowMenuPriceError(): boolean {
+    return this.submitted() || this.menuPriceTouched();
   }
 }

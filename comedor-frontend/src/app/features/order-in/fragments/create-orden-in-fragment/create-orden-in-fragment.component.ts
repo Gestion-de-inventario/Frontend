@@ -64,6 +64,10 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
   maxDate = signal<string>(this.getPeruEndOfYear());
 
+  submitted = signal(false);
+
+  touchedFields = signal<Set<string>>(new Set());
+
   @HostListener('document:click')
   closeDropdown(): void {
     this.openDropdown.set(null);
@@ -96,7 +100,7 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
   constructor() {
     this.initialLoading.set(true);
-    this.productService.listByStatus().subscribe({
+    this.productService.listByStatus('ACTIVO').subscribe({
       next: (products) => {
         this.productState.setProducts(products);
         this.initialLoading.set(false);
@@ -126,12 +130,14 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   }
 
   updateQuantity(index: number, quantity: number): void {
+    const parsedQuantity = Number(quantity);
+
     this.purchaseDetails.update((details) =>
       details.map((d, i) =>
         i === index
           ? {
               ...d,
-              quantity,
+              quantity: parsedQuantity,
             }
           : d,
       ),
@@ -151,12 +157,13 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   }
 
   updatePrice(index: number, unitPrice: number): void {
+    const parsedPrice = Number(unitPrice);
     this.purchaseDetails.update((details) =>
       details.map((d, i) =>
         i === index
           ? {
               ...d,
-              unitPrice,
+              unitPrice: parsedPrice,
             }
           : d,
       ),
@@ -178,6 +185,12 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   }
 
   createOrder(): void {
+    this.submitted.set(true);
+
+    if (this.isFormInvalid() || this.loading()) {
+      return;
+    }
+
     if (this.orderType() === 'COMPRA') {
       this.createPurchase();
       return;
@@ -331,6 +344,9 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
     this.date.set(this.getPeruToday());
 
+    this.submitted.set(false);
+    this.touchedFields.set(new Set());
+
     this.purchaseDetails.set([
       {
         productId: null,
@@ -374,6 +390,18 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   }
 
   isFormInvalid(): boolean {
+    if (!this.date()) {
+      return true;
+    }
+
+    if (this.date() < this.minDate()) {
+      return true;
+    }
+
+    if (this.date() > this.maxDate()) {
+      return true;
+    }
+
     if (this.purchaseDetails().length === 0) {
       return true;
     }
@@ -382,16 +410,63 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
       return true;
     }
 
-    if (this.orderType() === 'COMPRA') {
-      return this.purchaseDetails().some(
-        (d) => !d.productId || d.quantity <= 0 || d.unitPrice <= 0,
-      );
-    }
+    return this.purchaseDetails().some((detail) => {
+      if (!detail.productId) return true;
 
-    if (!this.date()) {
-      return true;
-    }
+      if (this.isQuantityInvalid(detail)) return true;
 
-    return this.purchaseDetails().some((d) => !d.productId || d.quantity <= 0);
+      if (this.orderType() === 'COMPRA' && this.isPriceInvalid(detail)) return true;
+
+      return false;
+    });
+  }
+
+  private fieldKey(index: number, field: 'product' | 'quantity' | 'unitPrice'): string {
+    return `${index}-${field}`;
+  }
+
+  markTouched(index: number, field: 'product' | 'quantity' | 'unitPrice'): void {
+    this.touchedFields.update((fields) => {
+      const copy = new Set(fields);
+      copy.add(this.fieldKey(index, field));
+      return copy;
+    });
+  }
+
+  shouldShowError(index: number, field: 'product' | 'quantity' | 'unitPrice'): boolean {
+    return this.submitted() || this.touchedFields().has(this.fieldKey(index, field));
+  }
+
+  isRequiredValue(value: number | null | undefined): boolean {
+    return value === null || value === undefined || value === 0 || Number.isNaN(Number(value));
+  }
+
+  isPositiveNumber(value: number | null | undefined): boolean {
+    return Number(value) > 0;
+  }
+
+  isDecimalOrInteger(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    const valueAsString = String(value);
+
+    return /^\d+(\.\d+)?$/.test(valueAsString);
+  }
+
+  isQuantityInvalid(detail: PurchaseDetailForm): boolean {
+    return (
+      this.isRequiredValue(detail.quantity) ||
+      !this.isDecimalOrInteger(detail.quantity) ||
+      !this.isPositiveNumber(detail.quantity)
+    );
+  }
+
+  isPriceInvalid(detail: PurchaseDetailForm): boolean {
+    return (
+      this.orderType() === 'COMPRA' &&
+      (this.isRequiredValue(detail.unitPrice) ||
+        !this.isDecimalOrInteger(detail.unitPrice) ||
+        !this.isPositiveNumber(detail.unitPrice))
+    );
   }
 }

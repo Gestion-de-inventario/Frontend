@@ -111,18 +111,32 @@
             <label class="form-label fw-bold text-muted small text-uppercase mb-1"
               >DNI <span class="text-danger">*</span></label
             >
+
             <input
               type="text"
-              class="form-control rounded-3 shadow-sm custom-input"
-              formControlName="dni"
-              placeholder="Ej. 12345678"
+              inputmode="numeric"
+              pattern="[0-9]*"
               maxlength="8"
+              class="form-control"
+              formControlName="dni"
               [class.is-invalid]="
                 manualForm.controls.dni.touched && manualForm.controls.dni.invalid
               "
             />
-            @if (manualForm.controls.dni.touched && manualForm.controls.dni.invalid) {
-              <div class="invalid-feedback small fw-medium">El DNI debe tener 8 dígitos</div>
+            @if (manualForm.controls.dni.touched && manualForm.controls.dni.hasError('required')) {
+              <div class="invalid-feedback small fw-medium">El DNI es obligatorio.</div>
+            }
+
+            @if (
+              manualForm.controls.dni.touched &&
+              (manualForm.controls.dni.hasError('minlength') ||
+                manualForm.controls.dni.hasError('maxlength'))
+            ) {
+              <div class="invalid-feedback small fw-medium">El DNI debe tener 8 dígitos.</div>
+            }
+
+            @if (manualForm.controls.dni.touched && manualForm.controls.dni.hasError('pattern')) {
+              <div class="invalid-feedback small fw-medium">El DNI debe tener solo números.</div>
             }
           </div>
 
@@ -153,8 +167,13 @@
                 manualForm.controls.name.touched && manualForm.controls.name.invalid
               "
             />
-            @if (manualForm.controls.name.touched && manualForm.controls.name.invalid) {
+            @if (
+              manualForm.controls.name.touched && manualForm.controls.name.hasError('required')
+            ) {
               <div class="invalid-feedback small fw-medium">Este campo es obligatorio</div>
+            }
+            @if (manualForm.controls.name.touched && manualForm.controls.name.hasError('pattern')) {
+              <small class="text-danger">El nombre solo debe contener letras y espacios.</small>
             }
           </div>
 
@@ -171,8 +190,17 @@
                 manualForm.controls.lastname.touched && manualForm.controls.lastname.invalid
               "
             />
-            @if (manualForm.controls.lastname.touched && manualForm.controls.lastname.invalid) {
+            @if (
+              manualForm.controls.lastname.touched &&
+              manualForm.controls.lastname.hasError('required')
+            ) {
               <div class="invalid-feedback small fw-medium">Este campo es obligatorio</div>
+            }
+            @if (
+              manualForm.controls.lastname.touched &&
+              manualForm.controls.lastname.hasError('pattern')
+            ) {
+              <small class="text-danger">El apellido solo debe contener letras y espacios.</small>
             }
           </div>
         </form>
@@ -243,21 +271,40 @@
           Ingresa el número de DNI y el sistema recuperará los datos automáticamente consultando a
           RENIEC.
         </p>
+        <form [formGroup]="reniecForm">
+          <div>
+            <label class="form-label fw-bold text-muted small text-uppercase mb-1"
+              >DNI a consultar <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control form-control-lg rounded-3 shadow-sm custom-input"
+              placeholder="Ej. 12345678"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="8"
+              formControlName="dni"
+              [class.is-invalid]="
+                reniecForm.controls.dni.touched && reniecForm.controls.dni.invalid
+              "
+            />
+            @if (reniecForm.controls.dni.touched && reniecForm.controls.dni.hasError('required')) {
+              <div class="invalid-feedback small fw-medium">El DNI es obligatorio.</div>
+            }
 
-        <div>
-          <label class="form-label fw-bold text-muted small text-uppercase mb-1"
-            >DNI a consultar <span class="text-danger">*</span></label
-          >
-          <input
-            type="text"
-            class="form-control form-control-lg rounded-3 shadow-sm custom-input"
-            placeholder="Ej. 12345678"
-            [ngModel]="dniSearch()"
-            (ngModelChange)="dniSearch.set($event)"
-            maxlength="8"
-          />
-        </div>
+            @if (
+              reniecForm.controls.dni.touched &&
+              (reniecForm.controls.dni.hasError('minlength') ||
+                reniecForm.controls.dni.hasError('maxlength'))
+            ) {
+              <div class="invalid-feedback small fw-medium">El DNI debe tener 8 dígitos.</div>
+            }
 
+            @if (reniecForm.controls.dni.touched && reniecForm.controls.dni.hasError('pattern')) {
+              <div class="invalid-feedback small fw-medium">El DNI debe tener solo números.</div>
+            }
+          </div>
+        </form>
         @if (reniecError) {
           <div
             class="alert alert-danger bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger mt-3 mb-0 p-3 rounded-3 small fw-medium d-flex align-items-start gap-2"
@@ -295,7 +342,7 @@
         </button>
         <button
           class="btn btn-primary rounded-pill py-2.5 px-4 w-100 w-sm-auto fw-medium d-flex justify-content-center align-items-center gap-2 order-1 order-sm-2"
-          [disabled]="dniSearch().length !== 8 || loading()"
+          [disabled]="reniecForm.invalid || loading()"
           (click)="createByDni()"
         >
           @if (loading()) {

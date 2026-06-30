@@ -99,33 +99,116 @@
             <form [formGroup]="form" class="row g-4">
               <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold text-dark small">DNI</label>
+
                 <input
                   type="text"
+                  inputmode="numeric"
+                  maxlength="8"
                   class="form-control custom-input"
                   formControlName="dni"
                   [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
                 />
-                @if (form.controls.dni.touched && form.controls.dni.invalid) {
-                  <small class="text-danger">El DNI debe tener 8 dígitos</small>
+
+                @if (form.controls.dni.touched && form.controls.dni.hasError('required')) {
+                  <small class="text-danger">El DNI es obligatorio.</small>
+                }
+
+                @if (
+                  form.controls.dni.touched &&
+                  (form.controls.dni.hasError('minlength') ||
+                    form.controls.dni.hasError('maxlength'))
+                ) {
+                  <small class="text-danger">El DNI debe tener 8 dígitos.</small>
+                }
+
+                @if (form.controls.dni.touched && form.controls.dni.hasError('pattern')) {
+                  <small class="text-danger">El DNI debe contener solo números.</small>
                 }
               </div>
               <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold text-dark small">Nombre</label>
-                <input type="text" class="form-control custom-input" formControlName="name" />
+
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  formControlName="name"
+                  [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+                />
+
+                @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+                  <small class="text-danger">El nombre es obligatorio.</small>
+                }
+
+                @if (
+                  form.controls.name.touched &&
+                  (form.controls.name.hasError('minlength') ||
+                    form.controls.name.hasError('maxlength'))
+                ) {
+                  <small class="text-danger">El nombre debe tener entre 2 y 70 caracteres.</small>
+                }
+
+                @if (form.controls.name.touched && form.controls.name.hasError('pattern')) {
+                  <small class="text-danger">El nombre solo debe contener letras y espacios.</small>
+                }
               </div>
               <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold text-dark small">Apellido</label>
-                <input type="text" class="form-control custom-input" formControlName="lastname" />
+
+                <input
+                  type="text"
+                  class="form-control custom-input"
+                  formControlName="lastname"
+                  [class.is-invalid]="
+                    form.controls.lastname.touched && form.controls.lastname.invalid
+                  "
+                />
+
+                @if (
+                  form.controls.lastname.touched && form.controls.lastname.hasError('required')
+                ) {
+                  <small class="text-danger">El apellido es obligatorio.</small>
+                }
+
+                @if (
+                  form.controls.lastname.touched &&
+                  (form.controls.lastname.hasError('minlength') ||
+                    form.controls.lastname.hasError('maxlength'))
+                ) {
+                  <small class="text-danger">El apellido debe tener entre 2 y 80 caracteres.</small>
+                }
+
+                @if (form.controls.lastname.touched && form.controls.lastname.hasError('pattern')) {
+                  <small class="text-danger"
+                    >El apellido solo debe contener letras y espacios.</small
+                  >
+                }
               </div>
               <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold text-dark small">Tipo de beneficiario</label>
-                <select class="form-select" formControlName="beneficiaryTypeId">
+
+                <select
+                  class="form-select"
+                  formControlName="beneficiaryTypeId"
+                  [class.is-invalid]="
+                    form.controls.beneficiaryTypeId.touched &&
+                    form.controls.beneficiaryTypeId.invalid
+                  "
+                >
+                  <option [ngValue]="null" disabled>Seleccione un tipo</option>
+
                   @for (type of beneficiaryTypes(); track type.id) {
-                    <option [value]="type.id">
+                    <option [ngValue]="type.id">
                       {{ type.name }}
                     </option>
                   }
                 </select>
+
+                @if (
+                  form.controls.beneficiaryTypeId.touched &&
+                  form.controls.beneficiaryTypeId.hasError('required')
+                ) {
+                  <small class="text-danger">Debe seleccionar un tipo de beneficiario.</small>
+                }
               </div>
             </form>
           }
@@ -172,7 +255,7 @@
           </button>
           <button
             class="btn btn-primary rounded-pill px-4 fw-medium"
-            [disabled]="loading()"
+            [disabled]="form.invalid || loading()"
             (click)="save()"
           >
             @if (loading()) {

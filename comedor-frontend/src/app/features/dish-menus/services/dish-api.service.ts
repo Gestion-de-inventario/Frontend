@@ -16,13 +16,16 @@ export class DishApiService {
   }
 
   create(request: CreateDishMenuRequest) {
-    return this.http.post<DishMenuResponse>(`${this.apiUrl}${API_ENDPOINTS.DISH_MENU.CREATE}`, request);
+    return this.http.post<DishMenuResponse>(
+      `${this.apiUrl}${API_ENDPOINTS.DISH_MENU.CREATE}`,
+      request,
+    );
   }
 
   edit(id: number, request: EditDishMenuRequest) {
     return this.http.put<DishMenuResponse>(
       `${this.apiUrl}${API_ENDPOINTS.DISH_MENU.EDIT.replace('{id}', id.toString())}`,
-      request
+      request,
     );
   }
 
@@ -30,7 +33,7 @@ export class DishApiService {
     return this.http.post<DishMenuResponse>(
       `${this.apiUrl}${API_ENDPOINTS.DISH_MENU.CHANGE_STATUS.replace('{id}', id.toString())}`,
       null,
-      { params: new HttpParams().set('estado', status) }
+      { params: new HttpParams().set('status', status) },
     );
   }
 }

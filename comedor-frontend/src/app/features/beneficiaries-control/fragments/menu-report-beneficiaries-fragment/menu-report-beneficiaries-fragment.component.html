@@ -314,7 +314,7 @@
             </svg>
           </div>
           <h5 class="modal-title fw-bold text-dark mb-0">
-            {{ editingRecord ? 'Editar beneficiario' : 'Agregar beneficiario' }}
+            {{ editingRecord ? 'Editar registro' : 'Agregar beneficiario' }}
           </h5>
           <button
             type="button"
@@ -360,6 +360,11 @@
                   </button>
                 </div>
               }
+              @if (shouldShowBeneficiaryError() && isBeneficiaryInvalid()) {
+                <div class="text-danger small fw-medium mt-2">
+                  Debe seleccionar un beneficiario.
+                </div>
+              }
             </div>
           }
 
@@ -370,11 +375,40 @@
               >
               <input
                 type="number"
+                min="0.01"
+                step="0.01"
+                inputmode="decimal"
                 class="form-control form-control-lg rounded-3 text-center fw-bold"
+                [class.is-invalid]="shouldShowMenusAmountError() && isMenusAmountInvalid()"
                 [ngModel]="menusAmount()"
-                (ngModelChange)="menusAmount.set($event)"
-                min="1"
+                (ngModelChange)="menusAmount.set($event); menusAmountTouched.set(true)"
+                (blur)="menusAmountTouched.set(true)"
               />
+
+              @if (shouldShowMenusAmountError() && isRequiredValue(menusAmount())) {
+                <div class="invalid-feedback small fw-medium">
+                  La cantidad de menús es obligatoria.
+                </div>
+              }
+
+              @if (
+                shouldShowMenusAmountError() &&
+                !isRequiredValue(menusAmount()) &&
+                !isDecimalOrInteger(menusAmount())
+              ) {
+                <div class="invalid-feedback small fw-medium">La cantidad debe ser mayor a 0.</div>
+              }
+
+              @if (
+                shouldShowMenusAmountError() &&
+                !isRequiredValue(menusAmount()) &&
+                isDecimalOrInteger(menusAmount()) &&
+                !isPositiveNumber(menusAmount())
+              ) {
+                <div class="invalid-feedback small fw-medium">
+                  La cantidad debe ser mayor que cero.
+                </div>
+              }
             </div>
             <div class="col-6">
               <label class="form-label fw-bold text-muted small text-uppercase mb-2"
@@ -382,10 +416,38 @@
               >
               <input
                 type="number"
+                min="0.01"
+                step="0.01"
+                inputmode="decimal"
                 class="form-control form-control-lg rounded-3 text-center fw-bold text-success"
+                [class.is-invalid]="shouldShowMenuPriceError() && isMenuPriceInvalid()"
                 [ngModel]="menuPrice()"
-                (ngModelChange)="menuPrice.set($event)"
+                (ngModelChange)="menuPrice.set($event); menuPriceTouched.set(true)"
+                (blur)="menuPriceTouched.set(true)"
               />
+
+              @if (shouldShowMenuPriceError() && isRequiredValue(menuPrice())) {
+                <div class="invalid-feedback small fw-medium">El precio es obligatorio.</div>
+              }
+
+              @if (
+                shouldShowMenuPriceError() &&
+                !isRequiredValue(menuPrice()) &&
+                !isDecimalOrInteger(menuPrice())
+              ) {
+                <div class="invalid-feedback small fw-medium">El precio debe ser mayor a 0.</div>
+              }
+
+              @if (
+                shouldShowMenuPriceError() &&
+                !isRequiredValue(menuPrice()) &&
+                isDecimalOrInteger(menuPrice()) &&
+                !isPositiveNumber(menuPrice())
+              ) {
+                <div class="invalid-feedback small fw-medium">
+                  El precio debe ser mayor que cero.
+                </div>
+              }
             </div>
           </div>
 
@@ -444,7 +506,7 @@
           <button
             class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm"
             style="font-size: 1rem"
-            [disabled]="loading() || (!editingRecord && !selectedBeneficiary()) || !menusAmount()"
+            [disabled]="loading() || isFormInvalid()"
             (click)="saveBeneficiary()"
           >
             @if (loading()) {

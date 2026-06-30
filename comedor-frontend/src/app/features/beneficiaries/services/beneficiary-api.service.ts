@@ -15,7 +15,7 @@ export class BeneficiaryApiService {
 
   listByStatus(status?: string) {
     let params = new HttpParams();
-    if (status) params = params.set('estado', status);
+    if (status) params = params.set('status', status);
     return this.http.get<BeneficiaryResponse[]>(
       `${this.apiUrl}${API_ENDPOINTS.BENEFICIARY.LIST_BY_STATUS}`,
       { params },
