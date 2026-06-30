@@ -115,8 +115,10 @@
             <select
               class="form-select form-select-lg rounded-3 border-light-subtle shadow-sm"
               style="font-size: 0.95rem; height: 50px"
+              [class.is-invalid]="shouldShowDishError() && !selectedDishMenuId()"
               [ngModel]="selectedDishMenuId()"
-              (ngModelChange)="selectedDishMenuId.set($event)"
+              (ngModelChange)="selectedDishMenuId.set($event); dishTouched.set(true)"
+              (blur)="dishTouched.set(true)"
             >
               <option [ngValue]="null" disabled>Seleccione una plantilla</option>
               @for (dish of dishMenus(); track dish.id) {
@@ -127,6 +129,12 @@
                 }
               }
             </select>
+
+            @if (shouldShowDishError() && !selectedDishMenuId()) {
+              <div class="invalid-feedback small fw-medium">
+                Debe seleccionar una plantilla de menú.
+              </div>
+            }
           </div>
 
           <div>
@@ -137,12 +145,42 @@
             >
             <input
               type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
               class="form-control form-control-lg rounded-3 border-light-subtle shadow-sm"
               style="font-size: 0.95rem; height: 50px"
               placeholder="Ingrese la cantidad"
+              [class.is-invalid]="shouldShowQuantityError() && isQuantityPreparedInvalid()"
               [ngModel]="quantityPrepared()"
-              (ngModelChange)="quantityPrepared.set($event)"
+              (ngModelChange)="quantityPrepared.set($event); quantityTouched.set(true)"
+              (blur)="quantityTouched.set(true)"
             />
+
+            @if (shouldShowQuantityError() && isRequiredValue(quantityPrepared())) {
+              <div class="invalid-feedback small fw-medium">La cantidad es obligatoria.</div>
+            }
+
+            @if (
+              shouldShowQuantityError() &&
+              !isRequiredValue(quantityPrepared()) &&
+              !isInteger(quantityPrepared())
+            ) {
+              <div class="invalid-feedback small fw-medium">
+                La cantidad debe ser un número entero.
+              </div>
+            }
+
+            @if (
+              shouldShowQuantityError() &&
+              !isRequiredValue(quantityPrepared()) &&
+              isInteger(quantityPrepared()) &&
+              !isPositiveNumber(quantityPrepared())
+            ) {
+              <div class="invalid-feedback small fw-medium">
+                La cantidad debe ser mayor que cero.
+              </div>
+            }
           </div>
 
           <div>
@@ -183,6 +221,11 @@
                   </div>
                 }
               </div>
+              @if (shouldShowCooksError() && selectedCooks().length === 0) {
+                <div class="text-danger small fw-medium mt-2">
+                  Debe seleccionar al menos un encargado.
+                </div>
+              }
             </div>
           </div>
           <div>
@@ -308,7 +351,7 @@
                   (click)="goToCreatePurchase()"
                   data-bs-dismiss="modal"
                 >
-                  Crear orden de compra
+                  Crear orden de entrada
                 </button>
                 <button
                   class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium"

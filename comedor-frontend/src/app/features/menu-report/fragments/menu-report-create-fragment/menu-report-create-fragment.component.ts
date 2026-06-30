@@ -33,6 +33,14 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
   private readonly iventoryOrderState = inject(InventoryOrderStateService);
+
+  submitted = signal(false);
+
+  quantityTouched = signal(false);
+  dishTouched = signal(false);
+  dateTouched = signal(false);
+  cooksTouched = signal(false);
+
   cookDisplay = (cook: UserResponse) => `${cook.name} ${cook.lastname} - DNI: ${cook.dni}`;
 
   canCreate = this.authState.hasPermission('MENU_REPORT_CREATE_REPORT');
@@ -109,6 +117,9 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
 
   createReport(): void {
+    this.submitted.set(true);
+    this.cooksTouched.set(true);
+
     if (
       !this.selectedDishMenuId() ||
       !this.quantityPrepared() ||
@@ -132,7 +143,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.toastService.show('Reporte creado', 'success');
+          this.toastService.show('Orden creada', 'success');
           this.created.set(true);
         },
         error: (err) => {
@@ -166,12 +177,15 @@ export class MenuReportCreateFragmentComponent implements OnInit {
     this.created.set(false);
 
     this.selectedDishMenuId.set(null);
-
     this.quantityPrepared.set(null);
-
     this.selectedCooks.set([]);
-
     this.createdDate.set(this.getPeruToday());
+
+    this.submitted.set(false);
+    this.quantityTouched.set(false);
+    this.dishTouched.set(false);
+    this.dateTouched.set(false);
+    this.cooksTouched.set(false);
   }
 
   openMissingStockModal(faltantes: MissingProductsResponse[]): void {
@@ -194,6 +208,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
   // Helpers de cocineras
   addCook(cook: UserResponse): void {
+    this.cooksTouched.set(true);
     this.selectedCooks.update((current) => {
       if (current.some((c) => c.user_id === cook.user_id)) {
         return current;
@@ -204,6 +219,7 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   }
 
   removeCook(cook: UserResponse) {
+    this.cooksTouched.set(true);
     this.selectedCooks.update((l) => l.filter((c) => c.user_id !== cook.user_id));
   }
 
@@ -230,14 +246,55 @@ export class MenuReportCreateFragmentComponent implements OnInit {
 
   readonly canCreateReport = computed(() => {
     if (this.creating()) return false;
+
     if (!this.selectedDishMenuId()) return false;
-    if (!this.quantityPrepared() || this.quantityPrepared()! <= 0) return false;
+
+    if (this.isQuantityPreparedInvalid()) return false;
+
     if (this.selectedCooks().length === 0) return false;
+
     if (!this.createdDate()) return false;
 
     if (this.createdDate() < this.minDate()) return false;
+
     if (this.createdDate() > this.maxDate()) return false;
 
     return true;
   });
+
+  isRequiredValue(value: number | null | undefined): boolean {
+    return value === null || value === undefined || value === 0 || Number.isNaN(Number(value));
+  }
+
+  isPositiveNumber(value: number | null | undefined): boolean {
+    return Number(value) > 0;
+  }
+
+  isInteger(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    return Number.isInteger(Number(value));
+  }
+
+  isQuantityPreparedInvalid(): boolean {
+    const value = this.quantityPrepared();
+
+    return this.isRequiredValue(value) || !this.isInteger(value) || !this.isPositiveNumber(value);
+  }
+
+  shouldShowQuantityError(): boolean {
+    return this.submitted() || this.quantityTouched();
+  }
+
+  shouldShowDishError(): boolean {
+    return this.submitted() || this.dishTouched();
+  }
+
+  shouldShowDateError(): boolean {
+    return this.submitted() || this.dateTouched();
+  }
+
+  shouldShowCooksError(): boolean {
+    return this.submitted() || this.cooksTouched();
+  }
 }

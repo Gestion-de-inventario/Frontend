@@ -32,9 +32,19 @@ export class DishCreateFragmentComponent {
   supplies: { productId: number | null; quantityNeeded: number | null }[] = [];
 
   readonly form = new FormGroup({
-    name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    name: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(80),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
+    }),
   });
+  submitted = signal(false);
 
+  touchedSupplies = signal<Set<string>>(new Set());
   constructor() {
     this.productService.listByStatus('ACTIVO').subscribe({
       next: (products) => (this.products = products),
@@ -42,7 +52,10 @@ export class DishCreateFragmentComponent {
   }
 
   addSupply(): void {
-    this.supplies.push({ productId: null, quantityNeeded: null });
+    this.supplies.push({
+      productId: null,
+      quantityNeeded: null,
+    });
   }
 
   removeSupply(index: number): void {
@@ -55,17 +68,24 @@ export class DishCreateFragmentComponent {
   }
 
   resetForm(): void {
-    this.form.reset();
+    this.form.reset({
+      name: '',
+    });
+
     this.supplies = [];
+
+    this.submitted.set(false);
+    this.touchedSupplies.set(new Set());
   }
 
   create(): void {
-    if (this.form.invalid || this.supplies.length === 0 || this.loading()) return;
-    const invalidSupplies = this.supplies.some((s) => !s.productId || !s.quantityNeeded);
-    if (invalidSupplies) {
-      this.toastService.show('Completa todos los insumos', 'warning');
+    this.submitted.set(true);
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid || this.isSuppliesInvalid() || this.loading()) {
       return;
     }
+
     this.loading.set(true);
 
     this.dishService
@@ -92,5 +112,50 @@ export class DishCreateFragmentComponent {
           this.loading.set(false);
         },
       });
+  }
+
+  private supplyFieldKey(index: number, field: 'product' | 'quantity'): string {
+    return `${index}-${field}`;
+  }
+
+  markSupplyTouched(index: number, field: 'product' | 'quantity'): void {
+    this.touchedSupplies.update((fields) => {
+      const copy = new Set(fields);
+      copy.add(this.supplyFieldKey(index, field));
+      return copy;
+    });
+  }
+
+  shouldShowSupplyError(index: number, field: 'product' | 'quantity'): boolean {
+    return this.submitted() || this.touchedSupplies().has(this.supplyFieldKey(index, field));
+  }
+  isRequiredValue(value: number | null | undefined): boolean {
+    return value === null || value === undefined || value === 0 || Number.isNaN(Number(value));
+  }
+
+  isPositiveNumber(value: number | null | undefined): boolean {
+    return Number(value) > 0;
+  }
+
+  isDecimalOrInteger(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    return /^\d+(\.\d+)?$/.test(String(value));
+  }
+
+  isSupplyQuantityInvalid(quantity: number | null): boolean {
+    return (
+      this.isRequiredValue(quantity) ||
+      !this.isDecimalOrInteger(quantity) ||
+      !this.isPositiveNumber(quantity)
+    );
+  }
+
+  isSuppliesInvalid(): boolean {
+    if (this.supplies.length === 0) return true;
+
+    return this.supplies.some(
+      (s) => !s.productId || this.isSupplyQuantityInvalid(s.quantityNeeded),
+    );
   }
 }

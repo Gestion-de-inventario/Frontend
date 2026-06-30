@@ -8,12 +8,16 @@ import { AuthStateService } from '../../services/auth-state.service';
 
 import { ButtonComponent } from '@shared/components/ui/button/button';
 
+import { ToastService } from '@shared/services/toast.service';
+
+import { ToastComponent } from '@shared/components/toast/toast.component';
+
 @Component({
   selector: 'app-login-page',
 
   standalone: true,
 
-  imports: [ReactiveFormsModule, ButtonComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, ToastComponent],
 
   templateUrl: './login.page.html',
 
@@ -21,6 +25,8 @@ import { ButtonComponent } from '@shared/components/ui/button/button';
 })
 export class LoginPage {
   private readonly authState = inject(AuthStateService);
+
+  private readonly toastService = inject(ToastService);
 
   private readonly router = inject(Router);
 
@@ -56,7 +62,8 @@ export class LoginPage {
         this.router.navigate(['/dashboard']);
       },
 
-      error: () => {
+      error: (error) => {
+        this.toastService.show(error.error.message, 'danger');
         this.isLoading.set(false);
       },
     });

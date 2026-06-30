@@ -15,12 +15,18 @@ export class ProductApiService {
 
   listByStatus(status?: string) {
     let params = new HttpParams();
-    if (status) params = params.set('estado', status);
-    return this.http.get<ProductResponse[]>(`${this.apiUrl}${API_ENDPOINTS.PRODUCT.LIST_BY_STATUS}`, { params });
+    if (status) params = params.set('status', status);
+    return this.http.get<ProductResponse[]>(
+      `${this.apiUrl}${API_ENDPOINTS.PRODUCT.LIST_BY_STATUS}`,
+      { params },
+    );
   }
 
   create(request: ProductRequest) {
-    return this.http.post<ProductResponse>(`${this.apiUrl}${API_ENDPOINTS.PRODUCT.CREATE}`, request);
+    return this.http.post<ProductResponse>(
+      `${this.apiUrl}${API_ENDPOINTS.PRODUCT.CREATE}`,
+      request,
+    );
   }
 
   edit(id: number, request: Partial<ProductRequest>) {
@@ -34,7 +40,7 @@ export class ProductApiService {
     return this.http.post<ProductResponse>(
       `${this.apiUrl}${API_ENDPOINTS.PRODUCT.CHANGE_STATUS.replace('{id}', id.toString())}`,
       null,
-      { params: new HttpParams().set('estado', status) }
+      { params: new HttpParams().set('status', status) },
     );
   }
 }

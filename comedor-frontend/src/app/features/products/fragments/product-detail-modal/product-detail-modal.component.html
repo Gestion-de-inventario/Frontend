@@ -121,7 +121,6 @@
                 }
               </div>
             </div>
-
           } @else {
             <form [formGroup]="form" class="row g-4">
               <div class="col-12">
@@ -134,16 +133,17 @@
                   <label class="form-label fw-semibold text-dark small">Categoría</label>
                   <select class="form-select custom-input" formControlName="categoryId">
                     @for (category of categories; track category.id) {
-                      <option [value]="category.id">{{ category.name }}</option>
+                      <option [ngValue]="category.id">{{ category.name }}</option>
                     }
                   </select>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold text-dark small">Etiqueta</label>
                   <select class="form-select custom-input" formControlName="tagId">
-                    <option [ngValue]="null">Sin etiqueta</option>
+                    <option [ngValue]="0">Sin etiqueta</option>
+
                     @for (tag of tags; track tag.id) {
-                      <option [value]="tag.id">{{ tag.name }}</option>
+                      <option [ngValue]="tag.id">{{ tag.name }}</option>
                     }
                   </select>
                 </div>

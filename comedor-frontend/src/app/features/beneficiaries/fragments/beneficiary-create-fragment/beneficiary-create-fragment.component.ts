@@ -31,20 +31,36 @@ export class BeneficiaryCreateFragmentComponent {
 
   loading = signal<boolean>(false);
   reniecError: string | null = null;
-  dniSearch = signal('');
+
+  readonly reniecForm = new FormGroup({
+    dni: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^[0-9]+$/),
+      ],
+    }),
+  });
 
   readonly manualForm = new FormGroup({
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(8)],
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^[0-9]+$/),
+      ],
     }),
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
     }),
     lastname: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
     }),
     beneficiaryTypeId: new FormControl<number | null>(null),
   });
@@ -84,21 +100,31 @@ export class BeneficiaryCreateFragmentComponent {
   }
 
   createByDni(): void {
-    if (this.dniSearch().length !== 8 || this.loading()) return;
+    if (this.reniecForm.invalid || this.loading()) {
+      this.reniecForm.markAllAsTouched();
+      return;
+    }
 
     this.loading.set(true);
     this.reniecError = null;
 
-    this.beneficiaryService.createByDni(this.dniSearch()).subscribe({
+    const { dni } = this.reniecForm.getRawValue();
+
+    this.beneficiaryService.createByDni(dni).subscribe({
       next: (created) => {
         this.beneficiaryState.addBeneficiary(created);
         this.toastService.show('Beneficiario registrado correctamente', 'success');
         this.resetReniec();
+
         bootstrap.Modal.getInstance(
           document.getElementById('createBeneficiaryReniecModal')!,
         )?.hide();
       },
       error: (error) => {
+        this.toastService.show(
+          error.error?.message || 'No se pudo registrar el beneficiario',
+          'danger',
+        );
         this.reniecError = error.error?.message ?? 'No se pudo registrar el beneficiario';
         this.loading.set(false);
       },
@@ -109,7 +135,10 @@ export class BeneficiaryCreateFragmentComponent {
   }
 
   resetReniec(): void {
-    this.dniSearch.set('');
+    this.reniecForm.reset({
+      dni: '',
+    });
+
     this.reniecError = null;
   }
 }

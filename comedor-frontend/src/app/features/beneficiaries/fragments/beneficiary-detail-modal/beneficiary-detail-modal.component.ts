@@ -33,14 +33,40 @@ export class BeneficiaryDetailModalComponent {
   readonly form = new FormGroup({
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(8), Validators.maxLength(8)],
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^[0-9]+$/),
+      ],
     }),
-    name: new FormControl('', { nonNullable: true }),
-    lastname: new FormControl('', { nonNullable: true }),
-    status: new FormControl('', { nonNullable: true }),
-    beneficiaryTypeId: new FormControl<number | null>(null),
-  });
 
+    name: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(70),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
+    }),
+
+    lastname: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(80),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
+    }),
+
+    status: new FormControl('', { nonNullable: true }),
+
+    beneficiaryTypeId: new FormControl<number | null>(null, {
+      validators: [Validators.required],
+    }),
+  });
   ngOnInit(): void {
     this.loadBeneficiaryTypes();
   }
@@ -76,14 +102,21 @@ export class BeneficiaryDetailModalComponent {
 
     if (!beneficiary || this.loading()) return;
 
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.loading.set(true);
+
+    const raw = this.form.getRawValue();
 
     this.beneficiaryService
       .edit(beneficiary.id, {
-        dni: this.form.value.dni || undefined,
-        name: this.form.value.name || undefined,
-        lastname: this.form.value.lastname || undefined,
-        beneficiaryTypeId: Number(this.form.value.beneficiaryTypeId) || undefined,
+        dni: raw.dni,
+        name: raw.name.trim(),
+        lastname: raw.lastname.trim(),
+        beneficiaryTypeId: Number(raw.beneficiaryTypeId),
       })
       .subscribe({
         next: (updated) => {

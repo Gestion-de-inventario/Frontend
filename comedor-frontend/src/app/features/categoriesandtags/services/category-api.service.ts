@@ -15,17 +15,17 @@ export class CategoryApiService {
 
   listByStatus(status?: string) {
     let params = new HttpParams();
-    if (status) params = params.set('estado', status);
+    if (status) params = params.set('status', status);
     return this.http.get<CategoryResponse[]>(
       `${this.apiUrl}${API_ENDPOINTS.CATEGORY.LIST_BY_STATUS}`,
-      { params }
+      { params },
     );
   }
 
   create(request: CategoryRequest) {
     return this.http.post<CategoryResponse>(
       `${this.apiUrl}${API_ENDPOINTS.CATEGORY.CREATE}`,
-      request
+      request,
     );
   }
 
@@ -33,7 +33,7 @@ export class CategoryApiService {
     return this.http.post<CategoryResponse>(
       `${this.apiUrl}${API_ENDPOINTS.CATEGORY.CHANGE_STATUS.replace('{id}', id.toString())}`,
       null,
-      { params: new HttpParams().set('estado', status) }
+      { params: new HttpParams().set('status', status) },
     );
   }
 }

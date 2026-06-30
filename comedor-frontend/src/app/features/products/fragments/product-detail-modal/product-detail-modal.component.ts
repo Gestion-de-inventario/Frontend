@@ -54,13 +54,18 @@ export class ProductDetailModalComponent {
     const product = this.product();
     if (!product) return;
 
+    this.form.reset();
+
     this.form.patchValue({
       name: product.name,
-      categoryId: product.categoryId,
-      tagId: product.tagId,
-      unit: product.unit,
-      reorderPoint: product.reorderPoint,
+      categoryId: Number(product.categoryId),
+      tagId: product.tagId ?? 0,
+      unit: this.normalizeUnit(product.unit),
+      reorderPoint: Number(product.reorderPoint),
     });
+
+    console.log('Producto:', product);
+    console.log('Formulario parcheado:', this.form.getRawValue());
 
     this.mode = 'edit';
   }
@@ -75,13 +80,15 @@ export class ProductDetailModalComponent {
 
     this.loading.set(true);
 
+    const raw = this.form.getRawValue();
+
     this.productService
       .edit(product.id, {
-        name: this.form.value.name ?? undefined,
-        categoryId: this.form.value.categoryId ?? undefined,
-        tagId: this.form.value.tagId ?? undefined,
-        unit: this.form.value.unit ?? undefined,
-        reorderPoint: this.form.value.reorderPoint ?? undefined,
+        name: raw.name ?? undefined,
+        categoryId: raw.categoryId ?? undefined,
+        tagId: raw.tagId ?? 0,
+        unit: raw.unit ?? undefined,
+        reorderPoint: raw.reorderPoint ?? undefined,
       })
       .subscribe({
         next: (updated) => {
@@ -126,5 +133,22 @@ export class ProductDetailModalComponent {
   close(): void {
     this.mode = 'view';
     this.productState.clearSelectedProduct();
+  }
+
+  private normalizeUnit(unit: string | null | undefined): string | null {
+    if (!unit) return null;
+
+    const unitMap: Record<string, string> = {
+      KG: 'KILOGRAMOS',
+      KILOGRAMOS: 'KILOGRAMOS',
+
+      L: 'LITROS',
+      LITROS: 'LITROS',
+
+      UNIDAD: 'UNIDADES',
+      UNIDADES: 'UNIDADES',
+    };
+
+    return unitMap[unit] ?? unit;
   }
 }
