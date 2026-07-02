@@ -125,7 +125,13 @@
             <form [formGroup]="form" class="row g-4">
               <div class="col-12">
                 <label class="form-label fw-semibold text-dark small">Nombre</label>
-                <input type="text" class="form-control custom-input" formControlName="name" />
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="name"
+                  (input)="onNameInput($event, 'name')"
+                />
+
               </div>
 
               @if (!tieneTransacciones) {
@@ -188,6 +194,12 @@
                   class="form-control custom-input"
                   formControlName="reorderPoint"
                 />
+                @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('min')) {
+                  <div class="invalid-feedback d-block">Ingrese un valor mayor o igual a 1.</div>
+                }
+                @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('required')) {
+                  <div class="invalid-feedback d-block">El punto de reorden es obligatorio.</div>
+                }
               </div>
             </form>
           }

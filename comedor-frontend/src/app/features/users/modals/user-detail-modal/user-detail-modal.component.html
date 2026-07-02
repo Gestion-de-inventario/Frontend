@@ -125,9 +125,9 @@
                 <label class="form-label fw-semibold text-dark small">Nombre</label>
                 <input
                   type="text"
-                  class="form-control custom-input"
+                  class="form-control"
                   formControlName="name"
-                  [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
+                  (input)="onNameInput($event, 'name')"
                 />
                 @if (form.controls.name.touched && form.controls.name.invalid) {
                   <small class="text-danger">Este campo es obligatorio</small>
@@ -137,11 +137,9 @@
                 <label class="form-label fw-semibold text-dark small">Apellido</label>
                 <input
                   type="text"
-                  class="form-control custom-input"
+                  class="form-control"
                   formControlName="lastname"
-                  [class.is-invalid]="
-                    form.controls.lastname.touched && form.controls.lastname.invalid
-                  "
+                  (input)="onNameInput($event, 'lastname')"
                 />
                 @if (form.controls.lastname.touched && form.controls.lastname.invalid) {
                   <small class="text-danger">Este campo es obligatorio</small>
@@ -151,8 +149,11 @@
                 <label class="form-label fw-semibold text-dark small">DNI</label>
                 <input
                   type="text"
-                  class="form-control custom-input"
+                  inputmode="numeric"
+                  class="form-control"
                   formControlName="dni"
+                  maxlength="8"
+                  (input)="onDniInput($event)"
                   [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
                 />
                 @if (form.controls.dni.touched && form.controls.dni.invalid) {

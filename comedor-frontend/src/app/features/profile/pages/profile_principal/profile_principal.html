@@ -209,6 +209,8 @@
         </div>
       </div>
     }
+
+    
     <!-- MODAL EDITAR DATOS -->
     <div class="modal fade" id="editProfileModal" tabindex="-1" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
@@ -242,21 +244,32 @@
             <form [formGroup]="editForm" class="d-flex flex-column gap-3">
               <div>
                 <label class="form-label fw-semibold text-dark small">Nombre</label>
-                <input type="text" class="form-control" formControlName="name" />
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="name"
+                  (input)="onNameInput($event, 'name')"
+                />
               </div>
               <div>
                 <label class="form-label fw-semibold text-dark small">Apellido</label>
-                <input type="text" class="form-control" formControlName="lastname" />
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="lastname"
+                  (input)="onNameInput($event, 'lastname')"
+                />
               </div>
               <div>
                 <label class="form-label fw-semibold text-dark small">DNI</label>
                 <input
                   type="text"
+                  inputmode="numeric"
                   class="form-control"
                   formControlName="dni"
-                  [class.is-invalid]="
-                    editForm.controls.dni.touched && editForm.controls.dni.invalid
-                  "
+                  maxlength="8"
+                  (input)="onDniInput($event)"
+                  [class.is-invalid]="editForm.controls.dni.touched && editForm.controls.dni.invalid"
                 />
                 @if (editForm.controls.dni.touched && editForm.controls.dni.invalid) {
                   <small class="text-danger">El DNI debe tener 8 dígitos</small>
@@ -290,6 +303,8 @@
         </div>
       </div>
     </div>
+
+
     <!-- MODAL CAMBIAR CONTRASEÑA -->
     <div class="modal fade" id="changePasswordModal" tabindex="-1" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">

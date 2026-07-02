@@ -32,7 +32,7 @@ export class ProductCreateFragmentComponent {
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
     }),
     categoryId: new FormControl<number | null>(null, {
       validators: [Validators.required],
@@ -42,7 +42,7 @@ export class ProductCreateFragmentComponent {
       validators: [Validators.required],
     }),
     reorderPoint: new FormControl<number | null>(null, {
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.min(1)],
     }),
   });
 
@@ -102,5 +102,13 @@ export class ProductCreateFragmentComponent {
           this.loading.set(false);
         },
       });
+  }
+
+  onNameInput(event: Event, controlName: 'name'): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+    if (cleaned !== input.value) {
+      this.form.controls[controlName].setValue(cleaned, { emitEvent: false });
+    }
   }
 }

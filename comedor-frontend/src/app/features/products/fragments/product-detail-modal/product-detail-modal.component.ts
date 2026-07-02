@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -34,11 +34,16 @@ export class ProductDetailModalComponent {
   tags: TagResponse[] = [];
 
   readonly form = new FormGroup({
-    name: new FormControl<string | null>(null),
+    name: new FormControl<string | null>('',{
+        nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]
+    }),
     categoryId: new FormControl<number | null>(null),
     tagId: new FormControl<number | null>(null),
     unit: new FormControl<string | null>(null),
-    reorderPoint: new FormControl<number | null>(null),
+    reorderPoint: new FormControl<number | null>(null,{
+        validators: [Validators.required, Validators.min(1)],
+    }),
   });
 
   constructor() {
@@ -151,4 +156,13 @@ export class ProductDetailModalComponent {
 
     return unitMap[unit] ?? unit;
   }
+
+  onNameInput(event: Event, controlName: 'name'): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+    if (cleaned !== input.value) {
+      this.form.controls[controlName].setValue(cleaned, { emitEvent: false });
+    }
+  }
+
 }

@@ -47,18 +47,18 @@
       </div>
 
       <div class="modal-body px-4 px-md-5 py-4">
+
         <form [formGroup]="form" class="row g-4">
           <div class="col-12">
             <label class="form-label fw-semibold text-dark small"
               >Nombre del Producto <span class="text-danger">*</span></label
             >
             <input
-              type="text"
-              class="form-control custom-input"
-              formControlName="name"
-              placeholder="Ej. Arroz Costeño"
-              [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
-            />
+                type="text"
+                class="form-control"
+                formControlName="name"
+                (input)="onNameInput($event, 'name')"
+              />
 
             @if (form.controls.name.touched && form.controls.name.invalid) {
               <div class="invalid-feedback d-block">El nombre del producto es obligatorio.</div>
@@ -130,9 +130,13 @@
                 form.controls.reorderPoint.touched && form.controls.reorderPoint.invalid
               "
             />
-            @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.invalid) {
-              <div class="invalid-feedback d-block">Ingrese un valor de alerta.</div>
+            @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('min')) {
+              <div class="invalid-feedback d-block">Ingrese un valor mayor o igual a 1.</div>
             }
+            @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('required')) {
+              <div class="invalid-feedback d-block">El punto de reorden es obligatorio.</div>
+            }
+
           </div>
         </form>
       </div>

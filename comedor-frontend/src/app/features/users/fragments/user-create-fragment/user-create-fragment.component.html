@@ -44,6 +44,7 @@
               class="form-control rounded-3 shadow-sm custom-input"
               formControlName="name"
               placeholder="Ej. Juan"
+              (input)="onNameInput($event, 'name')"
               [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
             />
             @if (form.controls.name.touched && form.controls.name.invalid) {
@@ -58,6 +59,7 @@
               class="form-control rounded-3 shadow-sm custom-input"
               formControlName="lastname"
               placeholder="Ej. Pérez"
+              (input)="onNameInput($event, 'lastname')"
               [class.is-invalid]="form.controls.lastname.touched && form.controls.lastname.invalid"
             />
             @if (form.controls.lastname.touched && form.controls.lastname.invalid) {
@@ -69,10 +71,12 @@
             <label class="form-label fw-bold text-muted small text-uppercase mb-1">DNI <span class="text-danger">*</span></label>
             <input
               type="text"
+              inputmode="numeric"
               class="form-control rounded-3 shadow-sm custom-input"
               formControlName="dni"
               placeholder="8 dígitos numéricos"
               maxlength="8"
+              (input)="onDniInput($event)"
               [class.is-invalid]="form.controls.dni.touched && form.controls.dni.invalid"
             />
             @if (form.controls.dni.touched && form.controls.dni.invalid) {
