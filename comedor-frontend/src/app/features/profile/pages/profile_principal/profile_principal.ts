@@ -51,11 +51,17 @@ export class ProfilePrincipal implements OnInit {
   logoReading = signal(false);
 
   readonly editForm = new FormGroup({
-    name: new FormControl('', { nonNullable: true }),
-    lastname: new FormControl('', { nonNullable: true }),
+    name: new FormControl('', { 
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]
+     }),
+    lastname: new FormControl('', { 
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]
+     }),
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.minLength(8), Validators.maxLength(8)],
+      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)],
     }),
   });
 
@@ -265,5 +271,21 @@ export class ProfilePrincipal implements OnInit {
           this.loadingEmpresaConfig.set(false);
         },
       });
+  }
+
+  onDniInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = input.value.replace(/[^0-9]/g, '').slice(0, 8);
+    if (cleaned !== input.value) {
+      this.editForm.controls.dni.setValue(cleaned, { emitEvent: false });
+    }
+  }
+
+  onNameInput(event: Event, controlName: 'name' | 'lastname'): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+    if (cleaned !== input.value) {
+      this.editForm.controls[controlName].setValue(cleaned, { emitEvent: false });
+    }
   }
 }

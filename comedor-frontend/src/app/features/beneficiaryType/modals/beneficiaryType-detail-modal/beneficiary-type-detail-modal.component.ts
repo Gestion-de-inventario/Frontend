@@ -33,7 +33,7 @@ export class BeneficiaryTypeDetailModalComponent {
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50)],
     }),
 
     desc: new FormControl('', {
@@ -42,7 +42,7 @@ export class BeneficiaryTypeDetailModalComponent {
     }),
 
     menu_cost: new FormControl<number | null>(null, {
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.min(0)],
     }),
   });
 
@@ -132,4 +132,5 @@ export class BeneficiaryTypeDetailModalComponent {
 
     this.state.clearSelectedType();
   }
+
 }
