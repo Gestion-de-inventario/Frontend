@@ -314,7 +314,7 @@
             </svg>
           </div>
           <h5 class="modal-title fw-bold text-dark mb-0">
-            {{ editingRecord ? 'Editar registro' : 'Agregar beneficiario' }}
+            {{ editingRecord ? 'Editar registro' : 'Agregar registro' }}
           </h5>
           <button
             type="button"
@@ -374,14 +374,15 @@
                 >Cant. Menús <span class="text-danger">*</span></label
               >
               <input
-                type="number"
-                min="0.01"
-                step="0.01"
-                inputmode="decimal"
+                type="text"
+                inputmode="numeric"
+                maxlength="5"
+                pattern="[0-9]*"
                 class="form-control form-control-lg rounded-3 text-center fw-bold"
                 [class.is-invalid]="shouldShowMenusAmountError() && isMenusAmountInvalid()"
                 [ngModel]="menusAmount()"
                 (ngModelChange)="menusAmount.set($event); menusAmountTouched.set(true)"
+                (input)="limitQuantityDigits($event)"
                 (blur)="menusAmountTouched.set(true)"
               />
 
