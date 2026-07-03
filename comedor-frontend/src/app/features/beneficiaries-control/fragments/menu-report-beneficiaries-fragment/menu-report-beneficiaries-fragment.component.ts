@@ -496,4 +496,13 @@ export class MenuReportBeneficiariesFragmentComponent {
   shouldShowMenuPriceError(): boolean {
     return this.submitted() || this.menuPriceTouched();
   }
+  limitQuantityDigits(event: Event): void {
+    this.menusAmountTouched.set(true);
+
+    const input = event.target as HTMLInputElement;
+
+    input.value = input.value.replace(/\D/g, '').slice(0, 5);
+
+    this.menusAmount.set(input.value ? Number(input.value) : null);
+  }
 }

@@ -82,6 +82,21 @@
   }
 }
 
+.sidebar-link.active {
+  background: var(--color-primary, #2d2692);
+  color: #ffffff;
+}
+
+.sidebar-link.active svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+.sidebar-link.active:hover {
+  background: var(--color-primary, #2d2692);
+  color: #ffffff;
+}
+
 /* Botón de Logout */
 .logout-btn {
   min-height: 44px;

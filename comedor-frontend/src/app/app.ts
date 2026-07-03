@@ -16,9 +16,17 @@ export class App {
   ngOnInit(): void {
     this.authState.initAuth().subscribe({
       complete: () => {
+        const currentUrl = this.router.url;
+
         if (this.authState.isAuthenticated()) {
-          this.router.navigateByUrl('/dashboard', { replaceUrl: true });
-        } else {
+          if (currentUrl === '/' || currentUrl === '/login') {
+            this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+          }
+
+          return;
+        }
+
+        if (currentUrl !== '/login') {
           this.router.navigateByUrl('/login', { replaceUrl: true });
         }
       },

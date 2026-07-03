@@ -144,16 +144,16 @@
               >Cantidad a preparar *</label
             >
             <input
-              type="number"
-              min="1"
-              step="1"
+              type="text"
               inputmode="numeric"
+              maxlength="5"
+              pattern="[0-9]*"
               class="form-control form-control-lg rounded-3 border-light-subtle shadow-sm"
               style="font-size: 0.95rem; height: 50px"
               placeholder="Ingrese la cantidad"
               [class.is-invalid]="shouldShowQuantityError() && isQuantityPreparedInvalid()"
               [ngModel]="quantityPrepared()"
-              (ngModelChange)="quantityPrepared.set($event); quantityTouched.set(true)"
+              (input)="limitQuantityDigits($event)"
               (blur)="quantityTouched.set(true)"
             />
 

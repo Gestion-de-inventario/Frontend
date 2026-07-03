@@ -297,4 +297,14 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   shouldShowCooksError(): boolean {
     return this.submitted() || this.cooksTouched();
   }
+
+  limitQuantityDigits(event: Event): void {
+    this.quantityTouched.set(true);
+
+    const input = event.target as HTMLInputElement;
+
+    input.value = input.value.replace(/\D/g, '').slice(0, 5);
+
+    this.quantityPrepared.set(input.value ? Number(input.value) : null);
+  }
 }

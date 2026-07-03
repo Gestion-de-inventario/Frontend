@@ -86,7 +86,12 @@
       >Módulos</small
     >
     @if (authState.hasPermission('DASHBOARD_VIEW')) {
-      <a id="tour-dashboard" class="sidebar-link" (click)="navigateAndClose('/dashboard')">
+      <a
+        id="tour-dashboard"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/dashboard')"
+        (click)="navigateAndClose('/dashboard')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
             stroke-linecap="round"
@@ -99,7 +104,12 @@
     }
 
     @if (authState.hasPermission('MENU_REPORT_LIST_ALL')) {
-      <a id="tour-menu-report" class="sidebar-link" (click)="navigateAndClose('/menu-report')">
+      <a
+        id="tour-menu-report"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/menu-report')"
+        (click)="navigateAndClose('/menu-report')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path d="M2 12h20" />
           <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" />
@@ -114,6 +124,7 @@
       <a
         id="tour-control-salida"
         class="sidebar-link"
+        [class.active]="isActiveRoute('/beneficiaries-control')"
         (click)="navigateAndClose('/beneficiaries-control')"
       >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
@@ -128,7 +139,12 @@
     }
 
     @if (authState.hasPermission('CREATE_ORDER_IN')) {
-      <a id="tour-entrada" class="sidebar-link" (click)="navigateAndClose('/purchase-order')">
+      <a
+        id="tour-entrada"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/purchase-order')"
+        (click)="navigateAndClose('/purchase-order')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path d="m15 11-1 9" />
           <path d="m19 11-4-7" />
@@ -152,7 +168,12 @@
       authState.hasPermission('BENEFICIARY_TYPE_LIST_BY_STATUS') ||
       authState.hasPermission('BENEFICIARY_TYPE_CREATE')
     ) {
-      <a id="tour-usuarios" class="sidebar-link" (click)="navigateAndClose('/management')">
+      <a
+        id="tour-usuarios"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/management')"
+        (click)="navigateAndClose('/management')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
             stroke-linecap="round"
@@ -170,7 +191,12 @@
       authState.hasPermission('CATEGORY_LIST_BY_STATUS') ||
       authState.hasPermission('TAG_LIST_BY_STATUS')
     ) {
-      <a id="tour-inventario" class="sidebar-link" (click)="navigateAndClose('/inventory')">
+      <a
+        id="tour-inventario"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/inventory')"
+        (click)="navigateAndClose('/inventory')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
             stroke-linecap="round"
@@ -183,7 +209,12 @@
     }
 
     @if (authState.hasPermission('ROLE_LIST_BY_STATUS')) {
-      <a id="tour-roles" class="sidebar-link" (click)="navigateAndClose('/roles')">
+      <a
+        id="tour-roles"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/roles')"
+        (click)="navigateAndClose('/roles')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
             stroke-linecap="round"
@@ -201,7 +232,12 @@
       authState.hasPermission('MENU_REPORT_GET_BY_DATE') ||
       authState.hasPermission('MENU_REPORT_EXPORT')
     ) {
-      <a id="tour-reportes" class="sidebar-link" (click)="navigateAndClose('/reports')">
+      <a
+        id="tour-reportes"
+        class="sidebar-link"
+        [class.active]="isActiveRoute('/reports')"
+        (click)="navigateAndClose('/reports')"
+      >
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
             stroke-linecap="round"

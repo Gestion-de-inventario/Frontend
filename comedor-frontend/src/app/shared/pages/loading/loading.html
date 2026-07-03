@@ -1,13 +1,13 @@
-<div class="min-vh-100 d-flex justify-content-center align-items-center">
-  <div class="text-center">
+<div class="session-loading-overlay">
+  <div class="session-loading-card text-center">
     @if (!authState.backendOffline()) {
       <div class="spinner-border mb-3"></div>
 
-      <h5>Verificando sesión...</h5>
+      <h5 class="mb-1">Verificando sesión...</h5>
 
-      <p class="text-muted">Espere un momento.</p>
+      <p class="text-muted mb-0">Espere un momento.</p>
     } @else {
-      <div class="alert alert-warning text-start">
+      <div class="alert alert-warning text-start mb-0">
         <h5>Servidor iniciándose</h5>
 
         <p class="mb-3">

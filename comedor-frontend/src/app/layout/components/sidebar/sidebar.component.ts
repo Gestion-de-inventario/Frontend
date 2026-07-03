@@ -92,4 +92,14 @@ export class SidebarComponent implements AfterViewInit {
       error: () => this.router.navigateByUrl('/login', { replaceUrl: true }),
     });
   }
+
+  isActiveRoute(path: string): boolean {
+    const currentUrl = this.router.url.split('?')[0];
+
+    if (path === '/dashboard') {
+      return currentUrl === '/dashboard';
+    }
+
+    return currentUrl === path || currentUrl.startsWith(`${path}/`);
+  }
 }
