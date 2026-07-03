@@ -1,7 +1,7 @@
 import { Component, inject, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
-import { TourModalComponent } from '../tour-modal/tour-modal.component'; 
+import { TourModalComponent } from '../tour-modal/tour-modal.component';
 
 declare const bootstrap: any;
 
@@ -37,14 +37,14 @@ export class SidebarComponent implements AfterViewInit {
     });
 
     setTimeout(() => {
-      const userId = this.authState.session()?.id;
-      if (userId) {
-        const yaVio = localStorage.getItem(`tour_completado_${userId}`);
-        if (!yaVio) {
-          this.tourModal.abrir();
-        }
-      }
+      this.abrirTourInicialSiCorresponde();
     }, 800);
+
+    window.addEventListener('password-modal-closed', () => {
+      setTimeout(() => {
+        this.abrirTourInicialSiCorresponde(true);
+      }, 300);
+    });
   }
 
   iniciarTour(): void {
@@ -68,6 +68,20 @@ export class SidebarComponent implements AfterViewInit {
       if (offcanvas) {
         offcanvas.hide();
       }
+    }
+  }
+
+  private abrirTourInicialSiCorresponde(ignorarPasswordPendiente = false): void {
+    const session = this.authState.session();
+
+    if (!session) return;
+
+    if (!ignorarPasswordPendiente && session.passwordChanged === false) return;
+
+    const yaVio = localStorage.getItem(`tour_completado_${session.id}`);
+
+    if (!yaVio) {
+      this.tourModal.abrir();
     }
   }
 

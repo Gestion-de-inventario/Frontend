@@ -48,6 +48,8 @@ export class RoleDetailModalComponent {
 
   loading = signal<boolean>(false);
 
+  initalLoading = signal<boolean>(false);
+
   permissions: PermissionResponse[] = [];
 
   selectedPermissions: string[] = [];
@@ -99,7 +101,7 @@ export class RoleDetailModalComponent {
 
     this.permissionSearch = '';
 
-    this.loading.apply(true);
+    this.loading.set(true);
 
     this.permissionService.getAllPermissions().subscribe({
       next: (permissions) => {
@@ -120,11 +122,11 @@ export class RoleDetailModalComponent {
           permissions,
         }));
 
-        this.loading.apply(false);
+        this.loading.set(false);
       },
       error: (error) => {
         this.toastService.show(error.error?.message || 'Error al cargar permisos', 'danger');
-        this.loading.apply(false);
+        this.loading.set(false);
         this.mode = 'view';
       },
     });
@@ -165,7 +167,7 @@ export class RoleDetailModalComponent {
       return;
     }
 
-    this.loading.apply(true);
+    this.loading.set(true);
 
     this.roleService.changeStatus(role.role_id, status).subscribe({
       next: (updated) => {
@@ -179,11 +181,11 @@ export class RoleDetailModalComponent {
 
       error: (error) => {
         this.toastService.show('No se pudo cambiar el estado: ' + error.error.message, 'danger');
-        this.loading.apply(false);
+        this.loading.set(false);
       },
 
       complete: () => {
-        this.loading.apply(false);
+        this.loading.set(false);
       },
     });
   }
@@ -195,7 +197,7 @@ export class RoleDetailModalComponent {
       return;
     }
 
-    this.loading.apply(true);
+    this.loading.set(true);
 
     this.roleService
       .assignPermissions(role.role_id, {
@@ -206,16 +208,16 @@ export class RoleDetailModalComponent {
           this.roleState.updateRole(updatedRole);
           this.toastService.show('Permisos actualizados', 'success');
           this.mode = 'view';
-          this.loading.apply(false);
+          this.loading.set(false);
         },
 
         error: (error) => {
           this.toastService.show(error.error.message, 'danger');
-          this.loading.apply(false);
+          this.loading.set(false);
         },
 
         complete: () => {
-          this.loading.apply(false);
+          this.loading.set(false);
         },
       });
   }
@@ -231,7 +233,7 @@ export class RoleDetailModalComponent {
       return;
     }
 
-    this.loading.apply(true);
+    this.loading.set(true);
 
     this.roleService.editRole(role.role_id, this.form.getRawValue()).subscribe({
       next: (updatedRole) => {
@@ -244,11 +246,11 @@ export class RoleDetailModalComponent {
 
       error: (error) => {
         this.toastService.show(error.error.message, 'danger');
-        this.loading.apply(false);
+        this.loading.set(false);
       },
 
       complete: () => {
-        this.loading.apply(false);
+        this.loading.set(false);
       },
     });
   }
@@ -257,5 +259,30 @@ export class RoleDetailModalComponent {
     this.mode = 'view';
 
     this.roleState.clearSelectedRole();
+  }
+  matchesPermissionSearch(permission: PermissionResponse): boolean {
+    const term = this.permissionSearch.trim().toLowerCase();
+
+    if (!term) return true;
+
+    return (
+      permission.code.toLowerCase().includes(term) ||
+      permission.description?.toLowerCase().includes(term) ||
+      permission.module?.toLowerCase().includes(term)
+    );
+  }
+
+  filteredPermissionGroups(): {
+    module: string;
+    permissions: PermissionResponse[];
+  }[] {
+    return this.permissionGroups
+      .map((group) => ({
+        module: group.module,
+        permissions: group.permissions.filter((permission) =>
+          this.matchesPermissionSearch(permission),
+        ),
+      }))
+      .filter((group) => group.permissions.length > 0);
   }
 }

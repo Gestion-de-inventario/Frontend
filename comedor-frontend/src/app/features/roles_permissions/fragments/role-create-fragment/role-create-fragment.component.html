@@ -51,39 +51,111 @@
               placeholder="Ej: PRESIDENTA, SOCIA, COCINERA..."
               [class.is-invalid]="form.controls.name.touched && form.controls.name.invalid"
             />
-            @if (form.controls.name.touched && form.controls.name.invalid) {
-              <small class="text-danger">Este campo es obligatorio</small>
+            @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+              <div class="invalid-feedback small fw-medium">El nombre del rol es obligatorio.</div>
+            }
+            @if (form.controls.name.touched && form.controls.name.hasError('pattern')) {
+              <div class="invalid-feedback small fw-medium">
+                El nombre solo debe contener letras, números, espacios, guiones y guion bajo.
+              </div>
             }
           </div>
 
           <div>
             <label class="form-label fw-semibold text-dark small">Permisos</label>
-            <div class="permissions-container">
-              @for (permission of permissions; track permission.code) {
-                <div class="permission-card border rounded-3 p-3">
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      [id]="'permission-' + permission.code"
-                      (change)="onPermissionChange($event, permission.code)"
-                    />
-                    <label
-                      class="form-check-label fw-semibold small"
-                      [for]="'permission-' + permission.code"
-                    >
-                      {{ permission.code }}
-                    </label>
-                  </div>
-                  <div class="mt-1">
-                    <span class="badge bg-primary bg-opacity-10 text-primary border fw-normal">{{
-                      permission.module
-                    }}</span>
-                  </div>
-                  <small class="text-muted d-block mt-1">{{ permission.description }}</small>
+
+            <input
+              type="text"
+              class="form-control mb-3"
+              placeholder="Buscar permiso..."
+              [(ngModel)]="permissionSearch"
+              [ngModelOptions]="{ standalone: true }"
+            />
+
+            @if (permissionsLoading()) {
+              <div class="text-muted small d-flex align-items-center gap-2">
+                <span class="spinner-border spinner-border-sm"></span>
+                Cargando permisos...
+              </div>
+            } @else {
+              @if (filteredPermissionGroups().length === 0) {
+                <div class="alert alert-warning rounded-3 small mb-0">
+                  No existe ningún permiso que coincida con la búsqueda.
+                </div>
+              } @else {
+                <div class="accordion" id="createPermissionsAccordion">
+                  @for (group of filteredPermissionGroups(); track group.module; let i = $index) {
+                    <div class="accordion-item">
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          [attr.data-bs-target]="'#create-collapse-' + i"
+                        >
+                          <div class="d-flex align-items-center gap-3">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isModuleSelected(group.permissions)"
+                              (click)="$event.stopPropagation()"
+                              (change)="
+                                toggleModule(group.permissions, $any($event.target).checked)
+                              "
+                            />
+
+                            <strong>{{ group.module }}</strong>
+
+                            <span class="badge bg-light text-dark border">
+                              {{ group.permissions.length }}
+                            </span>
+                          </div>
+                        </button>
+                      </h2>
+
+                      <div
+                        class="accordion-collapse collapse"
+                        [id]="'create-collapse-' + i"
+                        data-bs-parent="#createPermissionsAccordion"
+                      >
+                        <div class="accordion-body d-flex flex-column gap-3">
+                          @for (permission of group.permissions; track permission.code) {
+                            @if (matchesPermissionSearch(permission)) {
+                              <div class="permission-item border rounded-3 p-3">
+                                <div class="form-check">
+                                  <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    [id]="permissionInputId(permission)"
+                                    [checked]="isPermissionSelected(permission.code)"
+                                    (change)="togglePermission(permission.code)"
+                                  />
+
+                                  <label
+                                    class="form-check-label fw-bold"
+                                    [for]="permissionInputId(permission)"
+                                  >
+                                    {{ permission.code }}
+                                  </label>
+                                </div>
+
+                                <small class="text-muted d-block mt-1">
+                                  {{ permission.description }}
+                                </small>
+                              </div>
+                            }
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  } @empty {
+                    <div class="alert alert-warning rounded-3 small mb-0">
+                      No hay permisos disponibles.
+                    </div>
+                  }
                 </div>
               }
-            </div>
+            }
           </div>
         </form>
       </div>
