@@ -1,6 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
 
@@ -21,7 +27,7 @@ declare const bootstrap: any;
 
   standalone: true,
 
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
 
   templateUrl: './role-create-fragment.component.html',
 
@@ -38,12 +44,21 @@ export class RoleCreateFragmentComponent {
 
   permissions: PermissionResponse[] = [];
 
+  permissionGroups: {
+    module: string;
+    permissions: PermissionResponse[];
+  }[] = [];
+
+  permissionSearch = '';
+
   loading = signal<boolean>(false);
+
+  permissionsLoading = signal<boolean>(false);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s_ -]+$/)],
     }),
 
     permissions: new FormControl<string[]>([], {
@@ -56,9 +71,42 @@ export class RoleCreateFragmentComponent {
   }
 
   loadPermissions(): void {
+    this.permissionsLoading.set(true);
+
     this.permissionService.getAllPermissions().subscribe({
       next: (permissions) => {
-        this.permissions = permissions;
+        this.permissions = permissions.filter((permission) => !!permission.code);
+
+        const grouped = this.permissions.reduce(
+          (acc, permission) => {
+            const module = permission.module || 'Sin módulo';
+
+            if (!acc[module]) {
+              acc[module] = [];
+            }
+
+            acc[module].push(permission);
+
+            return acc;
+          },
+          {} as Record<string, PermissionResponse[]>,
+        );
+
+        this.permissionGroups = Object.entries(grouped).map(([module, permissions]) => ({
+          module,
+          permissions,
+        }));
+        this.permissionsLoading.set(false);
+      },
+      error: (error) => {
+        this.toastService.show(
+          error.error?.message || 'No se pudieron cargar los permisos',
+          'danger',
+        );
+        this.permissionsLoading.set(false);
+      },
+      complete: () => {
+        this.permissionsLoading.set(false);
       },
     });
   }
@@ -83,18 +131,87 @@ export class RoleCreateFragmentComponent {
     this.form.controls.permissions.setValue(currentPermissions.filter((p) => p !== permission));
   }
 
+  togglePermission(permissionCode: string): void {
+    const currentPermissions = this.form.controls.permissions.value;
+
+    if (currentPermissions.includes(permissionCode)) {
+      this.form.controls.permissions.setValue(
+        currentPermissions.filter((permission) => permission !== permissionCode),
+      );
+
+      return;
+    }
+
+    this.form.controls.permissions.setValue([...new Set([...currentPermissions, permissionCode])]);
+  }
+
+  toggleModule(modulePermissions: PermissionResponse[], checked: boolean): void {
+    const codes = modulePermissions.map((permission) => permission.code);
+
+    const currentPermissions = this.form.controls.permissions.value;
+
+    if (checked) {
+      this.form.controls.permissions.setValue([...new Set([...currentPermissions, ...codes])]);
+
+      return;
+    }
+
+    this.form.controls.permissions.setValue(
+      currentPermissions.filter((permission) => !codes.includes(permission)),
+    );
+  }
+
+  isModuleSelected(modulePermissions: PermissionResponse[]): boolean {
+    const currentPermissions = this.form.controls.permissions.value;
+
+    return modulePermissions.every((permission) => currentPermissions.includes(permission.code));
+  }
+
+  isPermissionSelected(permissionCode: string): boolean {
+    return this.form.controls.permissions.value.includes(permissionCode);
+  }
+
+  matchesPermissionSearch(permission: PermissionResponse): boolean {
+    const term = this.permissionSearch.trim().toLowerCase();
+
+    if (!term) return true;
+
+    return (
+      permission.code.toLowerCase().includes(term) ||
+      permission.description?.toLowerCase().includes(term) ||
+      permission.module?.toLowerCase().includes(term)
+    );
+  }
+
+  filteredPermissionGroups(): {
+    module: string;
+    permissions: PermissionResponse[];
+  }[] {
+    return this.permissionGroups
+      .map((group) => ({
+        module: group.module,
+        permissions: group.permissions.filter((permission) =>
+          this.matchesPermissionSearch(permission),
+        ),
+      }))
+      .filter((group) => group.permissions.length > 0);
+  }
+
   create(): void {
     if (this.form.invalid || this.loading()) {
+      this.form.markAllAsTouched();
       return;
     }
 
     this.loading.set(true);
 
+    const raw = this.form.getRawValue();
+
     this.roleService
       .createRole({
-        name: this.form.controls.name.value,
+        name: raw.name.trim(),
 
-        permissions: this.form.controls.permissions.value,
+        permissions: raw.permissions,
       })
       .subscribe({
         next: (createdRole) => {
@@ -102,10 +219,7 @@ export class RoleCreateFragmentComponent {
 
           this.toastService.show('Rol creado correctamente', 'success');
 
-          this.form.reset({
-            name: '',
-            permissions: [],
-          });
+          this.resetForm();
 
           bootstrap.Modal.getInstance(document.getElementById('createRoleModal')!)?.hide();
         },
@@ -119,5 +233,16 @@ export class RoleCreateFragmentComponent {
           this.loading.set(false);
         },
       });
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      name: '',
+      permissions: [],
+    });
+  }
+
+  permissionInputId(permission: PermissionResponse): string {
+    return `permission-${permission.code}`;
   }
 }

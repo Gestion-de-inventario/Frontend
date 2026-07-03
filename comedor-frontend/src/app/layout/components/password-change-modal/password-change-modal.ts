@@ -1,6 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { UserService } from '@features/users/services/user-api.service';
@@ -22,38 +29,40 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './password-change-modal.html',
-  styleUrl: './password-change-modal.scss' // Recuerda usar styleUrl en singular
+  styleUrl: './password-change-modal.scss',
 })
 export class PasswordChangeModalComponent implements OnInit {
-
   readonly authState = inject(AuthStateService);
   private readonly userService = inject(UserService);
   private readonly toastService = inject(ToastService);
 
   loadingPassword = false;
 
-  readonly passwordForm = new FormGroup({
-    currentPassword: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-    newPassword: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8)],
-    }),
-    confirmPassword: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
-  }, { validators: passwordMatchValidator });
+  readonly passwordForm = new FormGroup(
+    {
+      currentPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      newPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(8)],
+      }),
+      confirmPassword: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    },
+    { validators: passwordMatchValidator },
+  );
 
   ngOnInit(): void {
     this.verificarCambioPassword();
   }
 
   verificarCambioPassword(): void {
-    const session = this.authState.session(); 
-    
+    const session = this.authState.session();
+
     // Apenas nace el componente, verifica si debe abrirse
     if (session && session.passwordChanged === false) {
       setTimeout(() => {
@@ -76,14 +85,15 @@ export class PasswordChangeModalComponent implements OnInit {
     this.userService.changeMyPassword(request).subscribe({
       next: () => {
         this.toastService.show('Contraseña actualizada correctamente', 'success');
-        
+
         const sesionActual = this.authState.session();
-        if(sesionActual) {
+        if (sesionActual) {
           this.authState.updateSession({ ...sesionActual, passwordChanged: true });
         }
 
         this.passwordForm.reset();
-        bootstrap.Modal.getInstance(document.getElementById('optionalPasswordModal')!)?.hide();
+        this.closePasswordModal();
+        this.loadingPassword = false;
       },
       error: (error) => {
         this.toastService.show('Error: ' + (error.error?.message ?? error.error), 'danger');
@@ -91,7 +101,24 @@ export class PasswordChangeModalComponent implements OnInit {
       },
       complete: () => {
         this.loadingPassword = false;
-      }
+      },
     });
+  }
+
+  closePasswordModal(): void {
+    const modalElement = document.getElementById('optionalPasswordModal');
+
+    if (!modalElement) return;
+
+    modalElement.addEventListener(
+      'hidden.bs.modal',
+      () => {
+        window.dispatchEvent(new CustomEvent('password-modal-closed'));
+      },
+      { once: true },
+    );
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.hide();
   }
 }

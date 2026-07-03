@@ -130,9 +130,10 @@
             <div class="mb-3">
               <input
                 type="text"
-                class="form-control"
-                placeholder="Buscar permisos..."
+                class="form-control mb-3"
+                placeholder="Buscar permiso..."
                 [(ngModel)]="permissionSearch"
+                [ngModelOptions]="{ standalone: true }"
               />
             </div>
             @if (loading()) {
@@ -143,69 +144,80 @@
 
             <!-- ACCORDION -->
             @if (!loading()) {
-              <div class="accordion" id="permissionsAccordion">
-                @for (group of permissionGroups; track group.module; let i = $index) {
-                  <div class="accordion-item">
-                    <!-- HEADER -->
+              @if (filteredPermissionGroups().length === 0) {
+                <div class="alert alert-warning rounded-3 small mb-0">
+                  No existe ningún permiso que coincida con la búsqueda.
+                </div>
+              } @else {
+                <div class="accordion" id="permissionsAccordion">
+                  @for (group of filteredPermissionGroups(); track group.module; let i = $index) {
+                    <div class="accordion-item">
+                      <!-- HEADER -->
 
-                    <h2 class="accordion-header">
-                      <button
-                        class="accordion-button collapsed"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        [attr.data-bs-target]="'#collapse-' + i"
-                      >
-                        <div class="d-flex align-items-center gap-3">
-                          <!-- MODULE CHECK -->
+                      <h2 class="accordion-header">
+                        <button
+                          class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          [attr.data-bs-target]="'#collapse-' + i"
+                        >
+                          <div class="d-flex align-items-center gap-3">
+                            <!-- MODULE CHECK -->
 
-                          <input
-                            type="checkbox"
-                            class="form-check-input"
-                            [checked]="isModuleSelected(group.permissions)"
-                            (click)="$event.stopPropagation()"
-                            (change)="toggleModule(group.permissions, $any($event.target).checked)"
-                          />
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isModuleSelected(group.permissions)"
+                              (click)="$event.stopPropagation()"
+                              (change)="
+                                toggleModule(group.permissions, $any($event.target).checked)
+                              "
+                            />
 
-                          <strong>
-                            {{ group.module }}
-                          </strong>
-                        </div>
-                      </button>
-                    </h2>
+                            <strong>
+                              {{ group.module }}
+                            </strong>
+                            <span class="badge bg-light text-dark border">
+                              {{ group.permissions.length }}
+                            </span>
+                          </div>
+                        </button>
+                      </h2>
 
-                    <!-- BODY -->
+                      <!-- BODY -->
 
-                    <div class="accordion-collapse collapse" [id]="'collapse-' + i">
-                      <div class="accordion-body d-flex flex-column gap-3">
-                        @for (permission of group.permissions; track permission.code) {
-                          @if (
-                            permission.code.toLowerCase().includes(permissionSearch.toLowerCase())
-                          ) {
-                            <div class="permission-item">
-                              <div class="form-check">
-                                <input
-                                  type="checkbox"
-                                  class="form-check-input"
-                                  [checked]="selectedPermissions.includes(permission.code)"
-                                  (change)="togglePermission(permission.code)"
-                                />
+                      <div class="accordion-collapse collapse" [id]="'collapse-' + i">
+                        <div class="accordion-body d-flex flex-column gap-3">
+                          @for (permission of group.permissions; track permission.code) {
+                            @if (
+                              permission.code.toLowerCase().includes(permissionSearch.toLowerCase())
+                            ) {
+                              <div class="permission-item">
+                                <div class="form-check">
+                                  <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    [checked]="selectedPermissions.includes(permission.code)"
+                                    (change)="togglePermission(permission.code)"
+                                  />
 
-                                <label class="form-check-label fw-bold">
-                                  {{ permission.code }}
-                                </label>
+                                  <label class="form-check-label fw-bold">
+                                    {{ permission.code }}
+                                  </label>
+                                </div>
+
+                                <small class="text-muted">
+                                  {{ permission.description }}
+                                </small>
                               </div>
-
-                              <small class="text-muted">
-                                {{ permission.description }}
-                              </small>
-                            </div>
+                            }
                           }
-                        }
+                        </div>
                       </div>
                     </div>
-                  </div>
-                }
-              </div>
+                  }
+                </div>
+              }
             }
           }
         </div>
