@@ -1,18 +1,17 @@
 <div class="container-fluid px-2 py-2">
-  
   <div class="bg-white rounded-4 shadow-sm p-3 mb-3 border-0">
     <h5 class="fw-bold text-dark mb-3">Roles registrados</h5>
-    
-    <div class="d-flex flex-column flex-sm-row gap-2">
-      <input 
-        class="form-control form-control-lg rounded-3 border-0 bg-light shadow-none flex-grow-1" 
-        placeholder="Buscar rol..." 
-        (input)="onSearch($event)" 
+
+    <div class="row">
+      <input
+        class="my-3 form-control form-control-lg rounded-3 border-0 bg-light shadow-none flex-grow-1"
+        placeholder="Buscar rol..."
+        (input)="onSearch($event)"
       />
-      
-      <select 
-        class="form-select form-select-lg rounded-3 border-0 bg-light shadow-none flex-shrink-0" 
-        style="min-width: 140px;" 
+
+      <select
+        class="form-select form-select-lg rounded-3 border-0 bg-light shadow-none flex-shrink-0"
+        style="min-width: 140px"
         (change)="onStatusChange($event)"
       >
         <option value="TODOS">Todos</option>
@@ -23,40 +22,50 @@
   </div>
 
   <div class="d-flex flex-column gap-2">
-    
     @if (loading()) {
-      @for (i of [1,2,3,4]; track i) {
+      @for (i of [1, 2, 3, 4]; track i) {
         <div class="card rounded-4 border-0 shadow-sm p-3 placeholder-glow mb-1">
           <div class="d-flex justify-content-between align-items-center gap-3">
             <div class="d-flex align-items-center gap-3 flex-grow-1">
-              <div class="placeholder rounded flex-shrink-0" style="width: 40px; height: 40px;"></div>
+              <div
+                class="placeholder rounded flex-shrink-0"
+                style="width: 40px; height: 40px"
+              ></div>
               <span class="placeholder col-5 rounded py-2"></span>
             </div>
             <div class="placeholder col-3 rounded-pill py-2 flex-shrink-0"></div>
           </div>
         </div>
       }
-    } 
-    
-    @else {
+    } @else {
       @for (role of roles(); track role.role_id) {
-        <div 
-          class="card border border-light shadow-sm rounded-4 p-3 mb-1" 
-          style="cursor: pointer;" 
+        <div
+          class="card border border-light shadow-sm rounded-4 p-3 mb-1"
+          style="cursor: pointer"
           (click)="openRole(role)"
         >
           <div class="d-flex justify-content-between align-items-center gap-3">
-            
             <div class="d-flex align-items-center gap-3 overflow-hidden">
-              <div 
-                class="bg-primary bg-opacity-10 text-primary rounded d-flex align-items-center justify-content-center flex-shrink-0" 
-                style="width: 40px; height: 40px;"
+              <div
+                class="bg-primary bg-opacity-10 text-primary rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 40px; height: 40px"
               >
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path>
+                <svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                  ></path>
                 </svg>
               </div>
-              
+
               <h6 class="fw-bold text-dark mb-0 text-truncate">{{ role.name }}</h6>
             </div>
 
@@ -72,12 +81,9 @@
                 {{ role.status }}
               </span>
             </div>
-
           </div>
         </div>
-      } 
-      
-      @empty {
+      } @empty {
         <div class="text-center py-5 mt-4">
           <i class="bi bi-shield-lock fs-1 text-muted opacity-50 d-block mb-2"></i>
           <h6 class="text-dark fw-bold mb-1">No se encontraron roles</h6>
