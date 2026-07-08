@@ -17,6 +17,8 @@ import { RoleService } from '@features/roles_permissions/services/role-api.servi
 import { MinRoleResponse } from '@features/roles_permissions/interfaces/min.role.response';
 import { finalize } from 'rxjs/internal/operators/finalize';
 
+declare const bootstrap: any;
+
 @Component({
   selector: 'app-user-detail-modal',
 
@@ -42,6 +44,8 @@ export class UserDetailModalComponent {
 
   readonly user = computed(() => this.userState.selectedUser());
 
+  pendingStatusAction = signal<'activate' | 'deactivate' | null>(null);
+
   mode: 'view' | 'edit' | 'change-password' = 'view';
 
   loading = signal(false);
@@ -55,17 +59,32 @@ export class UserDetailModalComponent {
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
     }),
 
     lastname: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
     }),
 
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^[0-9]+$/),
+      ],
     }),
     role_id: new FormControl(0, {
       nonNullable: true,
@@ -263,6 +282,57 @@ export class UserDetailModalComponent {
     const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
     if (cleaned !== input.value) {
       this.form.controls[controlName].setValue(cleaned, { emitEvent: false });
+    }
+  }
+
+  confirmActivate(): void {
+    if (!this.user() || this.loading()) return;
+
+    this.pendingStatusAction.set('activate');
+    this.openStatusConfirmModal();
+  }
+
+  confirmDeactivate(): void {
+    if (!this.user() || this.loading()) return;
+
+    this.pendingStatusAction.set('deactivate');
+    this.openStatusConfirmModal();
+  }
+
+  private openStatusConfirmModal(): void {
+    const modalElement = document.getElementById('confirmUserStatusModal');
+
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.show();
+  }
+
+  closeStatusConfirmModal(): void {
+    const modalElement = document.getElementById('confirmUserStatusModal');
+
+    if (!modalElement) return;
+
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    modal?.hide();
+
+    this.pendingStatusAction.set(null);
+  }
+
+  confirmStatusChange(): void {
+    const action = this.pendingStatusAction();
+
+    if (!action || this.loading()) return;
+
+    if (action === 'activate') {
+      this.activate();
+      this.closeStatusConfirmModal();
+      return;
+    }
+
+    if (action === 'deactivate') {
+      this.deactivate();
+      this.closeStatusConfirmModal();
     }
   }
 }

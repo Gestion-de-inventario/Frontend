@@ -1,22 +1,43 @@
 <div class="card border-0 shadow-sm rounded-4 mb-4">
   <div class="card-body">
-    <div class="row align-items-center">
-      <div class="col-auto">
-        <label class="fw-semibold mb-0"> Módulo: </label>
+    <div class="d-flex flex-column gap-3">
+      <div>
+        <h4 class="fw-bold text-dark mb-1">Gestión administrativa</h4>
+        <p class="text-muted mb-0">
+          Administra usuarios, beneficiarios y tipos de beneficiario según tus permisos.
+        </p>
       </div>
 
-      <div class="col-md-4">
-        <select class="form-select" [value]="currentModule" (change)="changeModule($event)">
-          @if (canListUsers || canCreateUser || canListActivedUsers) {
-            <option value="users">Usuarios</option>
-          }
-          @if (canListBeneficiaries || canCreateBeneficiary || canCreateBeneficiaryByDni) {
-            <option value="beneficiaries">Beneficiarios</option>
-          }
-          @if (canListBeneficiariesTypes || canCreateBeneficiaryType) {
-            <option value="beneficiary-types">Tipos de Beneficiario</option>
-          }
-        </select>
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <label for="adminModule" class="fw-semibold mb-0">Módulo:</label>
+        </div>
+
+        <div class="col-md-4">
+          <select
+            id="adminModule"
+            class="form-select"
+            [value]="currentModule"
+            (change)="changeModule($event)"
+            aria-describedby="adminModuleHelp"
+          >
+            @if (canListUsers || canCreateUser || canListActivedUsers) {
+              <option value="users">Usuarios</option>
+            }
+
+            @if (canListBeneficiaries || canCreateBeneficiary || canCreateBeneficiaryByDni) {
+              <option value="beneficiaries">Beneficiarios</option>
+            }
+
+            @if (canListBeneficiariesTypes || canCreateBeneficiaryType) {
+              <option value="beneficiary-types">Tipos de beneficiario</option>
+            }
+          </select>
+
+          <small id="adminModuleHelp" class="text-muted d-block mt-1">
+            Selecciona la sección administrativa que deseas gestionar.
+          </small>
+        </div>
       </div>
     </div>
   </div>

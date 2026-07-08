@@ -77,7 +77,16 @@
     } @else {
       <div class="text-center py-5 mt-4">
         <i class="bi bi-person-x fs-1 text-muted"></i>
-        <p class="text-muted fw-medium">No se encontraron usuarios.</p>
+        <p class="text-muted fw-medium mb-2">
+          No se encontraron usuarios con los filtros aplicados.
+        </p>
+
+        <button
+          class="btn btn-outline-secondary btn-sm rounded-pill"
+          (click)="search.set(''); onlyActive.set(false)"
+        >
+          Limpiar búsqueda
+        </button>
       </div>
     }
   </div>

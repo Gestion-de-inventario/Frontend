@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -36,22 +36,43 @@ export class UserCreateFragmentComponent {
 
   private readonly roleService = inject(RoleService);
 
+  showPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update((value) => !value);
+  }
+
   roles: MinRoleResponse[] = [];
   loading = false;
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
     }),
 
     lastname: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
     }),
 
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^\d{8}$/),
+      ],
     }),
 
     password: new FormControl('', {
