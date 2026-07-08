@@ -1,0 +1,26 @@
+.breadcrumb-wrapper {
+  background-color: #ffffff;
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.breadcrumb {
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active span {
+  color: var(--color-text);
+  font-weight: 600;
+}

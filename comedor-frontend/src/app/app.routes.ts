@@ -17,6 +17,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
+        data: { breadcrumb: 'Dashboard' },
         title: 'Dashboard',
         loadComponent: () =>
           import('@features/dashboard/pages/dashboard-principal.component').then(
@@ -26,6 +27,7 @@ export const routes: Routes = [
       {
         path: 'management',
         title: 'Gestión de Usuarios',
+        data: { breadcrumb: 'Gestión de usuarios' },
         loadComponent: () =>
           import('@features/users/pages/user-managment-principal/user-management-principal.component').then(
             (m) => m.UserManagementPrincipalComponent,
@@ -57,6 +59,7 @@ export const routes: Routes = [
       {
         path: 'roles',
         title: 'Roles',
+        data: { breadcrumb: 'Roles' },
         loadComponent: () =>
           import('@features/roles_permissions/pages/roles-permissions_principal/roles-permissions_principal').then(
             (m) => m.RolesPermissionsPrincipalComponent,
@@ -74,6 +77,7 @@ export const routes: Routes = [
       {
         path: 'transactions-modifications',
         title: 'Transacciones y Modificaciones',
+        data: { breadcrumb: 'Transacciones y Modificaciones' },
         loadComponent: () =>
           import('@features/transactions_modifications/pages/transactions-modifications_principal/transactions-modifications-principal.component').then(
             (m) => m.TransactionsModificationsPrincipalComponent,
@@ -89,6 +93,8 @@ export const routes: Routes = [
         children: [
           {
             path: 'list',
+            title: 'Registro Menú',
+            data: { breadcrumb: 'Registro de menú' },
             loadComponent: () =>
               import('@features/menu-report/fragments/menu-report-list-fragment/list-menu-report-fragment.component').then(
                 (m) => m.ListMenuReportFragmentComponent,
@@ -137,6 +143,7 @@ export const routes: Routes = [
       },
       {
         path: 'purchase-order',
+        data: { breadcrumb: 'Ingreso de insumos' },
         title: 'Ingreso de insumos',
         loadComponent: () =>
           import('@features/order-in/pages/purchase-order-principal/purchase-orden').then(
@@ -145,6 +152,7 @@ export const routes: Routes = [
         children: [
           {
             path: '',
+            data: { breadcrumb: '' },
             loadComponent: () =>
               import('@features/order-in/fragments/list-purchase-fragment/list-purchase-fragment.component').then(
                 (m) => m.ListPurchaseFragmentComponent,
@@ -152,6 +160,7 @@ export const routes: Routes = [
           },
           {
             path: 'create',
+            data: { breadcrumb: 'Registrar' },
             loadComponent: () =>
               import('@features/order-in/fragments/create-orden-in-fragment/create-orden-in-fragment.component').then(
                 (m) => m.InventoryOrderCreateFragmentComponent,
@@ -201,6 +210,7 @@ export const routes: Routes = [
       {
         path: 'reports',
         title: 'Reportes',
+        data: { breadcrumb: 'Reportes' },
         loadComponent: () =>
           import('@features/reports/pages/reports-principal/reports-principal.component').then(
             (m) => m.ReportsPrincipalComponent,

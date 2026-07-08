@@ -6,12 +6,14 @@ import { filter } from 'rxjs';
 
 import { HamburgerButtonComponent } from '../hamburger-button/hamburger-button.component';
 
+import { BreadcrumbComponent } from '../../../shared/components/breadcrum/breadcrumb.component';
+
 @Component({
   selector: 'app-navbar',
 
   standalone: true,
 
-  imports: [HamburgerButtonComponent],
+  imports: [HamburgerButtonComponent, BreadcrumbComponent],
 
   templateUrl: './navbar.component.html',
 
