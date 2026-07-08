@@ -26,6 +26,12 @@
               <p class="text-muted small">Ingresa tus credenciales para continuar</p>
             </div>
 
+            @if (loginError()) {
+              <div class="alert alert-danger small" role="alert" aria-live="assertive">
+                {{ loginError() }}
+              </div>
+            }
+
             <form [formGroup]="form" (ngSubmit)="login()">
               <div class="mb-4">
                 <label class="form-label fw-semibold">Número de DNI</label>
@@ -40,17 +46,34 @@
                     </svg>
                   </div>
                   <input
+                    #usernameInput
+                    id="username"
                     type="text"
                     class="form-control custom-input"
                     formControlName="username"
                     placeholder="Ej. 12345678"
                     maxlength="8"
+                    inputmode="numeric"
+                    autocomplete="username"
+                    [attr.aria-invalid]="
+                      form.controls.username.touched && form.controls.username.invalid
+                    "
+                    aria-describedby="username-help username-error"
                   />
                 </div>
 
+                <div id="username-help" class="form-text">
+                  Ingresa los 8 dígitos de tu DNI, sin espacios ni guiones.
+                </div>
+
                 @if (form.controls.username.touched && form.controls.username.invalid) {
-                  <div class="error-message mt-2 d-flex align-items-center gap-1">
+                  <div
+                    id="username-error"
+                    class="error-message mt-2 d-flex align-items-center gap-1"
+                    role="alert"
+                  >
                     <svg
+                      aria-hidden="true"
                       fill="none"
                       stroke="currentColor"
                       stroke-width="2"
@@ -64,7 +87,8 @@
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                       ></path>
                     </svg>
-                    <span>DNI inválido (debe tener 8 dígitos numéricos)</span>
+
+                    <span>El DNI debe tener exactamente 8 dígitos numéricos.</span>
                   </div>
                 }
               </div>
@@ -82,16 +106,41 @@
                     </svg>
                   </div>
                   <input
-                    type="password"
+                    #passwordInput
+                    id="password"
+                    [type]="showPassword() ? 'text' : 'password'"
                     class="form-control custom-input"
                     formControlName="password"
-                    placeholder="••••••••"
+                    placeholder="Ingresa tu contraseña"
+                    autocomplete="current-password"
+                    [attr.aria-invalid]="
+                      form.controls.password.touched && form.controls.password.invalid
+                    "
+                    aria-describedby="password-error password-help"
                   />
+
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    (click)="togglePasswordVisibility()"
+                    [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  >
+                    {{ showPassword() ? 'Ocultar' : 'Mostrar' }}
+                  </button>
+                </div>
+
+                <div id="password-help" class="form-text">
+                  Usa la contraseña asignada por el administrador del sistema.
                 </div>
 
                 @if (form.controls.password.touched && form.controls.password.invalid) {
-                  <div class="error-message mt-2 d-flex align-items-center gap-1">
+                  <div
+                    id="password-error"
+                    class="error-message mt-2 d-flex align-items-center gap-1"
+                    role="alert"
+                  >
                     <svg
+                      aria-hidden="true"
                       fill="none"
                       stroke="currentColor"
                       stroke-width="2"
@@ -105,7 +154,8 @@
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                       ></path>
                     </svg>
-                    <span>La contraseña es requerida</span>
+
+                    <span>La contraseña es obligatoria.</span>
                   </div>
                 }
               </div>
@@ -128,8 +178,22 @@
                     Ingresar al Sistema
                   }
                 </app-button>
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm"
+                  (click)="clearForm()"
+                  [disabled]="isLoading()"
+                >
+                  Limpiar campos
+                </button>
               </div>
             </form>
+            <div class="text-center mt-4">
+              <p class="small text-muted mb-0">
+                ¿Tienes problemas para ingresar? Comunícate con el administrador del comedor para
+                recuperar o actualizar tus credenciales.
+              </p>
+            </div>
           </div>
         </div>
       </div>

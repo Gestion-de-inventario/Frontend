@@ -1,5 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { DashboardApiService } from '../services/dashboard-api.service';
 import { DashboardStateService } from '../services/dashboard-state.service';
@@ -11,6 +13,7 @@ import { DashboardFinancialFragmentComponent } from '../fragments/dashboard-fina
   selector: 'app-dashboard-principal',
   standalone: true,
   imports: [
+    RouterLink,
     DashboardCardsFragmentComponent,
     DashboardChartFragmentComponent,
     DashboardFinancialFragmentComponent,
@@ -25,6 +28,8 @@ export class DashboardPrincipalComponent implements OnInit {
 
   readonly canView = this.authState.hasPermission('DASHBOARD_VIEW');
 
+  readonly periodoActual = signal<string>('Mes actual');
+
   ngOnInit(): void {
     if (this.canView) {
       this.loadDashboardData();
@@ -33,14 +38,25 @@ export class DashboardPrincipalComponent implements OnInit {
 
   loadDashboardData(anio?: number, mes?: number): void {
     this.dashboardState.setLoading(true);
-    this.dashboardApi.getDashboardData(anio, mes).subscribe({
-      next: (data) => {
-        this.dashboardState.setDashboardData(data);
-      },
-      error: (err) => {
-        console.error('Error cargando el dashboard', err);
-        this.dashboardState.setError('No se pudo cargar la información del dashboard.');
-      },
-    });
+    this.dashboardState.setError('');
+
+    this.dashboardApi
+      .getDashboardData(anio, mes)
+      .pipe(finalize(() => this.dashboardState.setLoading(false)))
+      .subscribe({
+        next: (data) => {
+          this.dashboardState.setDashboardData(data);
+        },
+        error: (err) => {
+          console.error('Error cargando el dashboard', err);
+          this.dashboardState.setError(
+            'No se pudo cargar la información del dashboard. Verifica tu conexión e inténtalo nuevamente.',
+          );
+        },
+      });
+  }
+
+  retryLoad(): void {
+    this.loadDashboardData();
   }
 }

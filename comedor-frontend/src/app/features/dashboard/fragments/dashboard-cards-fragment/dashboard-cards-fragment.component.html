@@ -2,7 +2,7 @@
   <div class="row g-4">
     <div class="col-12 col-md-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
-        <div class="card-body p-4 d-flex align-items-center gap-3">
+        <div class="card-body p-4 d-flex align-items-center gap-3" aria-label="Ingresos del mes">
           <div
             class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
             style="width: 56px; height: 56px"
@@ -101,6 +101,7 @@
             >
               {{ data()!.balanceNeto | currency: 'S/.' : 'symbol' : '1.2-2' }}
             </h3>
+            <p class="small text-muted mb-0 mt-1">Diferencia entre ingresos y egresos del mes.</p>
           </div>
         </div>
       </div>
