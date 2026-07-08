@@ -466,8 +466,8 @@ export class MenuReportBeneficiariesFragmentComponent {
 
     return (
       this.isRequiredValue(value) ||
-      !this.isDecimalOrInteger(value) ||
-      !this.isPositiveNumber(value)
+      !this.isPositiveNumber(value) ||
+      !this.hasValidPriceFormat(value)
     );
   }
 
@@ -504,5 +504,37 @@ export class MenuReportBeneficiariesFragmentComponent {
     input.value = input.value.replace(/\D/g, '').slice(0, 5);
 
     this.menusAmount.set(input.value ? Number(input.value) : null);
+  }
+
+  limitPriceDigits(event: Event): void {
+    this.menuPriceTouched.set(true);
+
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value;
+
+    value = value.replace(',', '.');
+
+    value = value.replace(/[^0-9.]/g, '');
+
+    const parts = value.split('.');
+    const integerPart = parts[0].slice(0, 5);
+    const decimalPart = parts[1]?.slice(0, 2);
+
+    if (parts.length > 1) {
+      value = `${integerPart}.${decimalPart ?? ''}`;
+    } else {
+      value = integerPart;
+    }
+
+    input.value = value;
+
+    this.menuPrice.set(value ? Number(value) : null);
+  }
+
+  hasValidPriceFormat(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    return /^\d{1,5}(\.\d{1,2})?$/.test(String(value));
   }
 }

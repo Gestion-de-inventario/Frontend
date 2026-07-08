@@ -46,6 +46,8 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
   purchaseDetails = signal<PurchaseDetailForm[]>([]);
 
+  quantityTouched = signal(false);
+
   readonly authState = inject(AuthStateService);
 
   canCreate = this.authState.hasPermission('CREATE_ORDER_IN');
@@ -187,7 +189,13 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   createOrder(): void {
     this.submitted.set(true);
 
-    if (this.isFormInvalid() || this.loading()) {
+    if (this.loading()) return;
+
+    if (this.isFormInvalid()) {
+      this.toastService.show(
+        'Completa correctamente la fecha, productos, cantidades y precios antes de guardar.',
+        'warning',
+      );
       return;
     }
 
@@ -234,7 +242,7 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          this.toastService.show('Error al crear la compra');
+          this.toastService.show('No se pudo registrar el ingreso de insumos');
         },
       });
   }
@@ -456,7 +464,7 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   isQuantityInvalid(detail: PurchaseDetailForm): boolean {
     return (
       this.isRequiredValue(detail.quantity) ||
-      !this.isDecimalOrInteger(detail.quantity) ||
+      !this.isInteger(detail.quantity) ||
       !this.isPositiveNumber(detail.quantity)
     );
   }
@@ -466,7 +474,80 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
       this.orderType() === 'COMPRA' &&
       (this.isRequiredValue(detail.unitPrice) ||
         !this.isDecimalOrInteger(detail.unitPrice) ||
-        !this.isPositiveNumber(detail.unitPrice))
+        !this.isPositiveNumber(detail.unitPrice) ||
+        !this.hasValidPriceFormat(detail.unitPrice))
     );
+  }
+
+  limitQuantityDigits(event: Event, index: number): void {
+    this.markTouched(index, 'quantity');
+
+    const input = event.target as HTMLInputElement;
+
+    const value = input.value.replace(/\D/g, '').slice(0, 5);
+
+    input.value = value;
+
+    this.purchaseDetails.update((details) =>
+      details.map((detail, i) =>
+        i === index
+          ? {
+              ...detail,
+              quantity: value ? Number(value) : 0,
+            }
+          : detail,
+      ),
+    );
+  }
+
+  limitPriceDigits(event: Event, index: number): void {
+    this.markTouched(index, 'unitPrice');
+
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value;
+
+    value = value.replace(',', '.');
+
+    value = value.replace(/[^0-9.]/g, '');
+
+    const parts = value.split('.');
+
+    const integerPart = parts[0].slice(0, 5);
+
+    let decimalPart = parts[1]?.slice(0, 2);
+
+    if (parts.length > 2) {
+      value = `${integerPart}.${decimalPart ?? ''}`;
+    } else if (parts.length === 2) {
+      value = `${integerPart}.${decimalPart ?? ''}`;
+    } else {
+      value = integerPart;
+    }
+
+    input.value = value;
+
+    this.purchaseDetails.update((details) =>
+      details.map((detail, i) =>
+        i === index
+          ? {
+              ...detail,
+              unitPrice: value ? Number(value) : 0,
+            }
+          : detail,
+      ),
+    );
+  }
+
+  isInteger(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    return Number.isInteger(Number(value));
+  }
+
+  hasValidPriceFormat(value: number | null | undefined): boolean {
+    if (value === null || value === undefined) return false;
+
+    return /^\d{1,5}(\.\d{1,2})?$/.test(String(value));
   }
 }

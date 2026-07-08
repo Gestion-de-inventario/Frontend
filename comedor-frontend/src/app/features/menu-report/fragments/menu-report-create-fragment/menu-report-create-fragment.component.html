@@ -1,6 +1,6 @@
 @if (!canCreate) {
   <div class="alert alert-danger m-3 rounded-4">
-    No tienes permiso para crear órdenes de compra.
+    No tienes permiso para crear registros de menú.
   </div>
 }
 
@@ -25,7 +25,7 @@
           <path d="M20 6 9 17l-5-5" />
         </svg>
       </div>
-      <h4 class="fw-bold text-dark mb-2">¡Registro Creado!</h4>
+      <h4 class="fw-bold text-dark mb-2">¡Registro de menú creado!</h4>
       <p class="text-muted small mb-4">
         El registro del menú se ha creado correctamente en el sistema.
       </p>
@@ -35,7 +35,7 @@
           class="btn btn-primary rounded-pill py-2.5 fw-medium w-100 shadow-sm"
           (click)="createAnother()"
         >
-          Crear otra orden
+          Crear otro registro
         </button>
         <button
           class="btn btn-outline-secondary rounded-pill py-2.5 fw-medium w-100"
@@ -110,7 +110,7 @@
             <label
               class="form-label fw-bold text-muted small text-uppercase mb-2"
               style="letter-spacing: 0.5px"
-              >Plato *</label
+              >Menú a preparar *</label
             >
             <select
               class="form-select form-select-lg rounded-3 border-light-subtle shadow-sm"
@@ -120,7 +120,7 @@
               (ngModelChange)="selectedDishMenuId.set($event); dishTouched.set(true)"
               (blur)="dishTouched.set(true)"
             >
-              <option [ngValue]="null" disabled>Seleccione una plantilla</option>
+              <option [ngValue]="null" disabled>Seleccione el menú que se va a concinar</option>
               @for (dish of dishMenus(); track dish.id) {
                 @if (dish.status === 'ACTIVO') {
                   <option [ngValue]="dish.id">
@@ -132,7 +132,7 @@
 
             @if (shouldShowDishError() && !selectedDishMenuId()) {
               <div class="invalid-feedback small fw-medium">
-                Debe seleccionar una plantilla de menú.
+                Debe seleccionar el menú que se va a preparar.
               </div>
             }
           </div>
@@ -141,7 +141,7 @@
             <label
               class="form-label fw-bold text-muted small text-uppercase mb-2"
               style="letter-spacing: 0.5px"
-              >Cantidad a preparar *</label
+              >Raciones a preparar *</label
             >
             <input
               type="text"
@@ -156,6 +156,9 @@
               (input)="limitQuantityDigits($event)"
               (blur)="quantityTouched.set(true)"
             />
+            <small id="quantityHelp" class="text-muted d-block mt-1">
+              Ingresa la cantidad total de raciones que se cocinarán.
+            </small>
 
             @if (shouldShowQuantityError() && isRequiredValue(quantityPrepared())) {
               <div class="invalid-feedback small fw-medium">La cantidad es obligatoria.</div>
@@ -187,7 +190,7 @@
             <label
               class="form-label fw-bold text-muted small text-uppercase mb-2"
               style="letter-spacing: 0.5px"
-              >Encargados</label
+              >Cocineras</label
             >
             <div class="position-relative">
               <app-search-select
@@ -216,6 +219,7 @@
                       type="button"
                       class="btn-close shadow-none flex-shrink-0"
                       style="font-size: 0.75rem"
+                      [attr.aria-label]="'Quitar a ' + cook.name + ' ' + cook.lastname"
                       (click)="removeCook(cook)"
                     ></button>
                   </div>
@@ -260,7 +264,7 @@
             >
               @if (creating()) {
                 <span class="spinner-border spinner-border-sm"></span>
-                <span>Creando orden...</span>
+                <span>Guardando registro...</span>
               } @else {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -276,13 +280,20 @@
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
                 </svg>
-                <span>Crear reporte</span>
+                <span>Crear registro de menú</span>
               }
             </button>
           </div>
         </div>
 
-        <div class="modal fade" id="missingStockModal" tabindex="-1" data-bs-backdrop="static">
+        <div
+          class="modal fade"
+          id="missingStockModal"
+          tabindex="-1"
+          data-bs-backdrop="static"
+          aria-labelledby="missingStockModalTitle"
+          aria-describedby="missingStockModalDescription"
+        >
           <div class="modal-dialog modal-dialog-centered px-3">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
               <div
@@ -310,13 +321,17 @@
                     <line x1="12" x2="12" y1="17" y2="17" />
                   </svg>
                 </div>
-                <h5 class="modal-title fw-bold text-dark mb-0" style="font-size: 1.1rem">
+                <h5
+                  id="missingStockModalTitle"
+                  class="modal-title fw-bold text-dark mb-0"
+                  style="font-size: 1.1rem"
+                >
                   Stock insuficiente
                 </h5>
               </div>
 
               <div class="modal-body px-4 py-3">
-                <p class="text-muted small mb-3">
+                <p id="missingStockModalDescription" class="text-muted small mb-3">
                   No existe el stock requerido en inventario para procesar la preparación de este
                   menú. Faltan los siguientes insumos:
                 </p>
@@ -351,7 +366,7 @@
                   (click)="goToCreatePurchase()"
                   data-bs-dismiss="modal"
                 >
-                  Crear orden de entrada
+                  Registrar ingreso de insumos
                 </button>
                 <button
                   class="btn btn-outline-secondary w-100 rounded-pill py-2.5 fw-medium"

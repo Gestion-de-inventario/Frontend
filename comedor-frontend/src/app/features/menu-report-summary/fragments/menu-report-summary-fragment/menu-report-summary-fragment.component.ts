@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -38,11 +38,35 @@ export class MenuReportSummaryFragmentComponent {
   startDate = signal(today);
   endDate = signal('');
 
+  minDate = signal<string>(this.getPeruStartOfYear());
+
+  maxDate = signal<string>(this.getPeruEndOfYear());
+
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+
+  readonly isDateRangeInvalid = computed(() => {
+    const start = this.startDate();
+    const end = this.endDate();
+
+    if (!start || !end) return false;
+
+    return start > end;
+  });
+
   constructor() {
     this.search();
   }
 
   search(): void {
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    if (this.isDateRangeInvalid()) {
+      this.errorMessage.set('La fecha de inicio no puede ser mayor que la fecha fin.');
+      return;
+    }
+
     this.loading.set(true);
 
     this.menuReportService
@@ -76,7 +100,7 @@ export class MenuReportSummaryFragmentComponent {
     this.startDate.set('');
     this.endDate.set('');
 
-    this.search();
+    //this.search();
   }
 
   refreshSummary(): void {
@@ -85,6 +109,13 @@ export class MenuReportSummaryFragmentComponent {
 
   exportarResumenPdf(): void {
     if (this.generatingPdf()) return;
+
+    if (this.generatingPdf() || this.isDateRangeInvalid()) {
+      this.errorMessage.set('Corrige el rango de fechas antes de exportar.');
+      return;
+    }
+    this.errorMessage.set(null);
+    this.generatingPdf.set(true);
 
     this.generatingPdf.set(true);
 
@@ -109,6 +140,14 @@ export class MenuReportSummaryFragmentComponent {
 
   exportarResumenExcel(): void {
     if (this.generatingExcel()) return;
+
+    if (this.generatingExcel() || this.isDateRangeInvalid()) {
+      this.errorMessage.set('Corrige el rango de fechas antes de exportar.');
+      return;
+    }
+
+    this.errorMessage.set(null);
+    this.generatingExcel.set(true);
 
     this.generatingExcel.set(true);
 
@@ -146,5 +185,18 @@ export class MenuReportSummaryFragmentComponent {
     a.click();
 
     window.URL.revokeObjectURL(url);
+  }
+
+  private getPeruEndOfYear(): string {
+    const year = new Intl.DateTimeFormat('en', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+    }).format(new Date());
+
+    return `${year}-12-31`;
+  }
+
+  private getPeruStartOfYear(): string {
+    return `2026-01-01`;
   }
 }

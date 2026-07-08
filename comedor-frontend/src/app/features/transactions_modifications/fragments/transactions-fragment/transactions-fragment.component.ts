@@ -7,7 +7,7 @@ import { TransactionStateService } from '@features/transactions_modifications/se
 import { TransactionsResponse } from '@features/transactions_modifications/interfaces/transactions/transactions.response';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
-
+import { finalize } from 'rxjs/operators';
 declare const bootstrap: any;
 
 @Component({
@@ -46,10 +46,27 @@ export class TransactionsFragmentComponent {
   source = signal<string | null>(null);
   name = signal<string>('');
 
+  errorMessage = signal<string | null>(null);
+
+  minDate = signal<string>(this.getPeruStartOfYear());
+
+  maxDate = signal<string>(this.getPeruEndOfYear());
+
   constructor() {
     if (!this.canList) return;
     this.loadTransactions();
   }
+
+  readonly isCustomDateRangeInvalid = computed(() => {
+    if (this.filterOption() !== 'custom') return false;
+
+    const start = this.customStartDate();
+    const end = this.customEndDate();
+
+    if (!start || !end) return true;
+
+    return start > end;
+  });
 
   // =========================
   // LOGICA DE FILTROS Y PDF
@@ -61,10 +78,17 @@ export class TransactionsFragmentComponent {
     }
   }
   applyFilters(): void {
+    if (this.isCustomDateRangeInvalid()) {
+      this.errorMessage.set(
+        'Selecciona una fecha de inicio y una fecha fin válidas para el rango personalizado.',
+      );
+      return;
+    }
+
+    this.errorMessage.set(null);
     this.page.set(0);
     this.loadTransactions();
   }
-
   onCustomDateChange() {
     if (this.customStartDate() && this.customEndDate()) {
       this.applyFilters();
@@ -128,29 +152,42 @@ export class TransactionsFragmentComponent {
     };
   }
 
-  exportToPdf() {
+  exportToPdf(): void {
+    if (this.exporting() || this.isCustomDateRangeInvalid()) {
+      this.errorMessage.set('Corrige el rango de fechas antes de exportar el PDF.');
+      return;
+    }
+
+    this.errorMessage.set(null);
     this.exporting.set(true);
+
     const { start, end } = this.calculateDates(this.filterOption());
 
-    this.transactionService.exportPdf(start, end).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const fileName =
-          start && end ? `transacciones_${start}_al_${end}.pdf` : `transacciones_historico.pdf`;
-        a.download = fileName;
+    this.transactionService
+      .exportPdf(start, end)
+      .pipe(finalize(() => this.exporting.set(false)))
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
 
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+          a.href = url;
+          a.download = `transacciones_${start}_al_${end}.pdf`;
 
-        this.toastService.show('PDF exportado correctamente', 'success');
-      },
-      error: () => this.toastService.show('Error al exportar PDF', 'danger'),
-      complete: () => this.exporting.set(false),
-    });
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          window.URL.revokeObjectURL(url);
+
+          this.toastService.show('PDF exportado correctamente', 'success');
+        },
+
+        error: () => {
+          this.errorMessage.set('No se pudo exportar el PDF. Inténtalo nuevamente.');
+          this.toastService.show('Error al exportar PDF', 'danger');
+        },
+      });
   }
 
   sourceOptions = computed(() => {
@@ -203,29 +240,28 @@ export class TransactionsFragmentComponent {
   // =========================
 
   loadTransactions(): void {
+    this.errorMessage.set(null);
     this.loading.set(true);
 
     const q = this.buildQuery();
 
     this.transactionService
       .getTransactions(q.page, q.size, q.start, q.end, q.type, q.source, q.name)
+      .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => {
           this.transactionState.set(response.content);
-
           this.totalPages.set(response.totalPages);
           this.totalElements.set(response.totalElements);
-
           this.page.set(response.number);
         },
 
         error: () => {
+          this.transactionState.set([]);
+          this.errorMessage.set(
+            'No se pudieron cargar las transacciones. Verifica los filtros o tu conexión e inténtalo nuevamente.',
+          );
           this.toastService.show('Error al cargar transacciones', 'danger');
-          this.loading.set(false);
-        },
-
-        complete: () => {
-          this.loading.set(false);
         },
       });
   }
@@ -262,5 +298,18 @@ export class TransactionsFragmentComponent {
       '-' +
       String(date.getDate()).padStart(2, '0')
     );
+  }
+
+  private getPeruEndOfYear(): string {
+    const year = new Intl.DateTimeFormat('en', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+    }).format(new Date());
+
+    return `${year}-12-31`;
+  }
+
+  private getPeruStartOfYear(): string {
+    return `2026-01-01`;
   }
 }

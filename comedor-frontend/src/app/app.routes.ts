@@ -137,7 +137,7 @@ export const routes: Routes = [
       },
       {
         path: 'purchase-order',
-        title: 'Órdenes de entrada',
+        title: 'Ingreso de insumos',
         loadComponent: () =>
           import('@features/order-in/pages/purchase-order-principal/purchase-orden').then(
             (m) => m.PurchaseOrden,

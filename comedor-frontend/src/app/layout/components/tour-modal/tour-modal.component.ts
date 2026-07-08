@@ -46,7 +46,7 @@ export class TourModalComponent implements OnInit {
     },
     {
       icon: '📦',
-      titulo: 'Orden de Entrada',
+      titulo: 'Registrar Compras y Donaciones',
       descripcion:
         'Registra las compras y donaciones de insumos. Al confirmar una orden, el stock de los productos se actualiza automáticamente.',
       permiso: 'CREATE_ORDER_IN',

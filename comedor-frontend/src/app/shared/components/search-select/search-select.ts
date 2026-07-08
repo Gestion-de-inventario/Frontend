@@ -45,6 +45,7 @@ export class SearchSelectComponent<T> {
     }
 
     return this.items.filter((item) => this.displayFn(item).toLowerCase().includes(term));
+    //.slice(0, 4);
   }
 
   @HostListener('document:click', ['$event'])

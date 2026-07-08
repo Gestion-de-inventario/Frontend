@@ -10,7 +10,7 @@
           <div class="col-6">
             <div class="card-body p-0">
               <label class="form-label fw-bold text-muted small text-uppercase">
-                Tipo de orden
+                Fuente de ingreso
               </label>
 
               <select
@@ -68,6 +68,8 @@
                 id="startDateBuy"
                 [ngModel]="startDate()"
                 (ngModelChange)="startDate.set($event)"
+                [min]="minDate()"
+                [max]="endDate() || maxDate()"
               />
               <label for="startDateBuy" class="text-muted small">Fecha inicio</label>
             </div>
@@ -80,9 +82,22 @@
                 id="endDateBuy"
                 [ngModel]="endDate()"
                 (ngModelChange)="endDate.set($event)"
+                [min]="minDate()"
+                [max]="maxDate()"
               />
               <label for="endDateBuy" class="text-muted small">Fecha fin</label>
             </div>
+          </div>
+          <div class="col-12">
+            <div id="dateRangeHelp" class="form-text">
+              Puedes consultar un día específico o un rango de fechas.
+            </div>
+
+            @if (isDateRangeInvalid()) {
+              <div id="dateRangeError" class="invalid-feedback d-block" role="alert">
+                La fecha de inicio no puede ser mayor que la fecha fin.
+              </div>
+            }
           </div>
           <div class="col-12">
             <div class="form-floating">
@@ -96,7 +111,7 @@
                 <option value="PENDIENTE">Pendiente</option>
                 <option value="RECIBIDO">Recibido</option>
               </select>
-              <label for="statusBuy" class="text-muted small">Estado de la orden</label>
+              <label for="statusBuy" class="text-muted small">Estado del registro</label>
             </div>
           </div>
         </div>
@@ -105,7 +120,7 @@
           <button
             class="btn btn-primary rounded-3 flex-grow-1 d-flex align-items-center justify-content-center gap-2"
             (click)="search()"
-            [disabled]="loading()"
+            [disabled]="loading() || isDateRangeInvalid()"
           >
             @if (loading()) {
               <span class="spinner-border spinner-border-sm"></span>

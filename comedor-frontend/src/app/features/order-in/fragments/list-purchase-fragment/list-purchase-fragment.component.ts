@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
@@ -49,6 +49,10 @@ export class ListPurchaseFragmentComponent {
   selectedOrder = signal<OrderInListItem | null>(null);
   orderType = this.inventoryOrderState.orderType;
 
+  minDate = signal<string>(this.getPeruStartOfYear());
+
+  maxDate = signal<string>(this.getPeruEndOfYear());
+
   detailLoading = signal<boolean>(false);
   changeStatusLoading = signal(false);
   loading = signal(false);
@@ -62,6 +66,18 @@ export class ListPurchaseFragmentComponent {
   status = signal('');
 
   orderFilter = signal<OrderFilter>('TODOS');
+
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+
+  readonly isDateRangeInvalid = computed(() => {
+    const start = this.startDate();
+    const end = this.endDate();
+
+    if (!start || !end) return false;
+
+    return start > end;
+  });
 
   constructor() {
     this.setInitialFilter();
@@ -101,9 +117,9 @@ export class ListPurchaseFragmentComponent {
   }
 
   get orderFilterLabel(): string {
-    if (this.orderFilter() === 'TODOS') return 'órdenes de entrada';
-    if (this.orderFilter() === 'COMPRA') return 'órdenes de compra';
-    return 'órdenes de donación';
+    if (this.orderFilter() === 'TODOS') return 'registro de ingreso de insumos';
+    if (this.orderFilter() === 'COMPRA') return 'registro de compras';
+    return 'registro de donaciones';
   }
 
   get canListCurrentFilter(): boolean {
@@ -165,7 +181,7 @@ export class ListPurchaseFragmentComponent {
         },
         error: () => {
           this.orders.set([]);
-          this.toastService.show('Error al cargar órdenes de entrada', 'danger');
+          this.toastService.show('Error al cargar registros de ingreso', 'danger');
         },
       });
   }
@@ -332,6 +348,14 @@ export class ListPurchaseFragmentComponent {
   }
 
   search(): void {
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    if (this.isDateRangeInvalid()) {
+      this.errorMessage.set('La fecha de inicio no puede ser mayor que la fecha fin.');
+      return;
+    }
+
     this.page.set(0);
 
     this.loadOrders();
@@ -436,5 +460,17 @@ export class ListPurchaseFragmentComponent {
         subTotal: 0,
       })),
     };
+  }
+  private getPeruEndOfYear(): string {
+    const year = new Intl.DateTimeFormat('en', {
+      timeZone: 'America/Lima',
+      year: 'numeric',
+    }).format(new Date());
+
+    return `${year}-12-31`;
+  }
+
+  private getPeruStartOfYear(): string {
+    return `2026-01-01`;
   }
 }
