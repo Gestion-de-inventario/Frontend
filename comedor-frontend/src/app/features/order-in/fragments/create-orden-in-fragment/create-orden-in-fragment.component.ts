@@ -462,11 +462,7 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
   }
 
   isQuantityInvalid(detail: PurchaseDetailForm): boolean {
-    return (
-      this.isRequiredValue(detail.quantity) ||
-      !this.isInteger(detail.quantity) ||
-      !this.isPositiveNumber(detail.quantity)
-    );
+    return this.isRequiredValue(detail.quantity) || !this.isPositiveNumber(detail.quantity);
   }
 
   isPriceInvalid(detail: PurchaseDetailForm): boolean {
