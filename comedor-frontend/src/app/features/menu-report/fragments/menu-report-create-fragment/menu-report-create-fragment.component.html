@@ -120,7 +120,7 @@
               (ngModelChange)="selectedDishMenuId.set($event); dishTouched.set(true)"
               (blur)="dishTouched.set(true)"
             >
-              <option [ngValue]="null" disabled>Seleccione el menú que se va a concinar</option>
+              <option [ngValue]="null" disabled>Seleccione el menú</option>
               @for (dish of dishMenus(); track dish.id) {
                 @if (dish.status === 'ACTIVO') {
                   <option [ngValue]="dish.id">
