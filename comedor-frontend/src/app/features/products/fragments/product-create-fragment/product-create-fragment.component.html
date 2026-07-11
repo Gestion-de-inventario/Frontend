@@ -47,18 +47,17 @@
       </div>
 
       <div class="modal-body px-4 px-md-5 py-4">
-
         <form [formGroup]="form" class="row g-4">
           <div class="col-12">
             <label class="form-label fw-semibold text-dark small"
               >Nombre del Producto <span class="text-danger">*</span></label
             >
             <input
-                type="text"
-                class="form-control"
-                formControlName="name"
-                (input)="onNameInput($event, 'name')"
-              />
+              type="text"
+              class="form-control"
+              formControlName="name"
+              (input)="onNameInput($event, 'name')"
+            />
 
             @if (form.controls.name.touched && form.controls.name.invalid) {
               <div class="invalid-feedback d-block">El nombre del producto es obligatorio.</div>
@@ -76,9 +75,12 @@
                 form.controls.categoryId.touched && form.controls.categoryId.invalid
               "
             >
-              <option [ngValue]="null" disabled selected>Seleccione</option>
-              @for (category of categories; track category.id) {
-                <option [value]="category.id">{{ category.name }}</option>
+              <option [ngValue]="null" disabled>Seleccione</option>
+
+              @for (category of categories(); track category.id) {
+                <option [ngValue]="category.id">
+                  {{ category.name }}
+                </option>
               }
             </select>
 
@@ -93,8 +95,11 @@
             >
             <select class="form-select custom-input" formControlName="tagId">
               <option [ngValue]="null">Sin etiqueta</option>
-              @for (tag of tags; track tag.id) {
-                <option [value]="tag.id">{{ tag.name }}</option>
+
+              @for (tag of tags(); track tag.id) {
+                <option [ngValue]="tag.id">
+                  {{ tag.name }}
+                </option>
               }
             </select>
           </div>
@@ -108,9 +113,9 @@
               formControlName="unit"
               [class.is-invalid]="form.controls.unit.touched && form.controls.unit.invalid"
             >
-              <option [ngValue]="null" disabled selected>Seleccione</option>
-              <option value="KILOGRAMOS">Kilogramos</option>
-              <option value="LITROS">Litros</option>
+              <option [ngValue]="null" disabled>Seleccione</option>
+              <option value="KG">Kilogramos</option>
+              <option value="L">Litros</option>
               <option value="UNIDADES">Unidades</option>
             </select>
             @if (form.controls.unit.touched && form.controls.unit.invalid) {
@@ -133,10 +138,11 @@
             @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('min')) {
               <div class="invalid-feedback d-block">Ingrese un valor mayor o igual a 1.</div>
             }
-            @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('required')) {
+            @if (
+              form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('required')
+            ) {
               <div class="invalid-feedback d-block">El punto de reorden es obligatorio.</div>
             }
-
           </div>
         </form>
       </div>
