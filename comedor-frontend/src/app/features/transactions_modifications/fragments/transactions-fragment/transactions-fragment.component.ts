@@ -4,7 +4,12 @@ import { FormsModule } from '@angular/forms';
 
 import { TransactionService } from '@features/transactions_modifications/services/transactions/transaction-api.service';
 import { TransactionStateService } from '@features/transactions_modifications/services/transactions/transaction-state.service';
-import { TransactionsResponse } from '@features/transactions_modifications/interfaces/transactions/transactions.response';
+import {
+  TransactionReferenceType,
+  TransactionSource,
+  TransactionsResponse,
+  TransactionType,
+} from '@features/transactions_modifications/interfaces/transactions/transactions.response';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
 
@@ -15,6 +20,7 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './transactions-fragment.component.html',
+  styleUrls: ['./transactions-fragment.component.scss'],
 })
 export class TransactionsFragmentComponent {
   readonly authState = inject(AuthStateService);
@@ -45,6 +51,7 @@ export class TransactionsFragmentComponent {
   type = signal<string | null>(null);
   source = signal<string | null>(null);
   name = signal<string>('');
+  referenceType = signal<TransactionReferenceType | null>(null);
 
   constructor() {
     if (!this.canList) return;
@@ -82,6 +89,7 @@ export class TransactionsFragmentComponent {
       type: this.type() ?? undefined,
       source: this.source() ?? undefined,
       name: this.name() || undefined,
+      referenceType: this.referenceType() ?? undefined,
     };
   }
 
@@ -154,25 +162,52 @@ export class TransactionsFragmentComponent {
   }
 
   sourceOptions = computed(() => {
-    switch (this.type()) {
-      case 'ENTRADA':
-        return [
-          { value: 'COMPRA', label: 'Compra' },
-          { value: 'DONACION', label: 'Donación' },
-          { value: 'TRANSFERENCIA', label: 'Transferencia' },
-        ];
+    const type = this.type();
+    const referenceType = this.referenceType();
 
-      case 'SALIDA':
-        return [{ value: 'INVENTARIO', label: 'Inventario' }];
-
-      default:
-        return [
-          { value: 'COMPRA', label: 'Compra' },
-          { value: 'DONACION', label: 'Donación' },
-          { value: 'TRANSFERENCIA', label: 'Transferencia' },
-          { value: 'INVENTARIO', label: 'Inventario' },
-        ];
+    if (referenceType === 'MENU') {
+      return [{ value: 'INVENTARIO', label: 'Inventario' }];
     }
+
+    if (referenceType === 'INGREDIENTE') {
+      if (type === 'ENTRADA') {
+        return [
+          { value: 'COMPRA', label: 'Compra' },
+          { value: 'DONACION', label: 'Donación' },
+          { value: 'TRANSFERENCIA', label: 'Transferencia' },
+        ];
+      }
+
+      if (type === 'SALIDA') {
+        return [{ value: 'INVENTARIO', label: 'Inventario' }];
+      }
+
+      return [
+        { value: 'COMPRA', label: 'Compra' },
+        { value: 'DONACION', label: 'Donación' },
+        { value: 'TRANSFERENCIA', label: 'Transferencia' },
+        { value: 'INVENTARIO', label: 'Inventario' },
+      ];
+    }
+
+    if (type === 'ENTRADA') {
+      return [
+        { value: 'COMPRA', label: 'Compra' },
+        { value: 'DONACION', label: 'Donación' },
+        { value: 'TRANSFERENCIA', label: 'Transferencia' },
+      ];
+    }
+
+    if (type === 'SALIDA') {
+      return [{ value: 'INVENTARIO', label: 'Inventario' }];
+    }
+
+    return [
+      { value: 'COMPRA', label: 'Compra' },
+      { value: 'DONACION', label: 'Donación' },
+      { value: 'TRANSFERENCIA', label: 'Transferencia' },
+      { value: 'INVENTARIO', label: 'Inventario' },
+    ];
   });
 
   onTypeChange(type: string | null): void {
@@ -187,6 +222,17 @@ export class TransactionsFragmentComponent {
     this.applyFilters();
   }
 
+  onCategoryChange(referenceType: TransactionReferenceType | null): void {
+    this.referenceType.set(referenceType);
+
+    const validSources = this.sourceOptions().map((s) => s.value);
+
+    if (this.source() && !validSources.includes(this.source()!)) {
+      this.source.set(null);
+    }
+    this.applyFilters();
+  }
+
   clearFilters(): void {
     this.filterOption.set('este_mes');
     this.type.set(null);
@@ -195,6 +241,7 @@ export class TransactionsFragmentComponent {
     this.customStartDate.set('');
     this.customEndDate.set('');
     this.page.set(0);
+    this.referenceType.set(null);
     this.loadTransactions();
   }
 
@@ -208,7 +255,7 @@ export class TransactionsFragmentComponent {
     const q = this.buildQuery();
 
     this.transactionService
-      .getTransactions(q.page, q.size, q.start, q.end, q.type, q.source, q.name)
+      .getTransactions(q.page, q.size, q.start, q.end, q.type, q.source, q.name, q.referenceType)
       .subscribe({
         next: (response) => {
           this.transactionState.set(response.content);
@@ -263,4 +310,21 @@ export class TransactionsFragmentComponent {
       String(date.getDate()).padStart(2, '0')
     );
   }
+
+  readonly transactionTypeLabels: Record<TransactionType, string> = {
+    ENTRADA: 'Entrada',
+    SALIDA: 'Salida',
+  };
+
+  readonly referenceTypeLabels: Record<TransactionReferenceType, string> = {
+    INGREDIENTE: 'Ingrediente',
+    MENU: 'Menú',
+  };
+
+  readonly sourceLabels: Record<TransactionSource, string> = {
+    COMPRA: 'Compra',
+    DONACION: 'Donación',
+    TRANSFERENCIA: 'Transferencia',
+    INVENTARIO: 'Inventario',
+  };
 }
