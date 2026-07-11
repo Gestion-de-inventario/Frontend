@@ -131,7 +131,6 @@
                   formControlName="name"
                   (input)="onNameInput($event, 'name')"
                 />
-
               </div>
 
               @if (!tieneTransacciones) {
@@ -156,8 +155,8 @@
                 <div class="col-md-6">
                   <label class="form-label fw-semibold text-dark small">Unidad</label>
                   <select class="form-select custom-input" formControlName="unit">
-                    <option value="KILOGRAMOS">Kilogramos</option>
-                    <option value="LITROS">Litros</option>
+                    <option value="KG">Kilogramos</option>
+                    <option value="L">Litros</option>
                     <option value="UNIDADES">Unidades</option>
                   </select>
                 </div>
@@ -190,15 +189,39 @@
               <div class="col-md-6">
                 <label class="form-label fw-semibold text-dark small">Punto de reorden</label>
                 <input
-                  type="number"
-                  class="form-control custom-input"
+                  type="text"
+                  inputmode="decimal"
+                  maxlength="8"
+                  class="form-control"
                   formControlName="reorderPoint"
+                  placeholder="Ej. 10.50"
+                  (input)="limitReorderPointDigits($event)"
                 />
-                @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('min')) {
-                  <div class="invalid-feedback d-block">Ingrese un valor mayor o igual a 1.</div>
+                @if (
+                  form.controls.reorderPoint.touched &&
+                  form.controls.reorderPoint.hasError('required')
+                ) {
+                  <div class="invalid-feedback small fw-medium">
+                    El punto de reposición es obligatorio.
+                  </div>
                 }
-                @if (form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('required')) {
-                  <div class="invalid-feedback d-block">El punto de reorden es obligatorio.</div>
+
+                @if (
+                  form.controls.reorderPoint.touched && form.controls.reorderPoint.hasError('min')
+                ) {
+                  <div class="invalid-feedback small fw-medium">
+                    El punto de reposición debe ser mayor que cero.
+                  </div>
+                }
+
+                @if (
+                  form.controls.reorderPoint.touched &&
+                  (form.controls.reorderPoint.hasError('max') ||
+                    form.controls.reorderPoint.hasError('pattern'))
+                ) {
+                  <div class="invalid-feedback small fw-medium">
+                    El punto de reposición debe tener máximo 5 cifras enteras y 2 decimales.
+                  </div>
                 }
               </div>
             </form>

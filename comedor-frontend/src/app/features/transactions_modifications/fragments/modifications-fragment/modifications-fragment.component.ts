@@ -14,6 +14,7 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './modifications-fragment.component.html',
+  styleUrls: ['./modifications-fragment.component.scss'],
 })
 export class ModificationsFragmentComponent {
   readonly authState = inject(AuthStateService);

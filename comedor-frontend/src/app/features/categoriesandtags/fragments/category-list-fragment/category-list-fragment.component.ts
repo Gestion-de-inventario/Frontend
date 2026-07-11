@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoryApiService } from '@features/categoriesandtags/services/category-api.service';
 import { CategoryStateService } from '@features/categoriesandtags/services/category-state.service';
-
+import { CategoryDetailModalComponent } from '../category-detail-modal/category-detail-modal.component';
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-category-list-fragment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CategoryDetailModalComponent],
   templateUrl: './category-list-fragment.component.html',
 })
 export class CategoryListFragmentComponent {
@@ -30,9 +30,7 @@ export class CategoryListFragmentComponent {
       list = list.filter((c) => c.status === 'ACTIVO');
     }
 
-    return list.filter((c) =>
-      c.name.toLowerCase().includes(this.search().toLowerCase())
-    );
+    return list.filter((c) => c.name.toLowerCase().includes(this.search().toLowerCase()));
   });
 
   constructor() {
@@ -50,7 +48,7 @@ export class CategoryListFragmentComponent {
       error: (err) => {
         console.error('Error cargando categorías', err);
         this.loading.set(false);
-      }
+      },
     });
   }
 

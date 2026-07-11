@@ -34,15 +34,21 @@ export class ProductDetailModalComponent {
   tags: TagResponse[] = [];
 
   readonly form = new FormGroup({
-    name: new FormControl<string | null>('',{
-        nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]
+    name: new FormControl<string | null>('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
     }),
     categoryId: new FormControl<number | null>(null),
     tagId: new FormControl<number | null>(null),
     unit: new FormControl<string | null>(null),
-    reorderPoint: new FormControl<number | null>(null,{
-        validators: [Validators.required, Validators.min(1)],
+    reorderPoint: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.pattern(/^\d{1,5}([.,]\d{1,2})?$/)],
     }),
   });
 
@@ -59,14 +65,20 @@ export class ProductDetailModalComponent {
     const product = this.product();
     if (!product) return;
 
-    this.form.reset();
-
+    this.form.reset({
+      name: '',
+      categoryId: null,
+      tagId: 0,
+      unit: null,
+      reorderPoint: '',
+    });
+    this.form.controls.reorderPoint.setValue(product.reorderPoint.toString().replace('.', ','));
     this.form.patchValue({
       name: product.name,
       categoryId: Number(product.categoryId),
       tagId: product.tagId ?? 0,
       unit: this.normalizeUnit(product.unit),
-      reorderPoint: Number(product.reorderPoint),
+      reorderPoint: product.reorderPoint.toString().replace('.', ','),
     });
 
     console.log('Producto:', product);
@@ -86,14 +98,14 @@ export class ProductDetailModalComponent {
     this.loading.set(true);
 
     const raw = this.form.getRawValue();
-
+    const reorderPoint = Number(raw.reorderPoint.replace(',', '.'));
     this.productService
       .edit(product.id, {
         name: raw.name ?? undefined,
         categoryId: raw.categoryId ?? undefined,
         tagId: raw.tagId ?? 0,
         unit: raw.unit ?? undefined,
-        reorderPoint: raw.reorderPoint ?? undefined,
+        reorderPoint: reorderPoint ?? undefined,
       })
       .subscribe({
         next: (updated) => {
@@ -144,11 +156,11 @@ export class ProductDetailModalComponent {
     if (!unit) return null;
 
     const unitMap: Record<string, string> = {
-      KG: 'KILOGRAMOS',
-      KILOGRAMOS: 'KILOGRAMOS',
+      KG: 'KG',
+      KILOGRAMOS: 'KG',
 
-      L: 'LITROS',
-      LITROS: 'LITROS',
+      L: 'L',
+      LITROS: 'L',
 
       UNIDAD: 'UNIDADES',
       UNIDADES: 'UNIDADES',
@@ -165,4 +177,33 @@ export class ProductDetailModalComponent {
     }
   }
 
+  limitReorderPointDigits(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value;
+
+    // Solo números, punto y coma
+    value = value.replace(/[^0-9.,]/g, '');
+
+    // Normaliza coma a punto visualmente
+    value = value.replace(',', '.');
+
+    // Permite solo un punto
+    const parts = value.split('.');
+
+    const integerPart = parts[0].slice(0, 5);
+    const decimalPart = parts[1]?.slice(0, 2);
+
+    if (parts.length > 1) {
+      value = `${integerPart}.${decimalPart ?? ''}`;
+    } else {
+      value = integerPart;
+    }
+
+    input.value = value;
+
+    this.form.controls.reorderPoint.setValue(value, {
+      emitEvent: false,
+    });
+  }
 }
