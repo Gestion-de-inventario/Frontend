@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProductApiService } from '@features/products/services/product-api.service';
@@ -18,73 +18,105 @@ declare const bootstrap: any;
   templateUrl: './product-create-fragment.component.html',
   styleUrl: './product-create-fragment.component.scss',
 })
-export class ProductCreateFragmentComponent {
+export class ProductCreateFragmentComponent implements OnInit {
   private readonly productService = inject(ProductApiService);
   private readonly productState = inject(ProductStateService);
   private readonly categoryService = inject(CategoryApiService);
   private readonly tagService = inject(TagApiService);
   private readonly toastService = inject(ToastService);
 
-  categories: CategoryResponse[] = [];
-  tags: TagResponse[] = [];
-  loading = signal<boolean>(false);
+  readonly categories = signal<CategoryResponse[]>([]);
+  readonly tags = signal<TagResponse[]>([]);
+  readonly loading = signal(false);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
     }),
+
     categoryId: new FormControl<number | null>(null, {
       validators: [Validators.required],
     }),
+
     tagId: new FormControl<number | null>(null),
+
     unit: new FormControl<string | null>(null, {
       validators: [Validators.required],
     }),
+
     reorderPoint: new FormControl<number | null>(null, {
       validators: [Validators.required, Validators.min(1)],
     }),
   });
 
-  constructor() {
+  ngOnInit(): void {
     this.loadCategories();
     this.loadTags();
   }
 
-  loadCategories(): void {
+  private loadCategories(): void {
     this.categoryService.listByStatus('ACTIVO').subscribe({
-      next: (categories) => (this.categories = categories),
+      next: (categories) => {
+        this.categories.set(categories.map((category) => ({ ...category })));
+      },
+      error: (error) => {
+        console.error('Error cargando categorías', error);
+        this.categories.set([]);
+      },
     });
   }
 
-  loadTags(): void {
+  private loadTags(): void {
     this.tagService.listByStatus('ACTIVO').subscribe({
-      next: (tags) => (this.tags = tags),
+      next: (tags) => {
+        this.tags.set(tags.map((tag) => ({ ...tag })));
+      },
+      error: (error) => {
+        console.error('Error cargando etiquetas', error);
+        this.tags.set([]);
+      },
     });
   }
 
   openModal(): void {
-    const modal = new bootstrap.Modal(document.getElementById('createProductModal'));
-    modal.show();
+    const modalElement = document.getElementById('createProductModal');
+
+    if (!modalElement) {
+      return;
+    }
+
+    bootstrap.Modal.getOrCreateInstance(modalElement).show();
   }
 
   create(): void {
-    if (this.form.invalid || this.loading()) return;
+    if (this.form.invalid || this.loading()) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const value = this.form.getRawValue();
 
     this.loading.set(true);
 
     this.productService
       .create({
-        name: this.form.getRawValue().name,
-        categoryId: this.form.getRawValue().categoryId!,
-        tagId: this.form.getRawValue().tagId ?? null,
-        unit: this.form.getRawValue().unit!,
-        reorderPoint: this.form.getRawValue().reorderPoint!,
+        name: value.name,
+        categoryId: value.categoryId!,
+        tagId: value.tagId,
+        unit: value.unit!,
+        reorderPoint: value.reorderPoint!,
       })
       .subscribe({
         next: (created) => {
           this.productState.addProduct(created);
           this.toastService.show('Producto creado correctamente', 'success');
+
           this.form.reset({
             name: '',
             categoryId: null,
@@ -92,10 +124,18 @@ export class ProductCreateFragmentComponent {
             unit: null,
             reorderPoint: null,
           });
-          bootstrap.Modal.getInstance(document.getElementById('createProductModal')!)?.hide();
+
+          const modalElement = document.getElementById('createProductModal');
+
+          if (modalElement) {
+            bootstrap.Modal.getInstance(modalElement)?.hide();
+          }
         },
         error: (error) => {
-          this.toastService.show('No se pudo crear: ' + error.error.message, 'danger');
+          const message = error?.error?.message ?? 'Error desconocido';
+
+          this.toastService.show(`No se pudo crear: ${message}`, 'danger');
+
           this.loading.set(false);
         },
         complete: () => {
@@ -106,9 +146,13 @@ export class ProductCreateFragmentComponent {
 
   onNameInput(event: Event, controlName: 'name'): void {
     const input = event.target as HTMLInputElement;
+
     const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+
     if (cleaned !== input.value) {
-      this.form.controls[controlName].setValue(cleaned, { emitEvent: false });
+      this.form.controls[controlName].setValue(cleaned, {
+        emitEvent: false,
+      });
     }
   }
 }

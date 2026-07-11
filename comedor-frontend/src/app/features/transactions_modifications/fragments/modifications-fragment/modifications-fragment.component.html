@@ -17,9 +17,11 @@
         <h5 class="fw-bold text-dark mb-0">Modificaciones recientes</h5>
       </div>
 
-      <button class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center" 
-              (click)="exportToPdf()" 
-              [disabled]="loading() || exporting()">
+      <button
+        class="btn btn-danger btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center"
+        (click)="exportToPdf()"
+        [disabled]="loading() || exporting()"
+      >
         @if (exporting()) {
           <span class="spinner-border spinner-border-sm me-2"></span> Exportando...
         } @else {
@@ -30,13 +32,14 @@
   </div>
 
   <div class="card-body px-4 pb-4">
-
     <div class="row g-3 mb-4 align-items-end bg-light p-3 rounded-4 mx-1 mt-1">
       <div class="col-md-4">
         <label class="form-label fw-bold text-muted small">Filtrar por fecha</label>
-        <select class="form-select rounded-3" 
-                [ngModel]="filterOption()" 
-                (ngModelChange)="filterOption.set($event); onFilterChange()">
+        <select
+          class="form-select rounded-3"
+          [ngModel]="filterOption()"
+          (ngModelChange)="filterOption.set($event); onFilterChange()"
+        >
           <option value="hoy">Hoy</option>
           <option value="ayer">Ayer</option>
           <option value="esta_semana">Esta semana</option>
@@ -49,15 +52,21 @@
       @if (filterOption() === 'custom') {
         <div class="col-md-4">
           <label class="form-label fw-bold text-muted small">Fecha Inicio</label>
-          <input type="date" class="form-control rounded-3" 
-                 [ngModel]="customStartDate()" 
-                 (ngModelChange)="customStartDate.set($event); onCustomDateChange()">
+          <input
+            type="date"
+            class="form-control rounded-3"
+            [ngModel]="customStartDate()"
+            (ngModelChange)="customStartDate.set($event); onCustomDateChange()"
+          />
         </div>
         <div class="col-md-4">
           <label class="form-label fw-bold text-muted small">Fecha Fin</label>
-          <input type="date" class="form-control rounded-3" 
-                 [ngModel]="customEndDate()" 
-                 (ngModelChange)="customEndDate.set($event); onCustomDateChange()">
+          <input
+            type="date"
+            class="form-control rounded-3"
+            [ngModel]="customEndDate()"
+            (ngModelChange)="customEndDate.set($event); onCustomDateChange()"
+          />
         </div>
       }
     </div>
@@ -67,80 +76,251 @@
         <div class="spinner-border text-primary"></div>
       </div>
     } @else if (modifications().length === 0) {
-      <div class="text-center py-5 text-muted">No hay modificaciones registradas en estas fechas.</div>
-    } @else {
-      <div class="row mt-4">
-        <div class="col">
-          <label class="form-label"> Por página </label>
-        </div>
-        <div class="col">
-          <select
-            class="form-select"
-            [ngModel]="pageSize()"
-            (ngModelChange)="changePageSize($event)"
-          >
-            <option [ngValue]="3">3</option>
-            <option [ngValue]="10">10</option>
-            <option [ngValue]="20">20</option>
-            <option [ngValue]="50">50</option>
-            <option [ngValue]="100">100</option>
-          </select>
-        </div>
+      <div class="text-center py-5 text-muted">
+        No hay modificaciones registradas en estas fechas.
       </div>
-      <div class="d-flex flex-column gap-2 mt-2">
+    } @else {
+      <div class="page-size-control mt-4">
+        <label for="modificationPageSize" class="page-size-label"> Por página </label>
+
+        <select
+          id="modificationPageSize"
+          class="form-select page-size-select"
+          [ngModel]="pageSize()"
+          (ngModelChange)="changePageSize($event)"
+        >
+          <option [ngValue]="3">3</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
+      </div>
+
+      <!-- Lista de modificaciones -->
+      <div class="modification-list mt-3" role="list" aria-label="Historial de modificaciones">
         @for (m of modifications(); track m.id) {
-          <div class="border rounded-3 px-3 py-3">
-            <div class="d-flex justify-content-between align-items-start mb-2">
+          <article
+            class="modification-card"
+            role="listitem"
+            [attr.aria-label]="
+              'Modificación de ' +
+              m.name +
+              '. Campo ' +
+              m.editedAttribute +
+              '. Realizada por ' +
+              m.username
+            "
+          >
+            <!-- Encabezado -->
+            <header class="modification-card__header">
+              <div class="modification-identity">
+                <div class="modification-icon" aria-hidden="true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-pencil-icon lucide-pencil"
+                  >
+                    <path
+                      d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+                    />
+                    <path d="m15 5 4 4" />
+                  </svg>
+                </div>
+
+                <div class="modification-title-container">
+                  <span class="entity-type">
+                    {{ m.editedClass }}
+                  </span>
+
+                  <h3 class="entity-name">
+                    {{ m.name }}
+                  </h3>
+                </div>
+              </div>
+
+              <time class="modification-date" [attr.datetime]="m.dateTime">
+                <i class="bi bi-clock" aria-hidden="true"></i>
+
+                {{ m.dateTime | date: 'dd/MM/yyyy, h:mm a' }}
+              </time>
+            </header>
+
+            <!-- Atributo modificado -->
+            <div class="modified-attribute">
+              <span class="detail-label"> Campo modificado </span>
+
+              <strong class="attribute-name">
+                {{ m.editedAttribute }}
+              </strong>
+            </div>
+
+            <!-- Comparación de valores -->
+            <div class="change-comparison">
+              <section class="change-value change-value--previous" aria-label="Valor anterior">
+                <div class="change-value__header">
+                  <span class="change-icon" aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-arrow-left-icon lucide-arrow-left"
+                    >
+                      <path d="m12 19-7-7 7-7" />
+                      <path d="M19 12H5" />
+                    </svg>
+                  </span>
+
+                  <span class="change-label"> Antes </span>
+                </div>
+
+                <p class="change-content">
+                  {{ m.previousValue || 'Sin valor' }}
+                </p>
+              </section>
+
+              <section
+                class="change-value change-value--new"
+                aria-label="Valor después de la modificación"
+              >
+                <div class="change-value__header">
+                  <span class="change-icon" aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-arrow-right-icon lucide-arrow-right"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </span>
+
+                  <span class="change-label"> Después </span>
+                </div>
+
+                <p class="change-content">
+                  {{ m.newValue || 'Sin valor' }}
+                </p>
+              </section>
+            </div>
+
+            <!-- Usuario responsable -->
+            <footer class="modification-footer">
+              <div class="user-icon" aria-hidden="true">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-user-round-icon lucide-user-round"
+                >
+                  <circle cx="12" cy="8" r="5" />
+                  <path d="M20 21a8 8 0 0 0-16 0" />
+                </svg>
+              </div>
+
               <div>
-                <span class="fw-semibold text-dark">{{ m.editedClass }}</span>
-                <span class="mx-1 text-muted">·</span>
-                <span class="text-muted small">{{ m.editedAttribute }}</span>
+                <span class="detail-label"> Modificado por </span>
+
+                <strong class="username">
+                  {{ m.username }}
+                </strong>
               </div>
-              <small class="text-muted">{{ m.dateTime | date: 'short' }}</small>
-            </div>
-            <div class="d-flex gap-2 flex-wrap mb-2">
-              <div
-                class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-danger bg-opacity-10"
-              >
-                <span class="badge bg-danger fw-normal">Antes</span>
-                <small class="text-dark">{{ m.previousValue }}</small>
-              </div>
-              <div
-                class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-success bg-opacity-10"
-              >
-                <span class="badge bg-success fw-normal">Después</span>
-                <small class="text-dark">{{ m.newValue }}</small>
-              </div>
-            </div>
-            <small class="text-muted"
-              ><span class="fw-medium">Usuario:</span> {{ m.username }}</small
-            >
-          </div>
+            </footer>
+          </article>
         }
       </div>
-      <div class="d-flex justify-content-between align-items-center mt-4">
+
+      <!-- Paginación -->
+      <nav class="modification-pagination mt-4" aria-label="Paginación de modificaciones">
         <button
-          class="btn btn-outline-secondary"
+          type="button"
+          class="btn btn-outline-secondary pagination-button"
           [disabled]="page() === 0"
           (click)="previousPage()"
+          aria-label="Ir a la página anterior"
         >
-          Anterior
+          <svg
+            class="pagination-button__icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+          </svg>
+          <span>Anterior</span>
         </button>
 
-        <span>
-          Página {{ page() + 1 }}
-          de
-          {{ totalPages() }}
-        </span>
+        <div class="pagination-information" aria-live="polite">
+          <span class="pagination-current"> Página {{ page() + 1 }} de {{ totalPages() }} </span>
+
+          <span class="pagination-total">
+            {{ totalElements() }}
+            {{ totalElements() === 1 ? 'modificación encontrada' : 'modificaciones encontradas' }}
+          </span>
+        </div>
 
         <button
-          class="btn btn-outline-secondary"
+          type="button"
+          class="btn btn-outline-secondary pagination-button"
           [disabled]="page() + 1 >= totalPages()"
           (click)="nextPage()"
+          aria-label="Ir a la página siguiente"
         >
-          Siguiente
+          <span>Siguiente</span>
+          <svg
+            class="pagination-button__icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m12 5 7 7-7 7" />
+            <path d="M5 12h14" />
+          </svg>
         </button>
-      </div>
+      </nav>
     }
   </div>
 </div>
