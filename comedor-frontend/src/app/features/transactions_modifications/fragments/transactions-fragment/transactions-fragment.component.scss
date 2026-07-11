@@ -1,0 +1,291 @@
+:host {
+  display: block;
+
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --border: #cbd5e1;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.transaction-card {
+  --reference-color: #0b3a6e;
+  --reference-background: #e8f1fb;
+
+  position: relative;
+  overflow: hidden;
+  padding: 1rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--reference-color);
+  border-radius: 0.875rem;
+  box-shadow: 0 4px 14px rgb(15 23 42 / 8%);
+}
+
+/* Ingrediente: azul */
+.transaction-card--ingredient {
+  --reference-color: #0b3a6e;
+  --reference-background: #e8f1fb;
+}
+
+/* Menú: morado */
+.transaction-card--menu {
+  --reference-color: #4a1f6f;
+  --reference-background: #f3eaf9;
+}
+
+.transaction-card__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.item-identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.item-icon {
+  display: inline-flex;
+  flex: 0 0 2.75rem;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--reference-color);
+  background: var(--reference-background);
+  border: 1px solid var(--reference-color);
+  border-radius: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.item-information {
+  min-width: 0;
+}
+
+.item-name {
+  margin: 0 0 0.4rem;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: fit-content;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.reference-chip {
+  color: var(--reference-color);
+  background: var(--reference-background);
+}
+
+.movement-chip--entry {
+  color: #005a3c;
+  background: #e6f4ee;
+}
+
+.movement-chip--exit {
+  color: #8a1c1c;
+  background: #fdecec;
+}
+
+.transaction-date {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.transaction-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.detail-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.75rem;
+  background: var(--surface-soft);
+  border: 1px solid #d6dee8;
+  border-radius: 0.75rem;
+}
+
+.detail-box--wide {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.detail-value {
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.user-information {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.user-code {
+  font-weight: 750;
+}
+
+/* Fuente: compra */
+.source-chip--purchase {
+  color: #6b3d00;
+  background: #fff4dd;
+}
+
+/* Fuente: donación */
+.source-chip--donation {
+  color: #005049;
+  background: #e4f5f3;
+}
+
+/* Fuente: transferencia */
+.source-chip--transfer {
+  color: #1e3a8a;
+  background: #dbeafe;
+}
+
+/* Fuente: inventario */
+.source-chip--inventory {
+  color: #3a3a3a;
+  background: #f2f4f7;
+}
+
+.stock-change {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.8rem;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+}
+
+.stock-description {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.stock-values {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stock-values strong {
+  font-size: 1.05rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 1rem;
+  color: var(--text-primary);
+  text-align: center;
+  background: var(--surface-soft);
+  border: 1px dashed #64748b;
+  border-radius: 0.875rem;
+}
+
+.empty-state i {
+  margin-bottom: 0.35rem;
+  font-size: 2rem;
+}
+
+.empty-state span {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 370px) {
+  .transaction-card__header {
+    grid-template-columns: 1fr;
+  }
+
+  .movement-chip {
+    margin-left: 3.5rem;
+  }
+
+  .transaction-details {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-box--wide {
+    grid-column: auto;
+  }
+
+  .stock-change {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.pagination-page {
+  color: #1f2937;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.pagination-total {
+  margin-top: 0.125rem;
+  color: #374151;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+}

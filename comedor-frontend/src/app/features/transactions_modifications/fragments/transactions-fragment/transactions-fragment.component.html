@@ -61,6 +61,20 @@
           </select>
         </div>
 
+        <!-- Categoria item -->
+        <div class="col-md-3">
+          <label class="form-label fw-bold text-muted small">Categoria item</label>
+          <select
+            class="form-select rounded-3"
+            [ngModel]="referenceType()"
+            (ngModelChange)="onCategoryChange($event)"
+          >
+            <option [ngValue]="null">Todos</option>
+            <option value="INGREDIENTE">Ingrediente</option>
+            <option value="MENU">Menú</option>
+          </select>
+        </div>
+
         <!-- TIPO MOVIMIENTO -->
         <div class="col-md-3">
           <label class="form-label fw-bold text-muted small">Tipo de movimiento</label>
@@ -187,46 +201,127 @@
             </select>
           </div>
         </div>
-        <div class="d-flex flex-column gap-2 mt-2">
+        <div
+          class="mt-4 transaction-list"
+          role="list"
+          aria-label="Historial de movimientos de inventario"
+        >
           @for (t of transactions(); track t.id) {
-            <div class="border rounded-3 px-3 py-3">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <span class="fw-semibold text-dark">{{ t.productName }}</span>
-                  <span class="ms-2 text-muted small">{{ t.dateTime | date: 'short' }}</span>
+            <article
+              class="transaction-card"
+              [class.transaction-card--ingredient]="t.referenceType === 'INGREDIENTE'"
+              [class.transaction-card--menu]="t.referenceType === 'MENU'"
+              role="listitem"
+              [attr.aria-label]="
+                transactionTypeLabels[t.type] +
+                ' de ' +
+                t.itemName +
+                ', tipo ' +
+                referenceTypeLabels[t.referenceType]
+              "
+            >
+              <!-- Encabezado -->
+              <div class="transaction-card__header">
+                <div class="item-identity">
+                  <div class="item-information">
+                    <h3 class="item-name">
+                      {{ t.itemName }}
+                    </h3>
+
+                    <span class="chip reference-chip">
+                      {{ referenceTypeLabels[t.referenceType] }}
+                    </span>
+                  </div>
                 </div>
+
                 <span
-                  class="badge rounded-pill"
-                  [class]="
-                    t.type === 'SALIDA'
-                      ? 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'
-                      : 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
-                  "
+                  class="chip movement-chip"
+                  [class.movement-chip--entry]="t.type === 'ENTRADA'"
+                  [class.movement-chip--exit]="t.type === 'SALIDA'"
                 >
-                  {{ t.type }}
+                  <i
+                    class="bi"
+                    aria-hidden="true"
+                    [class.bi-arrow-down-left]="t.type === 'ENTRADA'"
+                    [class.bi-arrow-up-right]="t.type === 'SALIDA'"
+                  ></i>
+
+                  {{ transactionTypeLabels[t.type] }}
                 </span>
               </div>
-              <div class="mt-2 d-flex gap-3 flex-wrap">
-                <span> Origen del movimiento : {{ t.source }} </span>
+
+              <!-- Fecha -->
+              <div class="transaction-date">
+                <i class="bi bi-clock" aria-hidden="true"></i>
+
+                <time [attr.datetime]="t.dateTime">
+                  {{ t.dateTime | date: 'dd/MM/yyyy, h:mm a' }}
+                </time>
               </div>
-              <div class="mt-2 d-flex gap-3 flex-wrap">
-                <small class="text-muted">
-                  <span class="fw-medium">Cantidad:</span> {{ t.amount }}
-                </small>
-                <small class="text-muted">
-                  <span class="fw-medium">Usuario:</span> {{ t.userName }} — {{ t.personaName }}
-                  {{ t.personaLastName }}
-                </small>
-                <small class="text-muted">
-                  <span class="fw-medium">Stock:</span> {{ t.currentStock }} → {{ t.finalStock }}
-                </small>
+
+              <!-- Información principal -->
+              <div class="transaction-details">
+                <div class="detail-box">
+                  <span class="detail-label">Fuente</span>
+
+                  <span
+                    class="chip source-chip"
+                    [class.source-chip--purchase]="t.source === 'COMPRA'"
+                    [class.source-chip--donation]="t.source === 'DONACION'"
+                    [class.source-chip--transfer]="t.source === 'TRANSFERENCIA'"
+                    [class.source-chip--inventory]="t.source === 'INVENTARIO'"
+                  >
+                    {{ sourceLabels[t.source] }}
+                  </span>
+                </div>
+
+                <div class="detail-box">
+                  <span class="detail-label">Cantidad</span>
+
+                  <strong class="detail-value">
+                    {{ t.amount | number: '1.0-3' }}
+                  </strong>
+                </div>
+
+                <div class="detail-box detail-box--wide">
+                  <span class="detail-label">Usuario responsable : {{ t.userName }}</span>
+
+                  <div class="user-information">
+                    <span> {{ t.personaName }} {{ t.personaLastName }} </span>
+                  </div>
+                </div>
               </div>
+
+              <!-- Cambio de stock -->
+              <div class="stock-change">
+                <div>
+                  <span class="detail-label">Variación de stock</span>
+                  <span class="stock-description"> Stock anterior y stock resultante </span>
+                </div>
+
+                <div class="stock-values">
+                  <span>{{ t.currentStock | number: '1.0-3' }}</span>
+
+                  <span> -> </span>
+
+                  <strong>{{ t.finalStock | number: '1.0-3' }}</strong>
+                </div>
+              </div>
+            </article>
+          } @empty {
+            <div class="empty-state" role="status">
+              <i class="bi bi-inbox" aria-hidden="true"></i>
+
+              <strong>No se encontraron movimientos</strong>
+
+              <span> Prueba modificando los filtros de búsqueda. </span>
             </div>
           }
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="d-flex justify-content-between align-items-center gap-2 mt-4">
           <button
+            type="button"
             class="btn btn-outline-secondary"
             [disabled]="page() === 0"
             (click)="previousPage()"
@@ -234,12 +329,16 @@
             Anterior
           </button>
 
-          <span class="text-muted small">
-            Página {{ page() + 1 }} de {{ totalPages() }} — {{ totalElements() }} transacciones
-            encontradas
-          </span>
+          <div
+            class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center"
+          >
+            <span class="pagination-page"> Página {{ page() + 1 }} de {{ totalPages() }} </span>
+
+            <span class="pagination-total"> {{ totalElements() }} transacciones encontradas </span>
+          </div>
 
           <button
+            type="button"
             class="btn btn-outline-secondary"
             [disabled]="page() + 1 >= totalPages()"
             (click)="nextPage()"

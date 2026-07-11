@@ -22,6 +22,7 @@ export class TransactionService {
     type?: string,
     source?: string,
     productName?: string,
+    referenceType?: string,
   ) {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
 
@@ -43,6 +44,10 @@ export class TransactionService {
 
     if (productName) {
       params = params.set('productName', productName);
+    }
+
+    if (referenceType) {
+      params = params.set('referenceType', referenceType);
     }
 
     return this.http.get<TransactionPageResponse>(
