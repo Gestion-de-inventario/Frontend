@@ -11,3 +11,11 @@
   background-color: var(--color-primary);
   color: var(--color-background);
 }
+
+.ui-button:disabled {
+  background-color: #ced4da;
+  color: #6c757d;
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}

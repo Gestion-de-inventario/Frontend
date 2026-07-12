@@ -41,10 +41,13 @@
                   </div>
                   <input
                     type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
                     class="form-control custom-input"
                     formControlName="username"
                     placeholder="Ej. 12345678"
                     maxlength="8"
+                    (input)="onlyDniNumbers($event)"
                   />
                 </div>
 
@@ -85,7 +88,8 @@
                     type="password"
                     class="form-control custom-input"
                     formControlName="password"
-                    placeholder="••••••••"
+                    placeholder="Ingresa tu contraseña"
+                    maxlength="40"
                   />
                 </div>
 
