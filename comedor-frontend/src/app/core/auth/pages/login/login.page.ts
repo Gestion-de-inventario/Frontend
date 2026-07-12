@@ -34,13 +34,17 @@ export class LoginPage {
     username: new FormControl('', {
       nonNullable: true,
 
-      validators: [Validators.required, Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^[0-9]{8}$/),
+      ],
     }),
 
     password: new FormControl('', {
       nonNullable: true,
-
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.maxLength(40)],
     }),
   });
 
@@ -67,5 +71,17 @@ export class LoginPage {
         this.isLoading.set(false);
       },
     });
+  }
+
+  onlyDniNumbers(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const cleaned = input.value.replace(/\D/g, '').slice(0, 8);
+
+    if (input.value !== cleaned) {
+      input.value = cleaned;
+    }
+
+    this.form.controls.username.setValue(cleaned, { emitEvent: false });
   }
 }
