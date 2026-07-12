@@ -1,0 +1,7 @@
+:host {
+  --my-red: #981b27;
+}
+
+.my-bg-red {
+  background-color: var(--my-red);
+}

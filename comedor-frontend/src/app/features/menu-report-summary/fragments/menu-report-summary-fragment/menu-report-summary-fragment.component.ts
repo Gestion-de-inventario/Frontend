@@ -23,6 +23,7 @@ const today = new Intl.DateTimeFormat('en-CA', {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './menu-report-summary-fragment.component.html',
+  styleUrls: ['./menu-report-summary-fragment.component.scss'],
 })
 export class MenuReportSummaryFragmentComponent {
   private readonly menuReportService = inject(MenuReportApiService);

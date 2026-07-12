@@ -1,0 +1,23 @@
+:host {
+  --new-text: #14532d;
+  --new-background: #f0fdf4;
+  --previous-text: #8d2020;
+  --previous-background: #fef2f2;
+  --blue-text: #003b94;
+  --blue-background: #e5f0ff;
+}
+
+.my-bg-green {
+  background-color: var(--new-background);
+}
+
+.my-txt-green {
+  color: var(--new-text);
+}
+
+.my-bg-red {
+  background-color: var(--previous-background);
+}
+.my-txt-red {
+  color: var(--previous-text);
+}

@@ -91,11 +91,9 @@
                 <span class="text-muted small">@{{ user.dni }} · {{ user.role }}</span>
               </div>
               <span
-                class="badge rounded-pill px-3 py-2"
+                class="chip"
                 [class]="
-                  user.status === 'INACTIVO'
-                    ? 'bg-danger bg-opacity-10 text-danger'
-                    : 'bg-success bg-opacity-10 text-success'
+                  user.status === 'INACTIVO' ? 'chip--status-inactive' : 'chip--status-active'
                 "
               >
                 {{ user.status }}
@@ -222,40 +220,48 @@
       >
         @if (mode === 'view' && user(); as user) {
           <div class="d-flex gap-2 row">
-            @if (authState.hasPermission('USER_ACTIVATE')) {
+            @if (loading()) {
               <div class="col">
-                <button
-                  class="btn btn-outline-success rounded-pill px-3 fw-medium"
-                  (click)="confirmActivate()"
-                  [disabled]="loading() || user.status === 'ACTIVO'"
-                >
-                  Activar
+                <button class="btn my-gray-btn rounded-pill px-3 fw-medium" disabled>
+                  <span class="spinner-border spinner-border-sm"></span> Cargando...
                 </button>
               </div>
-            }
+            } @else {
+              @if (authState.hasPermission('USER_ACTIVATE')) {
+                <div class="col">
+                  <button
+                    class="btn my-green-btn rounded-pill px-3 fw-medium"
+                    (click)="confirmActivate()"
+                    [disabled]="loading() || user.status === 'ACTIVO'"
+                  >
+                    Activar
+                  </button>
+                </div>
+              }
 
-            @if (authState.hasPermission('USER_DEACTIVATE')) {
-              <div class="col">
-                <button
-                  class="btn btn-outline-danger rounded-pill px-3 fw-medium"
-                  (click)="confirmDeactivate()"
-                  [disabled]="loading() || user.status === 'INACTIVO'"
-                >
-                  Desactivar
-                </button>
-              </div>
+              @if (authState.hasPermission('USER_DEACTIVATE')) {
+                <div class="col">
+                  <button
+                    class="btn my-red-btn rounded-pill px-3 fw-medium"
+                    (click)="confirmDeactivate()"
+                    [disabled]="loading() || user.status === 'INACTIVO'"
+                  >
+                    Desactivar
+                  </button>
+                </div>
+              }
             }
           </div>
           <div class="container">
             @if (authState.hasPermission('USER_EDIT')) {
               <div class="row mt-2">
-                <button class="btn btn-primary rounded-pill px-4 fw-medium" (click)="openEdit()">
+                <button class="btn my-blue-btn rounded-pill px-4 fw-medium" (click)="openEdit()">
                   Editar Datos
                 </button>
               </div>
               <div class="row mt-2">
                 <button
-                  class="btn btn-primary rounded-pill px-4 fw-medium"
+                  class="btn my-blue-btn rounded-pill px-4 fw-medium"
                   (click)="openForceChangePassword()"
                 >
                   Cambiar Contraseña

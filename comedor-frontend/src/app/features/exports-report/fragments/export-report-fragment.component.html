@@ -1,5 +1,4 @@
 <div class="d-flex flex-column gap-4">
-
   <!-- <div class="card border-0 shadow-sm rounded-4">
     <div class="card-body p-4">
       <div class="d-flex align-items-center gap-2 mb-3">
@@ -57,9 +56,7 @@
         <i class="bi bi-calendar-range text-secondary fs-5"></i>
         <h5 class="fw-semibold mb-0">Exportar por fecha</h5>
       </div>
-      <p class="text-muted small mb-3">
-        Selecciona una fecha para exportar el reporte de ese día.
-      </p>
+      <p class="text-muted small mb-3">Selecciona una fecha para exportar el reporte de ese día.</p>
 
       <div class="col-md-5 mb-3">
         <input
@@ -83,7 +80,7 @@
       } @else if (dateId()) {
         <div class="d-flex gap-3 flex-wrap">
           <button
-            class="btn btn-danger d-flex align-items-center gap-2"
+            class="btn my-bg-red d-flex align-items-center gap-2"
             [disabled]="exporting() !== null"
             (click)="exportByDate('pdf')"
           >
@@ -110,5 +107,4 @@
       }
     </div>
   </div>
-
 </div>

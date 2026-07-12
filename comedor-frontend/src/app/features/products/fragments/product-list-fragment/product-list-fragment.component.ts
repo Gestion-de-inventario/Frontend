@@ -13,6 +13,7 @@ declare const bootstrap: any;
   standalone: true,
   imports: [CommonModule, FormsModule, ProductDetailModalComponent],
   templateUrl: './product-list-fragment.component.html',
+  styleUrl: './product-list-fragment.component.scss',
 })
 export class ProductListFragmentComponent {
   private readonly productService = inject(ProductApiService);
@@ -49,18 +50,14 @@ export class ProductListFragmentComponent {
     return products;
   });
 
-  readonly totalPages = computed(() =>
-    Math.ceil(this.filteredProducts().length / this.pageSize)
-  );
+  readonly totalPages = computed(() => Math.ceil(this.filteredProducts().length / this.pageSize));
 
   readonly pagedProducts = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize;
     return this.filteredProducts().slice(start, start + this.pageSize);
   });
 
-  readonly pages = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, i) => i + 1)
-  );
+  readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   constructor() {
     this.loadProducts();
@@ -78,7 +75,7 @@ export class ProductListFragmentComponent {
       error: (err) => {
         console.error('Error cargando productos', err);
         this.loading.set(false);
-      }
+      },
     });
   }
 

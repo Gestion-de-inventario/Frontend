@@ -1,0 +1,27 @@
+:host {
+  --my-blue: #0b3a6e;
+  --my-blue-bg: #e8f1fb;
+}
+
+.my-blue-btn {
+  background-color: var(--my-blue);
+  color: #ffffff;
+}
+
+.my-blue-btn:hover {
+  background-color: #ffffff;
+  color: var(--my-blue);
+  border: 3px solid var(--my-blue);
+}
+
+.my-blue-btn:disabled {
+  background-color: var(--my-blue);
+  color: #ffffff;
+  opacity: 0.5;
+}
+
+.my-blue-container {
+  background-color: var(--my-blue-bg);
+  color: #000000;
+  border: 1px solid var(--my-blue);
+}

@@ -1,3 +1,6 @@
+:host {
+  --my-blue: #003b94;
+}
 .bg-success {
   background-color: var(--color-success) !important;
   color: white !important;
@@ -12,4 +15,29 @@
 }
 .text-info {
   color: #062128 !important;
+}
+
+.my-blue-btn:hover {
+  background-color: var(--my-blue);
+  color: #ffffff;
+  border: 1px solid var(--my-blue);
+}
+
+.my-blue-btn {
+  min-height: 44px;
+  background-color: #ffffff;
+  color: var(--my-blue);
+  border: 1px solid var(--my-blue);
+}
+
+.my-alt-blue-btn {
+  background-color: var(--my-blue);
+  color: #ffffff;
+  border: 1px solid var(--my-blue);
+}
+
+.my-alt-blue-btn:hover {
+  background-color: #ffffff;
+  color: var(--my-blue);
+  border: 1px solid var(--my-blue);
 }

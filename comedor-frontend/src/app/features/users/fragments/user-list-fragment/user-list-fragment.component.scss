@@ -1,3 +1,8 @@
+:host {
+  --reference-background: #e8f1fb;
+  --reference-color: #0b3a6e;
+}
+
 .search-wrapper {
   position: relative;
   display: flex;
@@ -8,7 +13,7 @@
     left: 16px;
     color: var(--color-text-secondary);
     pointer-events: none;
-    
+
     svg {
       width: 18px;
       height: 18px;
@@ -20,7 +25,7 @@
     height: 44px;
     border-radius: 50px;
     background-color: var(--color-surface);
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     transition: var(--transition-normal);
     font-size: 0.95rem;
 
@@ -37,7 +42,7 @@
   width: 2.5em;
   height: 1.25em;
   cursor: pointer;
-  
+
   &:checked {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
@@ -46,7 +51,7 @@
 
 .user-card {
   background-color: var(--color-background);
-  border-color: rgba(0,0,0,0.08) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
   transition: var(--transition-fast);
   cursor: pointer;
 
@@ -62,4 +67,36 @@
     font-size: 1rem;
     letter-spacing: 1px;
   }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: fit-content;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.chip-status-active {
+  color: #005a3c !important;
+  background: #e6f4ee !important;
+}
+
+.chip-status-inactive {
+  color: #8a1c1c !important;
+  background: #fdecec !important;
+}
+
+.my-bagde {
+  background-color: var(--reference-background);
+  color: var(--my-blue);
+  border: 1px solid var(--reference-color);
 }

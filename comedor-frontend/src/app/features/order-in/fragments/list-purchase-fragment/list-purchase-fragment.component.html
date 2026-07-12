@@ -35,13 +35,13 @@
           <div class="col-4">
             @if (canCreate) {
               <button
-                class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1"
+                class="btn my-blue-btn btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1"
                 (click)="goToCreate()"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -52,7 +52,7 @@
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
                 </svg>
-                Nueva
+                Crear
               </button>
             }
           </div>
@@ -118,7 +118,7 @@
 
         <div class="d-flex gap-2">
           <button
-            class="btn btn-primary rounded-3 flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+            class="btn my-alt-blue-btn rounded-3 flex-grow-1 d-flex align-items-center justify-content-center gap-2"
             (click)="search()"
             [disabled]="loading() || isDateRangeInvalid()"
           >
@@ -145,7 +145,7 @@
           </button>
 
           <button
-            class="btn btn-light border rounded-3 flex-grow-1 text-muted d-flex align-items-center justify-content-center gap-2"
+            class="btn btn-light border rounded-3 flex-grow-1 d-flex align-items-center justify-content-center gap-2"
             [disabled]="loading()"
             (click)="clearFilters()"
           >

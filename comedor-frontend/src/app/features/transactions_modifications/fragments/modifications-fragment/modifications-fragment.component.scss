@@ -9,12 +9,15 @@
 
   --border: #cbd5e1;
 
-  --primary-text: #1e3a8a;
-  --primary-background: #eff6ff;
+  --primary-text: #0b3a6e;
+  --primary-background: #e8f1fb;
 
   --previous-text: #7f1d1d;
   --previous-background: #fef2f2;
   --previous-border: #b91c1c;
+
+  --my-red: #981b27;
+  --my-blue: #003b94;
 
   --new-text: #14532d;
   --new-background: #f0fdf4;
@@ -52,6 +55,17 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.my-bg-red {
+  background-color: var(--my-red);
+  color: #ffffff;
+}
+
+.my-blue {
+  background-color: var(--primary-background);
+  color: var(--my-blue);
+  border: 1px solid var(--primary-background);
 }
 
 .modification-card {

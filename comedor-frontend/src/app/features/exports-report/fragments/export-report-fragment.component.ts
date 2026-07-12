@@ -1,13 +1,14 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { environment } from '@env/environment'; 
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-export-report-fragment',
   standalone: true,
   imports: [FormsModule],
   templateUrl: './export-report-fragment.component.html',
+  styleUrls: ['./export-report-fragment.component.scss'],
 })
 export class ExportReportFragmentComponent implements OnInit {
   private http = inject(HttpClient);
@@ -37,18 +38,16 @@ export class ExportReportFragmentComponent implements OnInit {
     this.todayError.set('');
     const today = this.getTodayString();
 
-    this.http
-      .get<{ id: number }>(`${environment.apiUrl}/menu_report/date/${today}`)
-      .subscribe({
-        next: (res) => {
-          this.todayId.set(res.id);
-          this.loadingToday.set(false);
-        },
-        error: () => {
-          this.todayError.set('No hay un reporte generado para hoy.');
-          this.loadingToday.set(false);
-        },
-      });
+    this.http.get<{ id: number }>(`${environment.apiUrl}/menu_report/date/${today}`).subscribe({
+      next: (res) => {
+        this.todayId.set(res.id);
+        this.loadingToday.set(false);
+      },
+      error: () => {
+        this.todayError.set('No hay un reporte generado para hoy.');
+        this.loadingToday.set(false);
+      },
+    });
   }
 
   onDateChange(value: string) {
@@ -59,18 +58,16 @@ export class ExportReportFragmentComponent implements OnInit {
     if (!value) return;
 
     this.fetchingByDate.set(true);
-    this.http
-      .get<{ id: number }>(`${environment.apiUrl}/menu_report/date/${value}`)
-      .subscribe({
-        next: (res) => {
-          this.dateId.set(res.id);
-          this.fetchingByDate.set(false);
-        },
-        error: () => {
-          this.dateError.set('No se encontró un reporte para esa fecha.');
-          this.fetchingByDate.set(false);
-        },
-      });
+    this.http.get<{ id: number }>(`${environment.apiUrl}/menu_report/date/${value}`).subscribe({
+      next: (res) => {
+        this.dateId.set(res.id);
+        this.fetchingByDate.set(false);
+      },
+      error: () => {
+        this.dateError.set('No se encontró un reporte para esa fecha.');
+        this.fetchingByDate.set(false);
+      },
+    });
   }
 
   exportToday(format: 'pdf' | 'excel') {
@@ -94,9 +91,7 @@ export class ExportReportFragmentComponent implements OnInit {
   }
 
   private async downloadFile(url: string, filename: string): Promise<void> {
-    const blob = await this.http
-      .get(url, { responseType: 'blob' })
-      .toPromise();
+    const blob = await this.http.get(url, { responseType: 'blob' }).toPromise();
     if (!blob) return;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

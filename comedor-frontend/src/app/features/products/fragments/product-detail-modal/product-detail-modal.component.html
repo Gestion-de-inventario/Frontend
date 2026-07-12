@@ -71,11 +71,9 @@
                 </div>
               </div>
               <span
-                class="badge rounded-pill px-3 py-2"
+                class="chip"
                 [class]="
-                  product.status === 'INACTIVO'
-                    ? 'bg-danger bg-opacity-10 text-danger'
-                    : 'bg-success bg-opacity-10 text-success'
+                  product.status === 'INACTIVO' ? 'chip--status-inactive' : 'chip--status-active'
                 "
               >
                 {{ product.status }}

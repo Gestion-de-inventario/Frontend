@@ -1,0 +1,62 @@
+:host {
+  --previous-text: #7f1d1d;
+  --previous-background: #fef2f2;
+  --previous-border: #b91c1c;
+
+  --new-text: #14532d;
+  --new-background: #f0fdf4;
+  --new-border: #15803d;
+
+  --my-blue: #003b94;
+  --reference-background: #e8f1fb;
+  --reference-color: #0b3a6e;
+
+  --my-gray: #4a5155;
+}
+
+.my-red-btn {
+  background-color: var(--previous-background);
+  color: var(--previous-text);
+  border: 1px solid var(--previous-border);
+}
+.my-green-btn {
+  background-color: var(--new-background);
+  color: var(--new-text);
+  border: 1px solid var(--new-border);
+}
+
+.my-gray-btn {
+  background-color: #ffffff;
+  color: var(--my-gray);
+  border: 1px solid var(--my-gray);
+}
+
+.my-blue-btn {
+  background-color: #ffffff;
+  color: var(--my-blue);
+  border: 1px solid var(--my-blue);
+}
+
+.my-red-btn:hover {
+  background-color: var(--previous-text);
+  color: var(--previous-background);
+}
+.my-bagde {
+  background-color: var(--reference-background);
+  color: var(--my-blue);
+  border: 1px solid var(--reference-color);
+}
+.my-green-btn:hover {
+  background-color: var(--new-text);
+  color: var(--new-background);
+}
+
+.my-gray-btn:hover {
+  background-color: var(--my-gray);
+  color: #ffffff;
+}
+
+.my-blue-btn:hover {
+  background-color: var(--my-blue);
+  color: #ffffff;
+}

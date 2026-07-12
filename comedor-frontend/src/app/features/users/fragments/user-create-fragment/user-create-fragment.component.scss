@@ -17,3 +17,19 @@
   font-weight: 500;
   margin-top: 6px;
 }
+
+:host {
+  --my-blue: #0b3a6e;
+  --my-blue-bg: #e8f1fb;
+}
+
+.my-blue-btn {
+  background-color: var(--my-blue);
+  color: #ffffff;
+}
+
+.my-blue-btn:hover {
+  background-color: #ffffff;
+  color: var(--my-blue);
+  border: 1px solid var(--my-blue);
+}

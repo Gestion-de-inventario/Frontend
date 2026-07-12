@@ -199,21 +199,21 @@
                 (selected)="addCook($event)"
               >
                 <ng-template let-cook>
-                  <div class="fw-semibold text-dark">{{ cook.name }} {{ cook.lastname }}</div>
-                  <small class="text-muted">DNI: {{ cook.dni }}</small>
+                  <div class="fw-semibold">{{ cook.name }} {{ cook.lastname }}</div>
+                  <small>DNI: {{ cook.dni }}</small>
                 </ng-template>
               </app-search-select>
 
               <div class="mt-3 d-flex flex-column gap-2">
                 @for (cook of selectedCooks(); track cook.user_id) {
                   <div
-                    class="d-flex align-items-center justify-content-between p-2.5 px-3 rounded-3 bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 shadow-sm"
+                    class="d-flex align-items-center justify-content-between p-2.5 px-3 rounded-3 my-blue-container shadow-sm"
                   >
                     <div class="d-flex flex-column overflow-hidden pe-2">
                       <span class="fw-semibold small text-truncate text-dark"
                         >{{ cook.name }} {{ cook.lastname }}</span
                       >
-                      <span class="text-muted" style="font-size: 0.7rem">DNI: {{ cook.dni }}</span>
+                      <span class="fw-bold" style="font-size: 0.7rem">DNI: {{ cook.dni }}</span>
                     </div>
                     <button
                       type="button"
@@ -257,7 +257,7 @@
 
           <div class="pt-2">
             <button
-              class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2"
+              class="btn my-blue-btn w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2"
               (click)="createReport()"
               [disabled]="!canCreateReport()"
               style="height: 52px; font-size: 1rem"

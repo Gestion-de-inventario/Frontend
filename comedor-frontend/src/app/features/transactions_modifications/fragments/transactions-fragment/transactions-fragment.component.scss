@@ -6,6 +6,22 @@
   --surface: #ffffff;
   --surface-soft: #f8fafc;
   --border: #cbd5e1;
+  --my-red: #981b27;
+
+  --primary-text: #0b3a6e;
+  --primary-background: #e8f1fb;
+
+  --my-blue: #003b94;
+  --reference-background: #e8f1fb;
+  --reference-color: #0b3a6e;
+
+  --my-gray: #4a5155;
+}
+
+.my-blue {
+  background-color: var(--reference-background);
+  color: var(--my-blue);
+  border: 1px solid var(--reference-color);
 }
 
 .transaction-list {
@@ -13,6 +29,11 @@
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+}
+
+.my-bg-red {
+  background-color: var(--my-red);
+  color: #ffffff;
 }
 
 .transaction-card {
@@ -112,6 +133,17 @@
 .movement-chip--exit {
   color: #8a1c1c;
   background: #fdecec;
+}
+
+.my-gray-btn {
+  background-color: #ffffff;
+  color: var(--my-gray);
+  border: 1px solid var(--my-gray);
+}
+
+.my-gray-btn:hover {
+  background-color: var(--my-gray);
+  color: #ffffff;
 }
 
 .transaction-date {

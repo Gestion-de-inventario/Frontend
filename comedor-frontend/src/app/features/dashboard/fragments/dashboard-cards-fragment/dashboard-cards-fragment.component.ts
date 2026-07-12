@@ -6,7 +6,8 @@ import { DashboardStateService } from '../../services/dashboard-state.service';
   selector: 'app-dashboard-cards-fragment',
   standalone: true,
   imports: [CurrencyPipe], // Importante para formatear el dinero
-  templateUrl: './dashboard-cards-fragment.component.html'
+  templateUrl: './dashboard-cards-fragment.component.html',
+  styleUrls: ['./dashboard-cards-fragment.component.scss'],
 })
 export class DashboardCardsFragmentComponent {
   readonly state = inject(DashboardStateService);

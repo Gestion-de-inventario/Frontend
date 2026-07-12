@@ -21,6 +21,7 @@ declare const bootstrap: any;
   imports: [CommonModule, FormsModule, UserDetailModalComponent],
 
   templateUrl: './user-list-fragment.component.html',
+  styleUrl: './user-list-fragment.component.scss',
 })
 export class UserListFragmentComponent {
   private readonly userService = inject(UserService);
@@ -60,18 +61,17 @@ export class UserListFragmentComponent {
   }
 
   loadUsers(): void {
-
-    this.loading.set(true);                   
+    this.loading.set(true);
 
     this.userService.listUsers().subscribe({
       next: (users) => {
         this.userState.setUsers(users);
-        this.loading.set(false);               
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Error cargando usuarios', err);
         this.loading.set(false);
-      }
+      },
     });
   }
 

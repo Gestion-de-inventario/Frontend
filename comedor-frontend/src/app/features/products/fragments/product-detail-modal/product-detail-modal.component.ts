@@ -15,6 +15,7 @@ import { TagResponse } from '@features/categoriesandtags/interfaces/tag.response
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './product-detail-modal.component.html',
+  styleUrl: './product-detail-modal.component.scss',
 })
 export class ProductDetailModalComponent {
   readonly authState = inject(AuthStateService);
