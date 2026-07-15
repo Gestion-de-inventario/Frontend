@@ -17,7 +17,6 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        data: { breadcrumb: 'Dashboard' },
         title: 'Dashboard',
         loadComponent: () =>
           import('@features/dashboard/pages/dashboard-principal.component').then(
@@ -86,28 +85,21 @@ export const routes: Routes = [
       {
         path: 'menu-report',
         title: 'Registro Menú',
+        data: { breadcrumb: 'Registro Menú' },
         loadComponent: () =>
-          import('@features/menu-report/pages/menu_report_principal/menu_report_principal').then(
-            (m) => m.MenuReportPrincipal,
+          import('@features/menu-report/fragments/menu-report-create-fragment/menu-report-create-fragment.component').then(
+            (m) => m.MenuReportCreateFragmentComponent,
           ),
-        children: [
-          {
-            path: 'list',
-            title: 'Registro Menú',
-            data: { breadcrumb: 'Registro de menú' },
-            loadComponent: () =>
-              import('@features/menu-report/fragments/menu-report-list-fragment/list-menu-report-fragment.component').then(
-                (m) => m.ListMenuReportFragmentComponent,
-              ),
-          },
-          {
-            path: '',
-            loadComponent: () =>
-              import('@features/menu-report/fragments/menu-report-create-fragment/menu-report-create-fragment.component').then(
-                (m) => m.MenuReportCreateFragmentComponent,
-              ),
-          },
-        ],
+      },
+
+      {
+        path: 'history/menu-report',
+        title: 'Historial de menus',
+        data: { breadcrumb: 'Historial de menus' },
+        loadComponent: () =>
+          import('@features/menu-report/fragments/menu-report-list-fragment/list-menu-report-fragment.component').then(
+            (m) => m.ListMenuReportFragmentComponent,
+          ),
       },
       {
         path: 'beneficiaries-control',

@@ -41,18 +41,20 @@ export class MenuReportCreateFragmentComponent implements OnInit {
   dateTouched = signal(false);
   cooksTouched = signal(false);
 
+  menuReportId = signal<number | null>(null);
+
   cookDisplay = (cook: UserResponse) => `${cook.name} ${cook.lastname} - DNI: ${cook.dni}`;
 
   canCreate = this.authState.hasPermission('MENU_REPORT_CREATE_REPORT');
 
   missingProducts = signal<MissingProductsResponse[]>([]);
 
-  goToBeneficiariesControl(): void {
-    this.router.navigate(['/beneficiaries-control']);
+  goToBeneficiariesControl(id: number): void {
+    this.router.navigate(['/beneficiaries-control/manage/', id]);
   }
 
-  goBack(): void {
-    this.router.navigate(['/menu-report/list']);
+  goList(): void {
+    this.router.navigate(['/history/menu-report']);
   }
   // Formulario de Creación
   selectedDishMenuId = signal<number | null>(null);
@@ -142,9 +144,10 @@ export class MenuReportCreateFragmentComponent implements OnInit {
         }),
       )
       .subscribe({
-        next: () => {
+        next: (res) => {
           this.toastService.show('Orden creada', 'success');
           this.created.set(true);
+          this.menuReportId.set(res.id);
         },
         error: (err) => {
           if (err.status === 409 && err.error?.required) {

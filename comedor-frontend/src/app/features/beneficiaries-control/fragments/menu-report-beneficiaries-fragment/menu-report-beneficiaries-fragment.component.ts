@@ -101,7 +101,7 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   readonly allBeneficiaries = this.beneficiaryState.beneficiaries;
   goBack(): void {
-    this.router.navigate(['/beneficiaries-control']);
+    this.router.navigate(['/menu-report/list']);
   }
   readonly filteredBeneficiaries = computed(() => {
     const term = this.beneficiarySearch().toLowerCase();
