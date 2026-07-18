@@ -103,7 +103,7 @@ export const routes: Routes = [
       },
       {
         path: 'beneficiaries-control',
-        title: 'Orden de Salida',
+        title: 'Recojo de Menú',
         loadComponent: () =>
           import('@features/beneficiaries-control/pages/beneficiary-control/beneficiary-control').then(
             (m) => m.BeneficiaryControl,

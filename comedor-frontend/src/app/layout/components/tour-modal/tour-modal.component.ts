@@ -39,7 +39,7 @@ export class TourModalComponent implements OnInit {
     },
     {
       icon: '✅',
-      titulo: 'Orden de Salida',
+      titulo: 'Registro de Recojo de Menú',
       descripcion:
         'Controla la entrega de menús a los beneficiarios. Registra quién recogió su menú, la cantidad y si realizó el pago.',
       permiso: 'MENU_REPORT_ADD_BENEFICIARY',

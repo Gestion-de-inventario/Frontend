@@ -63,6 +63,16 @@ export class MenuReportBeneficiariesFragmentComponent {
   menusAmountTouched = signal(false);
   menuPriceTouched = signal(false);
 
+  private readonly statusDebounceMs = 200;
+
+  private readonly pendingStatusChanges = new Map<number, Partial<BeneficiaryRecordResponse>>();
+
+  private readonly statusTimers = new Map<number, ReturnType<typeof setTimeout>>();
+
+  private readonly statusInFlight = new Set<number>();
+
+  private readonly rollbackSnapshots = new Map<number, BeneficiaryRecordResponse>();
+
   ngOnInit(): void {
     this.initReport();
   }
@@ -101,7 +111,7 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   readonly allBeneficiaries = this.beneficiaryState.beneficiaries;
   goBack(): void {
-    this.router.navigate(['/menu-report/list']);
+    this.router.navigate(['/history/menu-report']);
   }
   readonly filteredBeneficiaries = computed(() => {
     const term = this.beneficiarySearch().toLowerCase();
@@ -319,20 +329,43 @@ export class MenuReportBeneficiariesFragmentComponent {
   private updateBeneficiaryStatus(
     record: BeneficiaryRecordResponse,
     changes: Partial<BeneficiaryRecordResponse>,
-    rollback: () => void,
+    rollbackChanges: Partial<BeneficiaryRecordResponse>,
   ): void {
-    this.updatingBeneficiaryId.set(record.id);
     const report = this.report();
 
     if (!report) return;
-    const request = {
-      beneficiarioId: record.id,
-      pago: changes.pago ?? record.pago,
-      entregado: changes.entregado ?? record.entregado,
-      payMethod: record.paymentMethod,
-      menusAmount: record.cantidad,
-      menuPrice: record.total / record.cantidad,
+
+    const request: any = {
+      beneficiarioId: record.beneficiaryId ?? record.id,
     };
+
+    if (changes.pago !== undefined) {
+      request.pago = changes.pago;
+    }
+
+    if (changes.entregado !== undefined) {
+      request.entregado = changes.entregado;
+    }
+
+    if (changes.paymentMethod !== undefined) {
+      request.payMethod = changes.paymentMethod;
+    }
+
+    if (changes.cantidad !== undefined) {
+      request.menusAmount = changes.cantidad;
+    }
+
+    if (changes.total !== undefined && record.cantidad > 0) {
+      request.menuPrice = changes.total / record.cantidad;
+    }
+
+    if (Object.keys(request).length === 1) {
+      return;
+    }
+
+    this.patchRecordInReport(record.id, changes);
+
+    this.updatingBeneficiaryId.set(record.id);
 
     this.beneficiaryControlService
       .editBeneficiary(report.id, record.id, request)
@@ -342,11 +375,15 @@ export class MenuReportBeneficiariesFragmentComponent {
         }),
       )
       .subscribe({
-        next: () => {
+        next: (updatedRecord) => {
+          this.updateRecordInReport(updatedRecord);
+
+          this.syncReportSilently();
           this.toastService.show('Estado actualizado', 'success');
         },
         error: () => {
-          rollback();
+          this.patchRecordInReport(record.id, rollbackChanges);
+
           this.toastService.show('No se pudo actualizar', 'danger');
         },
       });
@@ -354,26 +391,19 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   togglePago(record: BeneficiaryRecordResponse, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const oldValue = record.pago;
 
-    record.pago = checked;
-
-    this.updateBeneficiaryStatus(record, { pago: checked }, () => (record.pago = oldValue));
+    this.queueBeneficiaryStatusUpdate(record.id, {
+      pago: checked,
+    });
   }
 
   toggleEntregado(record: BeneficiaryRecordResponse, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const oldValue = record.entregado;
 
-    record.entregado = checked;
-
-    this.updateBeneficiaryStatus(
-      record,
-      { entregado: checked },
-      () => (record.entregado = oldValue),
-    );
+    this.queueBeneficiaryStatusUpdate(record.id, {
+      entregado: checked,
+    });
   }
-
   clearBeneficiary(): void {
     this.selectedBeneficiary.set(null);
     this.beneficiarySearch.set('');
@@ -396,7 +426,7 @@ export class MenuReportBeneficiariesFragmentComponent {
       )
       .subscribe({
         next: (backendReport) => {
-          this.report.set(backendReport);
+          this.mergeReportPreservingBeneficiaryOrder(backendReport);
         },
         error: () => {
           console.warn('No se pudo sincronizar el reporte en segundo plano');
@@ -438,11 +468,11 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   isRequiredValue(value: number | null | undefined): boolean {
-    return value === null || value === undefined || value === 0 || Number.isNaN(Number(value));
+    return value === null || value === undefined || Number.isNaN(Number(value));
   }
 
   isPositiveNumber(value: number | null | undefined): boolean {
-    return Number(value) > 0;
+    return Number(value) >= 0;
   }
 
   isDecimalOrInteger(value: number | null | undefined): boolean {
@@ -536,5 +566,183 @@ export class MenuReportBeneficiariesFragmentComponent {
     if (value === null || value === undefined) return false;
 
     return /^\d{1,5}(\.\d{1,2})?$/.test(String(value));
+  }
+
+  private patchRecordInReport(recordId: number, changes: Partial<BeneficiaryRecordResponse>): void {
+    this.report.update((report) => {
+      if (!report) return report;
+
+      return {
+        ...report,
+        beneficiaries: report.beneficiaries.map((item) =>
+          item.id === recordId
+            ? {
+                ...item,
+                ...changes,
+              }
+            : item,
+        ),
+      };
+    });
+  }
+
+  private mergeReportPreservingBeneficiaryOrder(backendReport: MenuReportResponse): void {
+    this.report.update((currentReport) => {
+      if (!currentReport) return backendReport;
+
+      const currentBeneficiaries = currentReport.beneficiaries ?? [];
+      const backendBeneficiaries = backendReport.beneficiaries ?? [];
+
+      const backendById = new Map(backendBeneficiaries.map((record) => [record.id, record]));
+
+      const currentIds = new Set(currentBeneficiaries.map((record) => record.id));
+
+      const beneficiariesInCurrentOrder = currentBeneficiaries
+        .filter((record) => backendById.has(record.id))
+        .map((record) => backendById.get(record.id)!);
+
+      const newBeneficiariesFromBackend = backendBeneficiaries.filter(
+        (record) => !currentIds.has(record.id),
+      );
+
+      return {
+        ...backendReport,
+        beneficiaries: [...beneficiariesInCurrentOrder, ...newBeneficiariesFromBackend],
+      };
+    });
+  }
+
+  private findRecordById(recordId: number): BeneficiaryRecordResponse | null {
+    return this.report()?.beneficiaries?.find((item) => item.id === recordId) ?? null;
+  }
+
+  private queueBeneficiaryStatusUpdate(
+    recordId: number,
+    changes: Partial<BeneficiaryRecordResponse>,
+  ): void {
+    const currentRecord = this.findRecordById(recordId);
+
+    if (!currentRecord) return;
+
+    if (!this.rollbackSnapshots.has(recordId)) {
+      this.rollbackSnapshots.set(recordId, { ...currentRecord });
+    }
+
+    this.patchRecordInReport(recordId, changes);
+
+    const currentPending = this.pendingStatusChanges.get(recordId) ?? {};
+
+    this.pendingStatusChanges.set(recordId, {
+      ...currentPending,
+      ...changes,
+    });
+
+    const previousTimer = this.statusTimers.get(recordId);
+
+    if (previousTimer) {
+      clearTimeout(previousTimer);
+    }
+
+    const timer = setTimeout(() => {
+      this.flushBeneficiaryStatusUpdate(recordId);
+    }, this.statusDebounceMs);
+
+    this.statusTimers.set(recordId, timer);
+  }
+
+  private flushBeneficiaryStatusUpdate(recordId: number): void {
+    if (this.statusInFlight.has(recordId)) {
+      return;
+    }
+
+    const report = this.report();
+    const record = this.findRecordById(recordId);
+    const changes = this.pendingStatusChanges.get(recordId);
+
+    if (!report || !record || !changes) return;
+
+    this.pendingStatusChanges.delete(recordId);
+    this.statusTimers.delete(recordId);
+    this.statusInFlight.add(recordId);
+
+    const request: any = {
+      beneficiarioId: record.beneficiaryId ?? record.id,
+    };
+
+    if (changes.pago !== undefined) {
+      request.pago = changes.pago;
+    }
+
+    if (changes.entregado !== undefined) {
+      request.entregado = changes.entregado;
+    }
+
+    if (changes.paymentMethod !== undefined) {
+      request.payMethod = changes.paymentMethod;
+    }
+
+    if (changes.cantidad !== undefined) {
+      request.menusAmount = changes.cantidad;
+    }
+
+    if (changes.total !== undefined && record.cantidad > 0) {
+      request.menuPrice = changes.total / record.cantidad;
+    }
+
+    if (Object.keys(request).length === 1) {
+      this.statusInFlight.delete(recordId);
+      return;
+    }
+
+    this.beneficiaryControlService
+      .editBeneficiary(report.id, record.id, request)
+      .pipe(
+        finalize(() => {
+          this.statusInFlight.delete(recordId);
+
+          if (this.pendingStatusChanges.has(recordId)) {
+            this.flushBeneficiaryStatusUpdate(recordId);
+            return;
+          }
+
+          this.rollbackSnapshots.delete(recordId);
+        }),
+      )
+      .subscribe({
+        next: (updatedRecord) => {
+          const stillPending = this.pendingStatusChanges.get(recordId);
+          const currentOptimistic = this.findRecordById(recordId);
+
+          this.updateRecordInReport({
+            ...updatedRecord,
+            pago: stillPending?.pago ?? currentOptimistic?.pago ?? updatedRecord.pago,
+            entregado:
+              stillPending?.entregado ?? currentOptimistic?.entregado ?? updatedRecord.entregado,
+          });
+
+          if (!this.pendingStatusChanges.has(recordId)) {
+            this.syncReportSilently();
+          }
+        },
+        error: () => {
+          const snapshot = this.rollbackSnapshots.get(recordId);
+
+          if (snapshot) {
+            this.updateRecordInReport(snapshot);
+          }
+
+          this.pendingStatusChanges.delete(recordId);
+          this.rollbackSnapshots.delete(recordId);
+
+          const timer = this.statusTimers.get(recordId);
+
+          if (timer) {
+            clearTimeout(timer);
+            this.statusTimers.delete(recordId);
+          }
+
+          this.toastService.show('No se pudo actualizar', 'danger');
+        },
+      });
   }
 }

@@ -35,7 +35,7 @@
           </svg>
         </button>
         <div>
-          <h5 class="fw-bold text-dark mb-0">Órden de salida</h5>
+          <h5 class="fw-bold text-dark mb-0">Registro de Recojo</h5>
           <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-2 py-0"
             >#{{ report()?.id }}</span
           >
@@ -192,27 +192,19 @@
                       style="width: 2.5rem; height: 1.25rem; margin-left: -3rem; cursor: pointer"
                       type="checkbox"
                       [checked]="b.pago"
-                      [disabled]="updatingBeneficiaryId() === b.id"
                       (change)="togglePago(b, $event)"
                     />
                     <label class="form-check-label mb-0">
-                      @if (updatingBeneficiaryId() === b.id) {
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="spinner-border spinner-border-sm text-primary"></span>
-                          <small class="text-muted">Actualizando...</small>
-                        </div>
-                      } @else {
-                        <span
-                          class="badge rounded-pill fw-medium"
-                          [class]="
-                            b.pago
-                              ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
-                              : 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'
-                          "
-                        >
-                          {{ b.pago ? '✓ Pagó' : '✗ Sin pago' }}
-                        </span>
-                      }
+                      <span
+                        class="badge rounded-pill fw-medium"
+                        [class]="
+                          b.pago
+                            ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
+                            : 'bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25'
+                        "
+                      >
+                        {{ b.pago ? '✓ Pagó' : '✗ Sin pago' }}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -228,27 +220,19 @@
                       style="width: 2.5rem; height: 1.25rem; margin-left: -3rem; cursor: pointer"
                       type="checkbox"
                       [checked]="b.entregado"
-                      [disabled]="updatingBeneficiaryId() === b.id"
                       (change)="toggleEntregado(b, $event)"
                     />
                     <label class="form-check-label mb-0">
-                      @if (updatingBeneficiaryId() === b.id) {
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="spinner-border spinner-border-sm text-primary"></span>
-                          <small class="text-muted">Actualizando...</small>
-                        </div>
-                      } @else {
-                        <span
-                          class="badge rounded-pill fw-medium"
-                          [class]="
-                            b.entregado
-                              ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
-                              : 'bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50'
-                          "
-                        >
-                          {{ b.entregado ? '✓ Entregado' : '⏳ Pendiente' }}
-                        </span>
-                      }
+                      <span
+                        class="badge rounded-pill fw-medium"
+                        [class]="
+                          b.entregado
+                            ? 'bg-success bg-opacity-10 text-success border border-success border-opacity-25'
+                            : 'bg-warning bg-opacity-10 text-dark border border-warning border-opacity-50'
+                        "
+                      >
+                        {{ b.entregado ? '✓ Entregado' : '⏳ Pendiente' }}
+                      </span>
                     </label>
                   </div>
                 </div>
