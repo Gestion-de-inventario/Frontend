@@ -319,20 +319,43 @@ export class MenuReportBeneficiariesFragmentComponent {
   private updateBeneficiaryStatus(
     record: BeneficiaryRecordResponse,
     changes: Partial<BeneficiaryRecordResponse>,
-    rollback: () => void,
+    rollbackChanges: Partial<BeneficiaryRecordResponse>,
   ): void {
-    this.updatingBeneficiaryId.set(record.id);
     const report = this.report();
 
     if (!report) return;
-    const request = {
-      beneficiarioId: record.id,
-      pago: changes.pago ?? record.pago,
-      entregado: changes.entregado ?? record.entregado,
-      payMethod: record.paymentMethod,
-      menusAmount: record.cantidad,
-      menuPrice: record.total / record.cantidad,
+
+    const request: any = {
+      beneficiarioId: record.beneficiaryId ?? record.id,
     };
+
+    if (changes.pago !== undefined) {
+      request.pago = changes.pago;
+    }
+
+    if (changes.entregado !== undefined) {
+      request.entregado = changes.entregado;
+    }
+
+    if (changes.paymentMethod !== undefined) {
+      request.payMethod = changes.paymentMethod;
+    }
+
+    if (changes.cantidad !== undefined) {
+      request.menusAmount = changes.cantidad;
+    }
+
+    if (changes.total !== undefined && record.cantidad > 0) {
+      request.menuPrice = changes.total / record.cantidad;
+    }
+
+    if (Object.keys(request).length === 1) {
+      return;
+    }
+
+    this.patchRecordInReport(record.id, changes);
+
+    this.updatingBeneficiaryId.set(record.id);
 
     this.beneficiaryControlService
       .editBeneficiary(report.id, record.id, request)
@@ -342,11 +365,15 @@ export class MenuReportBeneficiariesFragmentComponent {
         }),
       )
       .subscribe({
-        next: () => {
+        next: (updatedRecord) => {
+          this.updateRecordInReport(updatedRecord);
+
+          this.syncReportSilently();
           this.toastService.show('Estado actualizado', 'success');
         },
         error: () => {
-          rollback();
+          this.patchRecordInReport(record.id, rollbackChanges);
+
           this.toastService.show('No se pudo actualizar', 'danger');
         },
       });
@@ -354,24 +381,14 @@ export class MenuReportBeneficiariesFragmentComponent {
 
   togglePago(record: BeneficiaryRecordResponse, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const oldValue = record.pago;
 
-    record.pago = checked;
-
-    this.updateBeneficiaryStatus(record, { pago: checked }, () => (record.pago = oldValue));
+    this.updateBeneficiaryStatus(record, { pago: checked }, { pago: record.pago });
   }
 
   toggleEntregado(record: BeneficiaryRecordResponse, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const oldValue = record.entregado;
 
-    record.entregado = checked;
-
-    this.updateBeneficiaryStatus(
-      record,
-      { entregado: checked },
-      () => (record.entregado = oldValue),
-    );
+    this.updateBeneficiaryStatus(record, { entregado: checked }, { entregado: record.entregado });
   }
 
   clearBeneficiary(): void {
@@ -438,11 +455,11 @@ export class MenuReportBeneficiariesFragmentComponent {
   }
 
   isRequiredValue(value: number | null | undefined): boolean {
-    return value === null || value === undefined || value === 0 || Number.isNaN(Number(value));
+    return value === null || value === undefined || Number.isNaN(Number(value));
   }
 
   isPositiveNumber(value: number | null | undefined): boolean {
-    return Number(value) > 0;
+    return Number(value) >= 0;
   }
 
   isDecimalOrInteger(value: number | null | undefined): boolean {
@@ -504,5 +521,23 @@ export class MenuReportBeneficiariesFragmentComponent {
     input.value = input.value.replace(/\D/g, '').slice(0, 5);
 
     this.menusAmount.set(input.value ? Number(input.value) : null);
+  }
+
+  private patchRecordInReport(recordId: number, changes: Partial<BeneficiaryRecordResponse>): void {
+    this.report.update((report) => {
+      if (!report) return report;
+
+      return {
+        ...report,
+        beneficiaries: report.beneficiaries.map((item) =>
+          item.id === recordId
+            ? {
+                ...item,
+                ...changes,
+              }
+            : item,
+        ),
+      };
+    });
   }
 }
