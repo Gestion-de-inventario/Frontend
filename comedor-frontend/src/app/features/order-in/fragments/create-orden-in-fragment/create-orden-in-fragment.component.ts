@@ -480,7 +480,23 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
 
     const input = event.target as HTMLInputElement;
 
-    const value = input.value.replace(/\D/g, '').slice(0, 5);
+    let value = input.value;
+
+    value = value.replace(',', '.');
+
+    value = value.replace(/[^0-9.]/g, '');
+
+    const parts = value.split('.');
+
+    const integerPart = parts[0].slice(0, 5);
+
+    const decimalPart = parts[1]?.slice(0, 2);
+
+    if (parts.length > 1) {
+      value = `${integerPart}.${decimalPart ?? ''}`;
+    } else {
+      value = integerPart;
+    }
 
     input.value = value;
 
@@ -545,5 +561,9 @@ export class InventoryOrderCreateFragmentComponent implements OnInit {
     if (value === null || value === undefined) return false;
 
     return /^\d{1,5}(\.\d{1,2})?$/.test(String(value));
+  }
+
+  hasValidQuantityFormat(value: number): boolean {
+    return /^\d{1,5}(\.\d{1,2})?$/.test(value.toString());
   }
 }

@@ -176,9 +176,8 @@
                   <label class="form-label fw-bold text-muted small text-uppercase">Cantidad</label>
                   <input
                     type="text"
-                    inputmode="numeric"
-                    maxlength="5"
-                    pattern="[0-9]*"
+                    inputmode="decimal"
+                    maxlength="8"
                     class="form-control form-control-lg rounded-3 border-light-subtle shadow-sm"
                     style="font-size: 0.95rem; height: 50px"
                     placeholder="Ingrese la cantidad"
@@ -212,6 +211,16 @@
                   ) {
                     <div class="invalid-feedback small fw-medium">
                       La cantidad debe ser mayor que cero.
+                    </div>
+                  }
+                  @if (
+                    shouldShowError($index, 'quantity') &&
+                    !isRequiredValue(detail.quantity) &&
+                    isPositiveNumber(detail.quantity) &&
+                    !hasValidQuantityFormat(detail.quantity)
+                  ) {
+                    <div class="invalid-feedback small fw-medium">
+                      La cantidad debe tener máximo 5 cifras enteras y 2 decimales.
                     </div>
                   }
                 </div>
