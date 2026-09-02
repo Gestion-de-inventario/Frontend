@@ -38,3 +38,33 @@
   word-break: break-word;
   line-height: 1.4;
 }
+
+.permission-badge {
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+
+  &--1 {
+    color: #005a3c;
+    background: #e6f4ee;
+  }
+
+  &--2 {
+    color: #8a1c1c;
+    background: #fdecec;
+  }
+
+  &--3 {
+    color: #0b3a6e;
+    background: #e8f1fb;
+  }
+
+  &--4 {
+    color: #4a1f6f;
+    background: #f3eaf9;
+  }
+
+  &--5 {
+    color: #6b3d00;
+    background: #fff4dd;
+  }
+}

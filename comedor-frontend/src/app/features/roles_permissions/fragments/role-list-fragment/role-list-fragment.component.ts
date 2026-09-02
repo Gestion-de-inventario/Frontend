@@ -11,6 +11,7 @@ import { RoleStateService } from '@features/roles_permissions/services/role-stat
 import { RoleResponse } from '@features/roles_permissions/interfaces/role.response';
 
 import { RoleDetailModalComponent } from '@features/roles_permissions/modals/role-detail-modal/role-detail-modal.component';
+import { ToastService } from '@shared/services/toast.service';
 
 declare const bootstrap: any;
 
@@ -28,6 +29,8 @@ declare const bootstrap: any;
 export class RoleListFragmentComponent {
   private readonly roleService = inject(RoleService);
 
+  private readonly toastService = inject(ToastService);
+
   readonly roleState = inject(RoleStateService);
 
   readonly roles = computed(() => this.roleState.filteredRoles());
@@ -44,6 +47,11 @@ export class RoleListFragmentComponent {
     this.roleService.listRolesByStatus().subscribe({
       next: (roles) => {
         this.roleState.setRoles(roles);
+      },
+
+      error: (error) => {
+        this.toastService.show(error.error?.message || 'No se pudieron cargar los roles', 'danger');
+        this.loading.set(false);
       },
 
       complete: () => {

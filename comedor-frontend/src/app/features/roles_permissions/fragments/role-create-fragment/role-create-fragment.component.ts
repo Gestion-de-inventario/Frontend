@@ -20,6 +20,12 @@ import { ToastService } from '@shared/services/toast.service';
 
 import { PermissionResponse } from '@features/roles_permissions/interfaces/permission.response';
 
+import {
+  PERMISSION_MODULE_LABELS,
+  PERMISSION_LABELS,
+  PERMISSION_TITLE_LABELS,
+} from '@shared/constants/permission-labels';
+
 declare const bootstrap: any;
 
 @Component({
@@ -68,6 +74,18 @@ export class RoleCreateFragmentComponent {
 
   constructor() {
     this.loadPermissions();
+  }
+
+  getModuleLabel(module: string): string {
+    return PERMISSION_MODULE_LABELS[module] ?? module;
+  }
+
+  getPermissionActionLabel(permission: string): string {
+    return PERMISSION_LABELS[permission] ?? permission;
+  }
+
+  getPermissionTitle(permission: string): string {
+    return PERMISSION_TITLE_LABELS[permission] ?? permission;
   }
 
   loadPermissions(): void {
@@ -176,10 +194,16 @@ export class RoleCreateFragmentComponent {
 
     if (!term) return true;
 
+    const code = permission.code.toLowerCase();
+    const module = this.getModuleLabel(permission.module).toLowerCase();
+    const description = permission.description?.toLowerCase() ?? '';
+    const action = this.getPermissionActionLabel(permission.code).toLowerCase();
+
     return (
-      permission.code.toLowerCase().includes(term) ||
-      permission.description?.toLowerCase().includes(term) ||
-      permission.module?.toLowerCase().includes(term)
+      code.includes(term) ||
+      module.includes(term) ||
+      description.includes(term) ||
+      action.includes(term)
     );
   }
 

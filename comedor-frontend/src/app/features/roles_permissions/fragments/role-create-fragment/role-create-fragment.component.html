@@ -104,7 +104,7 @@
                               "
                             />
 
-                            <strong>{{ group.module }}</strong>
+                            <strong>{{ getModuleLabel(group.module) }}</strong>
 
                             <span class="badge bg-light text-dark border">
                               {{ group.permissions.length }}
@@ -120,30 +120,28 @@
                       >
                         <div class="accordion-body d-flex flex-column gap-3">
                           @for (permission of group.permissions; track permission.code) {
-                            @if (matchesPermissionSearch(permission)) {
-                              <div class="permission-item border rounded-3 p-3">
-                                <div class="form-check">
-                                  <input
-                                    type="checkbox"
-                                    class="form-check-input"
-                                    [id]="permissionInputId(permission)"
-                                    [checked]="isPermissionSelected(permission.code)"
-                                    (change)="togglePermission(permission.code)"
-                                  />
+                            <div class="permission-item border rounded-3 p-3">
+                              <div class="form-check">
+                                <input
+                                  type="checkbox"
+                                  class="form-check-input"
+                                  [id]="permissionInputId(permission)"
+                                  [checked]="isPermissionSelected(permission.code)"
+                                  (change)="togglePermission(permission.code)"
+                                />
 
-                                  <label
-                                    class="form-check-label fw-bold"
-                                    [for]="permissionInputId(permission)"
-                                  >
-                                    {{ permission.code }}
-                                  </label>
-                                </div>
-
-                                <small class="text-muted d-block mt-1">
-                                  {{ permission.description }}
-                                </small>
+                                <label
+                                  class="form-check-label fw-bold"
+                                  [for]="permissionInputId(permission)"
+                                >
+                                  {{ getPermissionTitle(permission.code) }}
+                                </label>
                               </div>
-                            }
+
+                              <small class="text-muted d-block mt-1">
+                                {{ permission.description }}
+                              </small>
+                            </div>
                           }
                         </div>
                       </div>

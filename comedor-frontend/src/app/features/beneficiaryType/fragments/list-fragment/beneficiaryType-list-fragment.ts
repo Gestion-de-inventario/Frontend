@@ -5,6 +5,7 @@ import { beneficiaryTypeResponse } from '@features/beneficiaryType/interfaces/be
 import { BeneficiaryTypeDetailModalComponent } from '@features/beneficiaryType/modals/beneficiaryType-detail-modal/beneficiary-type-detail-modal.component';
 import { BeneficiaryTypeApiService } from '@features/beneficiaryType/services/beneficiaryType-api.service';
 import { BeneficiaryTypeStateService } from '@features/beneficiaryType/services/beneficiaryType-state.service';
+import { ToastService } from '@shared/services/toast.service';
 
 declare const bootstrap: any;
 
@@ -18,6 +19,8 @@ export class BeneficiaryTypeListFragmentComponent {
   private readonly service = inject(BeneficiaryTypeApiService);
 
   readonly state = inject(BeneficiaryTypeStateService);
+
+  private readonly toastService = inject(ToastService);
 
   readonly types = computed(() => this.state.filteredTypes());
 
@@ -34,6 +37,14 @@ export class BeneficiaryTypeListFragmentComponent {
       next: (types) => {
         this.state.setTypes(types);
       },
+      error: (error) => {
+        this.toastService.show(
+          error.error?.message || 'No se pudo cargar los tipos de beneficiario',
+          'danger',
+        );
+        this.loading.set(false);
+      },
+
       complete: () => {
         this.loading.set(false);
       },

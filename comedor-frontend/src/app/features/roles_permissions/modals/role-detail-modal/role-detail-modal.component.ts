@@ -18,6 +18,13 @@ import { PermissionResponse } from '@features/roles_permissions/interfaces/permi
 
 import { FormsModule } from '@angular/forms';
 
+import {
+  PERMISSION_MODULE_LABELS,
+  PERMISSION_LABELS,
+  PERMISSION_MODULES,
+  PERMISSION_TITLE_LABELS,
+} from '@shared/constants/permission-labels';
+
 @Component({
   selector: 'app-role-detail-modal',
 
@@ -82,6 +89,44 @@ export class RoleDetailModalComponent {
     });
 
     this.mode = 'edit';
+  }
+
+  getModuleLabel(module: string): string {
+    return PERMISSION_MODULE_LABELS[module] ?? module;
+  }
+  getPermissionTitle(permission: string): string {
+    return PERMISSION_TITLE_LABELS[permission] ?? permission;
+  }
+
+  getPermissionActionLabel(permission: string): string {
+    return PERMISSION_LABELS[permission] ?? permission;
+  }
+
+  getPermissionModule(permission: string): string {
+    return PERMISSION_MODULES[permission] ?? 'Otros';
+  }
+
+  getPermissionColor(index: number): number {
+    return (index % 5) + 1;
+  }
+
+  getPermissionGroups(permissions: string[]): { module: string; permissions: string[] }[] {
+    const groups = new Map<string, string[]>();
+
+    for (const permission of permissions) {
+      const module = this.getPermissionModule(permission);
+
+      if (!groups.has(module)) {
+        groups.set(module, []);
+      }
+
+      groups.get(module)!.push(permission);
+    }
+
+    return Array.from(groups.entries()).map(([module, permissions]) => ({
+      module,
+      permissions,
+    }));
   }
 
   openAssignPermissions(): void {
@@ -260,15 +305,22 @@ export class RoleDetailModalComponent {
 
     this.roleState.clearSelectedRole();
   }
+
   matchesPermissionSearch(permission: PermissionResponse): boolean {
     const term = this.permissionSearch.trim().toLowerCase();
 
     if (!term) return true;
 
+    const code = permission.code.toLowerCase();
+    const module = this.getModuleLabel(permission.module).toLowerCase();
+    const description = permission.description?.toLowerCase() ?? '';
+    const action = this.getPermissionActionLabel(permission.code).toLowerCase();
+
     return (
-      permission.code.toLowerCase().includes(term) ||
-      permission.description?.toLowerCase().includes(term) ||
-      permission.module?.toLowerCase().includes(term)
+      code.includes(term) ||
+      module.includes(term) ||
+      description.includes(term) ||
+      action.includes(term)
     );
   }
 
