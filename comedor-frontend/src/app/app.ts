@@ -2,9 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { Loading } from '@shared/pages/loading/loading';
+import { AccessibilityWidgetComponent } from '@shared/components/accessibility-widget/accessibility-widget.component';
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Loading],
+  imports: [RouterOutlet, Loading, AccessibilityWidgetComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

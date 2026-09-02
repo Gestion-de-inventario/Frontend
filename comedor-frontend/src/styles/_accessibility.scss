@@ -1,45 +1,452 @@
-.accessibility-text-large {
-  --font-size-md: 1.2rem;
-  --font-size-lg: 1.4rem;
-  --font-size-xl: 1.8rem;
+/* =============================================================================
+   MODOS DE ACCESIBILIDAD
+   -----------------------------------------------------------------------------
+   Cada modo se activa con una clase sobre <html> que aplica AccessibilityService.
+   Los modos actúan redefiniendo tokens, no reglas de componentes, y por eso son
+   acumulables: alto contraste, tipografía legible e interlineado pueden estar
+   activos a la vez sin pisarse.
+
+   Este archivo va el último en la cascada para que sus valores prevalezcan.
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------------
+   Tamaño del texto
+   Escalar la raíz propaga el cambio a todo lo dimensionado en `rem`, incluidos
+   los componentes de Bootstrap, sin tocar ni una regla suya.
+   -------------------------------------------------------------------------- */
+
+html {
+  font-size: calc(100% * var(--a11y-font-scale, 1));
 }
 
-.accessibility-high-contrast {
-  --color-background: #000000;
-  --color-surface: #121212;
+/* -----------------------------------------------------------------------------
+   Tema oscuro y alto contraste
 
-  --color-text: #ffffff;
-  --color-text-secondary: #f1f1f1;
+   La aplicación tiene cientos de utilidades de color escritas a mano en las
+   plantillas (text-dark, bg-white, text-muted, bg-light). Sobre fondo oscuro
+   quedarían ilegibles o como bloques blancos, así que además de redefinir los
+   tokens hay que neutralizarlas. Se emplea !important porque son utilidades de
+   Bootstrap, que ya vienen con esa especificidad.
+   -------------------------------------------------------------------------- */
 
-  --color-primary: #4da3ff;
+@mixin superficie-oscura($fondo, $superficie, $hundida, $texto, $texto-2, $borde) {
+  --color-background: #{$fondo};
+  --color-surface: #{$superficie};
+  --color-secondary-background: #{$hundida};
+  --color-text: #{$texto};
+  --color-text-secondary: #{$texto-2};
+  --color-border: #{$borde};
+
+  /* Los avisos invierten en bloque: fondo apagado y texto claro. Si solo se
+     oscureciera el texto, seguirian siendo manchas claras sobre la pantalla. */
+  --color-warning-soft: #3a2f0a;
+  --color-warning-text: #ffd970;
+  --color-warning-ring: rgba(255, 193, 7, 0.18);
+  --color-error-soft: #3a1414;
+  --color-error-text: #ffb3ab;
+
+  color-scheme: dark;
+  background-color: #{$fondo};
+  color: #{$texto};
+
+  /* Bootstrap: variables globales */
+  --bs-body-bg: #{$fondo};
+  --bs-body-color: #{$texto};
+  --bs-border-color: #{$borde};
+  --bs-secondary-bg: #{$hundida};
+  --bs-tertiary-bg: #{$hundida};
+  --bs-emphasis-color: #{$texto};
+  --bs-secondary-color: #{$texto-2};
+
+  body {
+    background-color: #{$fondo};
+    color: #{$texto};
+  }
+
+  /* Superficies que las plantillas pintan de blanco a mano */
+  .bg-white,
+  .bg-body,
+  .card,
+  .modal-content,
+  .offcanvas,
+  .dropdown-menu,
+  .list-group-item,
+  .accordion-item,
+  .accordion-button {
+    background-color: #{$superficie} !important;
+    color: #{$texto} !important;
+    border-color: #{$borde} !important;
+  }
+
+  .bg-light,
+  .table > thead,
+  .card-header,
+  .card-footer,
+  .modal-header,
+  .modal-footer {
+    background-color: #{$hundida} !important;
+    color: #{$texto} !important;
+    border-color: #{$borde} !important;
+  }
+
+  /* Texto: `text-dark` es casi negro y sobre fondo oscuro desaparece. */
+  .text-dark,
+  .text-black,
+  .text-body {
+    color: #{$texto} !important;
+  }
+
+  .text-muted,
+  .text-secondary,
+  .form-text,
+  small.text-muted {
+    color: #{$texto-2} !important;
+  }
+
+  /* Campos de formulario */
+  .form-control,
+  .form-select,
+  .input-group-text {
+    background-color: #{$hundida} !important;
+    color: #{$texto} !important;
+    border-color: #{$borde} !important;
+  }
+
+  .form-control::placeholder {
+    color: #{$texto-2} !important;
+    opacity: 1;
+  }
+
+  .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: #{$texto};
+    --bs-table-border-color: #{$borde};
+    --bs-table-hover-bg: #{$hundida};
+    --bs-table-hover-color: #{$texto};
+  }
+
+  .border,
+  .border-top,
+  .border-bottom,
+  .border-start,
+  .border-end {
+    border-color: #{$borde} !important;
+  }
+
+  hr {
+    border-color: #{$borde};
+    opacity: 1;
+  }
+
+  /* Los iconos SVG monocromos de Bootstrap (cierre, flecha del select) son
+     negros por definición y sobre fondo oscuro no se ven. */
+  .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
+
+  /* Botones de color semantico: su fondo sigue siendo claro, asi que el texto
+     debe permanecer oscuro pese a la regla general de texto claro. */
+  .btn-warning,
+  .btn-warning *,
+  .btn-secondary.bg-warning {
+    color: #1a1400 !important;
+  }
+
+  /* Bootstrap deja sus colores compilados como literales dentro de cada
+     variante, de modo que redefinir --bs-primary no llega hasta aqui: los
+     botones de contorno conservarian el azul #0d6efd y el gris #212529 sobre
+     fondo oscuro. Hay que reasignar sus variables una por una. */
+  .btn-outline-primary {
+    --bs-btn-color: var(--color-primary-text);
+    --bs-btn-border-color: var(--color-primary-text);
+    --bs-btn-hover-bg: var(--color-primary);
+    --bs-btn-hover-border-color: var(--color-primary);
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-active-bg: var(--color-primary);
+    --bs-btn-active-color: #ffffff;
+  }
+
+  .btn-outline-secondary,
+  .btn-outline-dark {
+    --bs-btn-color: #{$texto-2};
+    --bs-btn-border-color: #{$borde};
+    --bs-btn-hover-bg: #{$hundida};
+    --bs-btn-hover-border-color: #{$borde};
+    --bs-btn-hover-color: #{$texto};
+    --bs-btn-active-bg: #{$hundida};
+    --bs-btn-active-color: #{$texto};
+  }
+
+  .btn-light,
+  .btn-secondary {
+    --bs-btn-bg: #{$hundida};
+    --bs-btn-border-color: #{$borde};
+    --bs-btn-color: #{$texto};
+    --bs-btn-hover-bg: #{$borde};
+    --bs-btn-hover-border-color: #{$borde};
+    --bs-btn-hover-color: #{$texto};
+  }
+
+  .btn-outline-success {
+    --bs-btn-color: #6ee7a8;
+    --bs-btn-border-color: #6ee7a8;
+    --bs-btn-hover-bg: #14532d;
+    --bs-btn-hover-color: #ffffff;
+  }
+
+  .btn-outline-danger {
+    --bs-btn-color: #ff8a80;
+    --bs-btn-border-color: #ff8a80;
+    --bs-btn-hover-bg: #7f1d1d;
+    --bs-btn-hover-color: #ffffff;
+  }
+
+  /* Enlaces: el azul por defecto de Bootstrap no contrasta sobre fondo oscuro. */
+  a:not(.btn),
+  .btn-link {
+    color: var(--color-primary-text);
+  }
+}
+
+.a11y-dark {
+  @include superficie-oscura(#12161c, #1a2029, #232b36, #f2f4f7, #b8c0cc, #39424f);
+
+  /* El morado de FONDO se mantiene oscuro para que el texto blanco que llevan
+     encima el avatar, el enlace activo del menú y los botones siga leyéndose.
+     Solo se aclara la variante de TEXTO. */
+  --color-primary: #4b45c4;
+  --color-primary-hover: #5f59d6;
+  --color-primary-text: #a9b4ff;
+  --bs-primary: #a9b4ff;
+  --bs-link-color: #a9b4ff;
+  --bs-link-hover-color: #c6cdff;
+
+  .btn-primary {
+    --bs-btn-bg: #4b45c4;
+    --bs-btn-border-color: #4b45c4;
+    --bs-btn-color: #ffffff;
+    --bs-btn-hover-bg: #5f59d6;
+    --bs-btn-hover-border-color: #5f59d6;
+    --bs-btn-hover-color: #ffffff;
+  }
+
+  .text-primary {
+    color: #a9b4ff !important;
+  }
+}
+
+/* Alto contraste: negro puro y blanco puro, por encima de 7:1 en todos los
+   pares de color (nivel AAA de WCAG 1.4.6). Las sombras desaparecen porque
+   sobre negro no aportan profundidad; la jerarquía pasa a expresarse con borde. */
+.a11y-high-contrast {
+  @include superficie-oscura(#000000, #0d0d0d, #1a1a1a, #ffffff, #e8e8e8, #8a8a8a);
+
+  --color-primary: #23306b;
+  --color-primary-hover: #2e3f8c;
+  --color-primary-text: #9db8ff;
   --color-secondary: #ffd54f;
+  --color-success: #6ee7a8;
+  --color-warning: #ffd54f;
+  --color-error: #ff8a80;
 
-  --color-border: #ffffff;
+  --bs-primary: #9db8ff;
+  --bs-link-color: #9db8ff;
+  --bs-link-hover-color: #c2d2ff;
+
+  --shadow-sm: none;
+
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .btn-primary {
+    --bs-btn-bg: #9db8ff;
+    --bs-btn-border-color: #ffffff;
+    --bs-btn-color: #000000;
+    --bs-btn-hover-bg: #c2d2ff;
+    --bs-btn-hover-border-color: #ffffff;
+    --bs-btn-hover-color: #000000;
+  }
+
+  /* Todo control recibe un borde visible: en alto contraste la forma no puede
+     depender de un fondo sutil. */
+  .btn,
+  .card,
+  .form-control,
+  .form-select,
+  .modal-content,
+  .dropdown-menu {
+    border: 1px solid #8a8a8a !important;
+  }
+
+  .text-primary {
+    color: #9db8ff !important;
+  }
+
+  :focus-visible {
+    outline: 3px solid #ffd54f !important;
+    outline-offset: 2px;
+  }
 }
 
-.accessibility-dyslexia {
-  --font-family-base: var(--font-family-dyslexia);
-  --letter-spacing-normal: 0.08em;
-  --line-height-normal: 1.8;
+/* -----------------------------------------------------------------------------
+   Tipografía legible
+   Atkinson Hyperlegible fue diseñada por el Braille Institute para separar los
+   caracteres que más se confunden: b/d, p/q, 0/O, 1/l/I. Junto con el espaciado
+   extra, reduce los errores de lectura en dislexia y baja visión.
+   -------------------------------------------------------------------------- */
+
+.a11y-legible-font {
+  --font-family-base: 'Atkinson Hyperlegible', 'Inter', system-ui, sans-serif;
+
+  font-family: var(--font-family-base);
+
+  body,
+  .btn,
+  .form-control,
+  .form-select,
+  .form-label,
+  .card,
+  .modal,
+  input,
+  select,
+  textarea,
+  button {
+    font-family: var(--font-family-base) !important;
+  }
+
+  /* El texto justificado abre "ríos" de espacio en blanco que dificultan seguir
+     el renglón. */
+  p,
+  li,
+  td {
+    text-align: left;
+  }
 }
 
-.accessibility-line-spacing {
-  --line-height-normal: 2;
+/* -----------------------------------------------------------------------------
+   Espaciado del texto (criterio WCAG 1.4.12)
+   -------------------------------------------------------------------------- */
+
+.a11y-line-spacing {
+  --line-height-normal: var(--line-height-reading);
+
+  body,
+  p,
+  li,
+  td,
+  label,
+  .card,
+  .form-label {
+    line-height: var(--line-height-reading) !important;
+  }
 }
 
-.accessibility-letter-spacing {
-  --letter-spacing-normal: 0.12em;
+.a11y-letter-spacing {
+  --letter-spacing-normal: var(--letter-spacing-reading);
+
+  body,
+  p,
+  li,
+  td,
+  label,
+  .btn,
+  .form-label {
+    letter-spacing: var(--letter-spacing-reading) !important;
+    word-spacing: 0.16em;
+  }
 }
 
-.reading-mask {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: rgba(0, 0, 0, 0.6);
+/* -----------------------------------------------------------------------------
+   Resaltar elementos accionables
+   Muchos controles de la aplicación se distinguen solo por el color del texto.
+   Este modo les añade una forma visible, para quien no percibe ese matiz.
+   -------------------------------------------------------------------------- */
 
-  mask: linear-gradient(to bottom, transparent 40%, black 45%, black 55%, transparent 60%);
+.a11y-highlight-links {
+  a:not(.btn),
+  .sidebar-link,
+  [role='button'] {
+    text-decoration: underline !important;
+    text-underline-offset: 0.2em;
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  button:not(.btn-close),
+  .btn {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+  }
 }
 
-.accessibility-big-cursor {
-  cursor: url('/assets/cursors/big-cursor.png'), auto;
+/* -----------------------------------------------------------------------------
+   Cursor grande
+   Se dibuja como SVG incrustado: no requiere ningún archivo de imagen, así que
+   no puede quedar roto si falta un recurso.
+   -------------------------------------------------------------------------- */
+
+.a11y-big-cursor,
+.a11y-big-cursor * {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M6 2l30 22-13 2 7 15-6 3-7-15-11 9z' fill='%23ffffff' stroke='%23000000' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E")
+      4 2,
+    auto !important;
+}
+
+.a11y-big-cursor a,
+.a11y-big-cursor button,
+.a11y-big-cursor [role='button'],
+.a11y-big-cursor label {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M18 4c-2 0-3 1.5-3 3v16l-4-4c-1.5-1.5-4-1.5-5 0s-1 3.5 0 5l10 14c1 1.5 3 2 5 2h11c3 0 5-2 5-5V22c0-2-1-3-3-3s-3 1-3 3v-2c0-2-1-3-3-3s-3 1-3 3v-2c0-2-1-3-3-3s-3 1-3 3V7c0-1.5-1-3-3-3z' fill='%23ffffff' stroke='%23000000' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E")
+      14 2,
+    pointer !important;
+}
+
+/* -----------------------------------------------------------------------------
+   Reducir animaciones
+   No se eliminan del todo (1ms) para que los eventos de fin de transición que
+   Bootstrap usa al abrir y cerrar modales sigan disparándose.
+   -------------------------------------------------------------------------- */
+
+.a11y-reduce-motion,
+.a11y-reduce-motion *,
+.a11y-reduce-motion *::before,
+.a11y-reduce-motion *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* -----------------------------------------------------------------------------
+   Filtros para daltonismo
+
+   Redistribuyen los tonos que la persona confunde hacia rangos que sí distingue.
+   No corrigen la visión ni sustituyen al resto de medidas: un estado que solo se
+   comunique con color sigue siendo un problema, y por eso los distintivos de la
+   aplicación llevan además texto.
+
+   El filtro se aplica sobre <html>. Cualquier elemento con `filter` pasa a ser
+   el bloque contenedor de sus descendientes `fixed`, así que aplicarlo más
+   adentro (sobre <body> o sobre un envoltorio) desancla los modales, el panel
+   lateral y el propio botón flotante. <html> es el ancestro más externo posible
+   y por tanto el que menos altera ese comportamiento.
+   -------------------------------------------------------------------------- */
+
+.a11y-protanopia {
+  filter: url('#a11y-protanopia');
+}
+
+.a11y-deuteranopia {
+  filter: url('#a11y-deuteranopia');
+}
+
+.a11y-tritanopia {
+  filter: url('#a11y-tritanopia');
 }

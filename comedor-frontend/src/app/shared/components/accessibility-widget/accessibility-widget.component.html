@@ -1,0 +1,255 @@
+<!-- Filtros de daltonismo. Son matrices de color que redistribuyen los tonos
+     confundibles hacia rangos que la persona sí distingue; no "corrigen" la
+     visión, reparten la información cromática de otro modo. -->
+<svg class="a11y-defs" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="a11y-protanopia">
+      <feColorMatrix
+        type="matrix"
+        values="0.567 0.433 0     0 0
+                0.558 0.442 0     0 0
+                0     0.242 0.758 0 0
+                0     0     0     1 0"
+      />
+    </filter>
+    <filter id="a11y-deuteranopia">
+      <feColorMatrix
+        type="matrix"
+        values="0.625 0.375 0     0 0
+                0.7   0.3   0     0 0
+                0     0.3   0.7   0 0
+                0     0     0     1 0"
+      />
+    </filter>
+    <filter id="a11y-tritanopia">
+      <feColorMatrix
+        type="matrix"
+        values="0.95  0.05  0     0 0
+                0     0.433 0.567 0 0
+                0     0.475 0.525 0 0
+                0     0     0     1 0"
+      />
+    </filter>
+  </defs>
+</svg>
+
+@if (a11y.preferences().readingMask) {
+  <div class="a11y-reading-mask" aria-hidden="true"></div>
+}
+
+<button
+  #trigger
+  type="button"
+  class="a11y-trigger"
+  [class.a11y-trigger--active]="a11y.isModified"
+  [attr.aria-expanded]="open()"
+  aria-controls="panel-accesibilidad"
+  aria-label="Opciones de accesibilidad"
+  (click)="togglePanel()"
+>
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <circle cx="12" cy="4" r="2" />
+    <path
+      d="M20 8.5c0 .55-.45 1-1 1l-4.5-.5v3.2l1.9 7.4a1 1 0 0 1-.72 1.22 1 1 0 0 1-1.22-.72L12.7 14.5h-1.4l-1.76 5.6a1 1 0 0 1-1.22.72 1 1 0 0 1-.72-1.22l1.9-7.4V9l-4.5.5a1 1 0 0 1 0-2L11 7h2l6-.5c.55 0 1 .45 1 1Z"
+    />
+  </svg>
+</button>
+
+@if (open()) {
+  <section
+    #panel
+    id="panel-accesibilidad"
+    class="a11y-panel"
+    role="dialog"
+    aria-label="Opciones de accesibilidad"
+    tabindex="-1"
+  >
+    <header class="a11y-panel__head">
+      <h2 class="a11y-panel__title">Accesibilidad</h2>
+      <button type="button" class="a11y-close" aria-label="Cerrar panel" (click)="close()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="a11y-panel__body">
+      <!-- Tamaño del texto -->
+      <fieldset class="a11y-group">
+        <legend class="a11y-group__title">Tamaño del texto</legend>
+        <div class="a11y-segmented" role="group" aria-label="Tamaño del texto">
+          @for (scale of scales; track scale) {
+            <button
+              type="button"
+              class="a11y-segmented__option"
+              [class.a11y-segmented__option--on]="a11y.preferences().fontScale === scale"
+              [attr.aria-pressed]="a11y.preferences().fontScale === scale"
+              (click)="a11y.set('fontScale', scale)"
+            >
+              {{ porcentaje(scale) }}
+            </button>
+          }
+        </div>
+      </fieldset>
+
+      <!-- Tema -->
+      <fieldset class="a11y-group">
+        <legend class="a11y-group__title">Contraste y color</legend>
+        @for (theme of themes; track theme.value) {
+          <button
+            type="button"
+            class="a11y-option"
+            [class.a11y-option--on]="a11y.preferences().theme === theme.value"
+            [attr.aria-pressed]="a11y.preferences().theme === theme.value"
+            (click)="a11y.set('theme', theme.value)"
+          >
+            <span class="a11y-option__text">
+              <span class="a11y-option__label">{{ theme.label }}</span>
+              <span class="a11y-option__hint">{{ theme.hint }}</span>
+            </span>
+            <span class="a11y-check" aria-hidden="true"></span>
+          </button>
+        }
+      </fieldset>
+
+      <!-- Daltonismo -->
+      <fieldset class="a11y-group">
+        <legend class="a11y-group__title">Filtro para daltonismo</legend>
+        @for (filter of filters; track filter.value) {
+          <button
+            type="button"
+            class="a11y-option"
+            [class.a11y-option--on]="a11y.preferences().colorFilter === filter.value"
+            [attr.aria-pressed]="a11y.preferences().colorFilter === filter.value"
+            (click)="a11y.set('colorFilter', filter.value)"
+          >
+            <span class="a11y-option__text">
+              <span class="a11y-option__label">{{ filter.label }}</span>
+              @if (filter.hint) {
+                <span class="a11y-option__hint">{{ filter.hint }}</span>
+              }
+            </span>
+            <span class="a11y-check" aria-hidden="true"></span>
+          </button>
+        }
+      </fieldset>
+
+      <!-- Lectura -->
+      <fieldset class="a11y-group">
+        <legend class="a11y-group__title">Lectura</legend>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().legibleFont"
+          [attr.aria-pressed]="a11y.preferences().legibleFont"
+          (click)="a11y.toggle('legibleFont')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Tipografía legible</span>
+            <span class="a11y-option__hint">Distingue mejor b/d, p/q y 0/O</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().lineSpacing"
+          [attr.aria-pressed]="a11y.preferences().lineSpacing"
+          (click)="a11y.toggle('lineSpacing')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Más interlineado</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().letterSpacing"
+          [attr.aria-pressed]="a11y.preferences().letterSpacing"
+          (click)="a11y.toggle('letterSpacing')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Más espacio entre letras</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().readingMask"
+          [attr.aria-pressed]="a11y.preferences().readingMask"
+          (click)="a11y.toggle('readingMask')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Máscara de lectura</span>
+            <span class="a11y-option__hint">Resalta la línea donde está el puntero</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+      </fieldset>
+
+      <!-- Navegación -->
+      <fieldset class="a11y-group">
+        <legend class="a11y-group__title">Navegación</legend>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().highlightLinks"
+          [attr.aria-pressed]="a11y.preferences().highlightLinks"
+          (click)="a11y.toggle('highlightLinks')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Resaltar elementos accionables</span>
+            <span class="a11y-option__hint">Marca enlaces y botones con un borde</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().bigCursor"
+          [attr.aria-pressed]="a11y.preferences().bigCursor"
+          (click)="a11y.toggle('bigCursor')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Cursor grande</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+
+        <button
+          type="button"
+          class="a11y-option"
+          [class.a11y-option--on]="a11y.preferences().reduceMotion"
+          [attr.aria-pressed]="a11y.preferences().reduceMotion"
+          (click)="a11y.toggle('reduceMotion')"
+        >
+          <span class="a11y-option__text">
+            <span class="a11y-option__label">Reducir animaciones</span>
+            <span class="a11y-option__hint">Evita mareos y distracciones</span>
+          </span>
+          <span class="a11y-check" aria-hidden="true"></span>
+        </button>
+      </fieldset>
+    </div>
+
+    <footer class="a11y-panel__foot">
+      <button
+        type="button"
+        class="a11y-reset"
+        [disabled]="!a11y.isModified"
+        (click)="a11y.reset()"
+      >
+        Restablecer todo
+      </button>
+      <p class="a11y-note">Tus ajustes se guardan solo en este dispositivo.</p>
+    </footer>
+  </section>
+}

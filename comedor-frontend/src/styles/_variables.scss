@@ -1,6 +1,13 @@
 :root {
   --color-primary: #2d2692;
   --color-primary-hover: #0d0a33;
+
+  /* El morado cumple dos papeles con exigencias opuestas: como FONDO debe ser
+     bastante oscuro para que el texto blanco encima se lea, y como TEXTO debe
+     ser claro para leerse sobre fondo oscuro. Con un solo valor es imposible
+     satisfacer ambos al invertir el tema, asi que se separan. En modo claro
+     coinciden. */
+  --color-primary-text: #2d2692;
   --color-secondary: #ffb800;
   --color-background: #ffffff;
   --color-secondary-background: #ebebeb;
@@ -10,7 +17,15 @@
   --color-border: #2d2692;
   --color-success: #1c4a35;
   --color-warning: #e6a700;
+
+  /* Variantes de aviso. Un fondo suave siempre se declara junto a su color de
+     texto: definir solo uno rompe el contraste al invertir el tema. */
+  --color-warning-soft: #fff8e1;
+  --color-warning-text: #6b4e00;
+  --color-warning-ring: rgba(255, 193, 7, 0.2);
   --color-error: #c62828;
+  --color-error-soft: #f8eaeb;
+  --color-error-text: #8a1c1c;
   --font-family-base: 'Inter', sans-serif;
   --font-family-dyslexia: 'OpenDyslexic', sans-serif;
   --font-size-xs: 0.75rem;
