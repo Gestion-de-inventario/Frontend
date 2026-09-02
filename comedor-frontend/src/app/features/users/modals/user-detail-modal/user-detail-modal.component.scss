@@ -58,7 +58,7 @@
 }
 
 .my-gray-btn {
-  background-color: #ffffff;
+  background-color: var(--color-background);
   color: var(--my-gray);
   border: 1px solid var(--my-gray);
 }
@@ -87,7 +87,7 @@
 }
 
 .my-blue-btn:hover {
-  background-color: #ffffff;
+  background-color: var(--color-background);
   color: var(--my-blue);
   border: 1px solid var(--my-blue);
 }

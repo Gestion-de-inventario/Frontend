@@ -70,10 +70,10 @@
 
   &:hover {
     background-color: rgba(45, 38, 146, 0.05); /* Efecto usando el color primario */
-    color: var(--color-primary);
+    color: var(--color-primary-text);
 
     svg {
-      color: var(--color-primary);
+      color: var(--color-primary-text);
     }
   }
 
@@ -103,8 +103,10 @@
   font-size: 0.95rem;
   font-weight: 500;
   border-radius: var(--border-radius-md);
-  background-color: #f8eaeb; /* Fondo rojo muy suave */
-  color: var(--color-error);
+  /* El fondo suave y su color de texto se declaran como par: al invertir el
+     tema deben girar juntos o el boton queda ilegible. */
+  background-color: var(--color-error-soft);
+  color: var(--color-error-text);
   border: 1px solid transparent;
   transition: var(--transition-normal);
 

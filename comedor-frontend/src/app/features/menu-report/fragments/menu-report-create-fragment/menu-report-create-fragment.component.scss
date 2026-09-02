@@ -9,7 +9,7 @@
 }
 
 .my-blue-btn:hover {
-  background-color: #ffffff;
+  background-color: var(--color-background);
   color: var(--my-blue);
   border: 3px solid var(--my-blue);
 }

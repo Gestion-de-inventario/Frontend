@@ -1,7 +1,7 @@
 /* Fondo general sutil para que las tarjetas blancas resalten */
 :host {
   display: block;
-  background-color: #f8f9fa;
+  background-color: var(--color-surface);
   min-height: 100%;
   padding-bottom: 2rem;
 }
@@ -11,7 +11,7 @@
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.04);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  background: #ffffff;
+  background: var(--color-background);
 
   &:hover {
     transform: translateY(-4px);
@@ -37,11 +37,11 @@
 .content-card {
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.04);
-  background: #ffffff;
+  background: var(--color-background);
   overflow: hidden;
 
   .card-header {
-    background-color: #ffffff;
+    background-color: var(--color-background);
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   }
 }
@@ -98,7 +98,7 @@
   display: block;
   padding: 1rem;
   border-radius: 1rem;
-  background: #ffffff;
+  background: var(--color-background);
   border: 1px solid #e9ecef;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   text-decoration: none;
