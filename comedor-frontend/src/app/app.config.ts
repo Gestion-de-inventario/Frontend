@@ -5,6 +5,8 @@ import {
   inject,
 } from '@angular/core';
 
+import { AuthStateService } from '@core/auth/services/auth-state.service';
+
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
@@ -17,5 +19,10 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
+    provideAppInitializer(() => {
+      const authState = inject(AuthStateService);
+
+      return authState.initAuth();
+    }),
   ],
 };

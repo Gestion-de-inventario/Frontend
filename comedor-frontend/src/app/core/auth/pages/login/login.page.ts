@@ -66,7 +66,7 @@ export class LoginPage {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/home']);
         },
 
         error: () => {

@@ -71,7 +71,7 @@ export const routes: Routes = [
             (m) => m.RolesPermissionsPrincipalComponent,
           ),
       },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
       {
         path: 'profile',
         title: 'Mi perfil',
@@ -208,8 +208,8 @@ export const routes: Routes = [
       },
       {
         path: 'reports',
-        title: 'Reportes',
-        data: { breadcrumb: 'Reportes' },
+        title: 'Auditoria y Reportes',
+        data: { breadcrumb: 'Auditoria y Reportes' },
         loadComponent: () =>
           import('@features/reports/pages/reports-principal/reports-principal.component').then(
             (m) => m.ReportsPrincipalComponent,
@@ -245,6 +245,30 @@ export const routes: Routes = [
               ),
           },
         ],
+      },
+      {
+        path: 'legales',
+        title: 'Legales',
+        data: { breadcrumb: 'Legales' },
+        loadComponent: () =>
+          import('@shared/pages/legales/principal/legales-principal-component').then(
+            (m) => m.LegalesPrincipalComponent,
+          ),
+        children: [
+          {
+            path: 'aviso-privacidad',
+            title: 'Aviso de Privacidad',
+            data: { breadcrumb: 'aviso de privacidad' },
+            loadComponent: () =>
+              import('@shared/pages/legales/aviso de privacidad/aviso-privacidad').then(
+                (m) => m.AvisoPrivacidad,
+              ),
+          },
+        ],
+      },
+      {
+        path: '**',
+        redirectTo: 'home',
       },
     ],
   },

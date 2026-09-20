@@ -74,7 +74,7 @@ export class TourModalComponent implements OnInit {
     },
     {
       icon: '📈',
-      titulo: 'Reportes',
+      titulo: 'Auditoria y Reportes',
       descripcion:
         'Consulta el historial de transacciones y modificaciones con filtros por fecha. Exporta reportes en PDF del menú diario, transacciones y modificaciones.',
       permiso: 'TRANSACTION_LIST_ALL',

@@ -8,18 +8,20 @@ import { BeneficiaryTypeApiService } from '@features/beneficiaryType/services/be
 import { BeneficiaryTypeStateService } from '@features/beneficiaryType/services/beneficiaryType-state.service';
 import { ToastService } from '@shared/services/toast.service';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
+import { Router, RouterLink } from '@angular/router';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-beneficiary-create-fragment',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
   templateUrl: './beneficiary-create-fragment.component.html',
   styleUrl: './beneficiary-create-fragment.scss',
 })
 export class BeneficiaryCreateFragmentComponent {
   private readonly authState = inject(AuthStateService);
+  private readonly router = inject(Router);
   private readonly beneficiaryService = inject(BeneficiaryApiService);
   private readonly beneficiaryState = inject(BeneficiaryStateService);
   private readonly toastService = inject(ToastService);
@@ -42,6 +44,10 @@ export class BeneficiaryCreateFragmentComponent {
         Validators.pattern(/^[0-9]+$/),
       ],
     }),
+    dataProcessingDocumented: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.requiredTrue],
+    }),
   });
 
   readonly manualForm = new FormGroup({
@@ -62,7 +68,13 @@ export class BeneficiaryCreateFragmentComponent {
       nonNullable: true,
       validators: [Validators.required, Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)],
     }),
-    beneficiaryTypeId: new FormControl<number | null>(null),
+    beneficiaryTypeId: new FormControl<number | null>(null, {
+      validators: [Validators.required],
+    }),
+    dataProcessingDocumented: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.requiredTrue],
+    }),
   });
 
   openModalManual(): void {

@@ -114,6 +114,7 @@
 
             <input
               type="text"
+              placeholder="Ingresa DNI Valido"
               inputmode="numeric"
               pattern="[0-9]*"
               maxlength="8"
@@ -148,8 +149,9 @@
               class="form-select rounded-3 shadow-sm custom-input"
               formControlName="beneficiaryTypeId"
             >
+              <option [ngValue]="null" disabled>Seleccione un tipo de beneficiario</option>
               @for (type of beneficiaryTypes(); track type.id) {
-                <option [value]="type.id">{{ type.name }}</option>
+                <option [ngValue]="type.id">{{ type.name }}</option>
               }
             </select>
           </div>
@@ -202,6 +204,42 @@
             ) {
               <small class="text-danger">El apellido solo debe contener letras y espacios.</small>
             }
+          </div>
+          <div class="col-12">
+            <div class="border rounded-4 p-3 bg-light">
+              <div class="d-flex align-items-start gap-3">
+                <div>
+                  <h6 class="fw-bold mb-1">Protección de datos personales</h6>
+
+                  <p class="small text-muted mb-2">
+                    El beneficiario debe haber sido informado sobre el tratamiento de sus datos
+                    personales durante su empadronamiento.
+                  </p>
+
+                  <a
+                    [routerLink]="['/legales/aviso-privacidad']"
+                    target="_blank"
+                    class="small fw-medium text-decoration-none"
+                  >
+                    Ver aviso de privacidad
+                  </a>
+                </div>
+              </div>
+
+              <div class="form-check mt-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="dataProcessingDocumented"
+                  formControlName="dataProcessingDocumented"
+                />
+
+                <label class="form-check-label small fw-medium" for="dataProcessingDocumented">
+                  Se ha registrado la documentación correspondiente al tratamiento de datos
+                  personales del beneficiario.
+                </label>
+              </div>
+            </div>
           </div>
         </form>
       </div>
@@ -279,7 +317,7 @@
             <input
               type="text"
               class="form-control form-control-lg rounded-3 shadow-sm custom-input"
-              placeholder="Ej. 12345678"
+              placeholder="Ej. 72111167"
               inputmode="numeric"
               pattern="[0-9]*"
               maxlength="8"
@@ -303,6 +341,42 @@
             @if (reniecForm.controls.dni.touched && reniecForm.controls.dni.hasError('pattern')) {
               <div class="invalid-feedback small fw-medium">El DNI debe tener solo números.</div>
             }
+          </div>
+          <div class="mt-2 col-12">
+            <div class="border rounded-4 p-3 bg-light">
+              <div class="d-flex align-items-start gap-3">
+                <div>
+                  <h6 class="fw-bold mb-1">Protección de datos personales</h6>
+
+                  <p class="small text-muted mb-2">
+                    El beneficiario debe haber sido informado sobre el tratamiento de sus datos
+                    personales durante su empadronamiento.
+                  </p>
+
+                  <a
+                    [routerLink]="['/legales/aviso-privacidad']"
+                    target="_blank"
+                    class="small fw-medium text-decoration-none"
+                  >
+                    Ver aviso de privacidad
+                  </a>
+                </div>
+              </div>
+
+              <div class="form-check mt-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="dataProcessingDocumented"
+                  formControlName="dataProcessingDocumented"
+                />
+
+                <label class="form-check-label small fw-medium" for="dataProcessingDocumented">
+                  Se ha registrado la documentación correspondiente al tratamiento de datos
+                  personales del beneficiario.
+                </label>
+              </div>
+            </div>
           </div>
         </form>
         @if (reniecError) {

@@ -11,26 +11,6 @@ import { AccessibilityWidgetComponent } from '@shared/components/accessibility-w
 })
 export class App {
   authState = inject(AuthStateService);
-  router = inject(Router);
+
   protected readonly title = signal('comedor-frontend');
-
-  ngOnInit(): void {
-    this.authState.initAuth().subscribe({
-      complete: () => {
-        const currentUrl = this.router.url;
-
-        if (this.authState.isAuthenticated()) {
-          if (currentUrl === '/' || currentUrl === '/login') {
-            this.router.navigateByUrl('/home', { replaceUrl: true });
-          }
-
-          return;
-        }
-
-        if (currentUrl !== '/login') {
-          this.router.navigateByUrl('/login', { replaceUrl: true });
-        }
-      },
-    });
-  }
 }
