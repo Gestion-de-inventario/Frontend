@@ -13,6 +13,7 @@ import { BeneficiaryTypeStateService } from '@features/beneficiaryType/services/
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './beneficiary-detail-modal.component.html',
+  styleUrl: './beneficiary-detail-modal.component.scss',
 })
 export class BeneficiaryDetailModalComponent {
   readonly authState = inject(AuthStateService);

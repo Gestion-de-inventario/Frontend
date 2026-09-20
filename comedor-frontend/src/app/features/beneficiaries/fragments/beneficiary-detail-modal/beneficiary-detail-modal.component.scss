@@ -1,0 +1,10 @@
+.btn-primary {
+  background: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  &:hover {
+    transform: translateY(-1px);
+    color: var(--color-background);
+    border-color: #1b1665;
+    background: #1b1665;
+  }
+}

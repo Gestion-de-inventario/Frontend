@@ -77,16 +77,26 @@
 
   /* Mañana */
   &--morning {
-    background: linear-gradient(135deg, #2d2692 0%, #5149bd 100%);
+    background: linear-gradient(135deg, #003975 0%, #5d54d5 100%);
 
     box-shadow: 0 12px 30px rgba(45, 38, 146, 0.18);
+
+    .welcome-card__icon {
+      background: none;
+      color: #ffdd00;
+    }
   }
 
   /* Tarde */
   &--afternoon {
-    background: linear-gradient(135deg, #4036a5 0%, #675fc7 100%);
+    background: linear-gradient(100deg, #003975 55%, #ffc23d 100%);
 
     box-shadow: 0 12px 30px rgba(45, 38, 146, 0.18);
+
+    .welcome-card__icon {
+      background: rgba(255, 190, 100, 0.22);
+      color: #ffc23d;
+    }
   }
 
   /* Noche */

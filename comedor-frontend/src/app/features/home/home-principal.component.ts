@@ -32,7 +32,7 @@ export class HomePrincipalComponent implements OnInit {
     if (hour >= 12 && hour < 18) {
       return 'afternoon';
     }
-
+    console.log(hour);
     return 'night';
   });
 
