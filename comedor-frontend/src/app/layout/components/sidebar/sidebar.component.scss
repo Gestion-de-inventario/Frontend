@@ -2,6 +2,26 @@
   background: var(--color-background);
   color: var(--color-text);
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08); /* Sombra elegante hacia la derecha */
+  /* Scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #2d2692 transparent;
+}
+
+.custom-sidebar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.custom-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-sidebar::-webkit-scrollbar-thumb {
+  background: #2d2692;
+  border-radius: 2px;
+}
+
+.custom-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #252078;
 }
 
 /* Decoración para el logo superior */
@@ -119,4 +139,39 @@
 .offcanvas {
   touch-action: pan-y;
   transition: transform 0.4s ease-in-out;
+}
+
+.btn-outline-primary {
+  border-color: #2d2692;
+  color: #2d2692;
+  &:hover {
+    background-color: #2d2692;
+    color: #ffffff;
+  }
+}
+/* Modo oscuro */
+:host-context(html.a11y-dark) {
+  .btn-outline-primary {
+    color: #a9b4ff;
+    border-color: #a9b4ff;
+
+    &:hover {
+      background-color: #4b45c4;
+      border-color: #4b45c4;
+      color: #ffffff;
+    }
+  }
+}
+
+/* Alto contraste */
+:host-context(html.a11y-high-contrast) {
+  .btn-outline-primary {
+    color: #ffffff;
+    border-color: #000000;
+
+    &:hover {
+      background-color: #ffffff;
+      color: #000000;
+    }
+  }
 }

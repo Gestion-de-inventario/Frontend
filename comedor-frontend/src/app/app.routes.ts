@@ -16,8 +16,15 @@ export const routes: Routes = [
     canActivate: [appReadyGuard, authGuard],
     children: [
       {
+        path: 'home',
+        title: 'Inicio',
+        loadComponent: () =>
+          import('@features/home/home-principal.component').then((m) => m.HomePrincipalComponent),
+      },
+      {
         path: 'dashboard',
         title: 'Dashboard',
+        data: { breadcrumb: 'Dashboard' },
         loadComponent: () =>
           import('@features/dashboard/pages/dashboard-principal.component').then(
             (m) => m.DashboardPrincipalComponent,
@@ -94,8 +101,8 @@ export const routes: Routes = [
 
       {
         path: 'history/menu-report',
-        title: 'Historial de menus',
-        data: { breadcrumb: 'Historial de menus' },
+        title: 'Registrar recojo de menú',
+        data: { breadcrumb: 'Recojo de menú' },
         loadComponent: () =>
           import('@features/menu-report/fragments/menu-report-list-fragment/list-menu-report-fragment.component').then(
             (m) => m.ListMenuReportFragmentComponent,

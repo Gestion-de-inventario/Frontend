@@ -1,0 +1,80 @@
+<div class="home-page">
+  <!-- Bienvenida -->
+  <section
+    class="welcome-card"
+    [class.welcome-card--morning]="currentPeriod() === 'morning'"
+    [class.welcome-card--afternoon]="currentPeriod() === 'afternoon'"
+    [class.welcome-card--night]="currentPeriod() === 'night'"
+  >
+    <div class="welcome-card__content">
+      <div class="welcome-card__icon" aria-hidden="true">
+        <i class="bi" [class]="periodIcon()"></i>
+      </div>
+
+      <div>
+        <span class="welcome-card__greeting">
+          {{ greeting() }}
+        </span>
+
+        <h1>{{ authState.session()?.name }} {{ authState.session()?.lastname }}</h1>
+
+        <p>Qué bueno verte. ¿Qué deseas hacer hoy?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accesos rápidos -->
+  <section class="quick-access">
+    <div class="section-heading">
+      <div>
+        <h2>Accesos rápidos</h2>
+        <p>Accede directamente a las funciones que utilizas con mayor frecuencia.</p>
+      </div>
+    </div>
+
+    <div class="quick-access__grid">
+      @for (access of visibleQuickAccesses(); track access.route) {
+        <button
+          type="button"
+          class="quick-access__card"
+          (click)="navigate(access.route)"
+          [attr.aria-label]="access.title"
+        >
+          <span class="quick-access__icon" aria-hidden="true">
+            <i class="bi" [class]="access.icon"></i>
+          </span>
+
+          <span class="quick-access__content">
+            <strong>
+              {{ access.title }}
+            </strong>
+
+            <small>
+              {{ access.description }}
+            </small>
+          </span>
+
+          <i class="bi bi-arrow-up-right quick-access__arrow" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+    <div class="quick-access__grid--yape">
+      @for (access of visibleQuickAccesses(); track access.route) {
+        <button
+          type="button"
+          class="quick-access__card--yape"
+          (click)="navigate(access.route)"
+          [attr.aria-label]="access.title"
+        >
+          <span class="quick-access__icon--yape" aria-hidden="true">
+            <i class="bi" [class]="access.icon"></i>
+          </span>
+
+          <span class="quick-access__content--yape">
+            <small>{{ access.description }}</small>
+          </span>
+        </button>
+      }
+    </div>
+  </section>
+</div>

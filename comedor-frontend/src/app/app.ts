@@ -21,7 +21,7 @@ export class App {
 
         if (this.authState.isAuthenticated()) {
           if (currentUrl === '/' || currentUrl === '/login') {
-            this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+            this.router.navigateByUrl('/home', { replaceUrl: true });
           }
 
           return;

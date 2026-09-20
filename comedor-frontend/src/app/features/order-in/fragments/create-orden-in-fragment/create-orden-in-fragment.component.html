@@ -43,18 +43,23 @@
         >
           Registrar otro ingreso
         </button>
-        <button
-          class="btn btn-outline-primary rounded-pill py-2.5 fw-medium"
-          (click)="goToMenuReport()"
-        >
-          Volver al Registro de menú
-        </button>
-        <button
-          class="btn btn-outline-secondary rounded-pill py-2.5 fw-medium"
-          (click)="goBackToList()"
-        >
-          Volver a la lista de registro de ingresos
-        </button>
+        @if (authState.hasPermission('MENU_REPORT_CREATE_REPORT')) {
+          <button
+            class="btn btn-outline-primary rounded-pill py-2.5 fw-medium"
+            (click)="goToMenuReport()"
+          >
+            Volver al Registro de menú
+          </button>
+        }
+
+        @if (authState.hasPermission('PURCHASE_LIST_ALL')) {
+          <button
+            class="btn btn-outline-secondary rounded-pill py-2.5 fw-medium"
+            (click)="goBackToList()"
+          >
+            Volver a la lista de registro de ingresos
+          </button>
+        }
       </div>
     </div>
   } @else {
@@ -315,9 +320,10 @@
             @if (loading()) {
               <span class="spinner-border spinner-border-sm me-2"></span>
               Registrando ingreso...
+            } @else {
+              Crear
+              {{ orderType() === 'COMPRA' ? 'registro de Compra' : 'registro de Donación' }}
             }
-            Crear
-            {{ orderType() === 'COMPRA' ? 'registro de Compra' : 'registro de Donación' }}
           </button>
         </div>
       </div>
