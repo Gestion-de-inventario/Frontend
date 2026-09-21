@@ -446,3 +446,52 @@
 :host-context(html.a11y-reduce-motion) .a11y-trigger:hover {
   transform: none;
 }
+
+/* En celular se aparta del área inferior, donde suelen vivir los botones
+   principales. Permanece visible y alcanzable, pero ocupa menos espacio. */
+@media (max-width: 520px) {
+  :host {
+    inset: 0 0 auto auto;
+  }
+
+  .a11y-trigger {
+    top: max(0.7rem, env(safe-area-inset-top, 0px));
+    right: max(0.7rem, env(safe-area-inset-right, 0px));
+    bottom: auto;
+
+    width: 42px;
+    height: 42px;
+
+    border-width: 1px;
+    border-radius: 12px;
+    box-shadow: 0 5px 16px rgb(0 0 0 / 18%);
+  }
+
+  .a11y-trigger svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .a11y-trigger[aria-expanded='true'] {
+    background: var(--color-primary-hover, #0d0a33);
+  }
+
+  .a11y-trigger--active::after {
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .a11y-panel {
+    top: calc(max(0.7rem, env(safe-area-inset-top, 0px)) + 50px);
+    right: max(0.7rem, env(safe-area-inset-right, 0px));
+    bottom: auto;
+
+    width: min(330px, calc(100vw - 1.4rem));
+    max-height: calc(100dvh - 4.8rem);
+
+    border-radius: 14px;
+    box-shadow: 0 14px 38px rgb(0 0 0 / 24%);
+  }
+}

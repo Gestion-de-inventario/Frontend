@@ -229,7 +229,7 @@ app-chatbot-widget {
   button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid #ffca3a; outline-offset: 2px; }
 
   @media (max-width: 520px) {
-    .chat-trigger { left: 1rem; bottom: 1rem; min-height: 54px; border-radius: 16px; }
+    .chat-trigger { right: 1rem; bottom: 1rem; left: auto; min-height: 54px; border-radius: 16px; }
     .chat-trigger__icon { width: 42px; height: 42px; }
     .chat-trigger__copy, .chat-trigger__arrow { display: none; }
     .chat-panel { inset: auto 0 0; width: 100%; height: min(82vh, 720px); border-right: 0; border-bottom: 0; border-left: 0; border-radius: 24px 24px 0 0; }
