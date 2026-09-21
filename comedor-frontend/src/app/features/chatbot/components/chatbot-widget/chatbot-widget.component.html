@@ -6,8 +6,12 @@
   aria-label="Abrir asistente de menú"
   (click)="toggle()"
 >
-  <i class="bi bi-stars" aria-hidden="true"></i>
-  <span class="chat-trigger__label">Pregúntale a MIRA</span>
+  <span class="chat-trigger__icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
+  <span class="chat-trigger__copy">
+    <strong>Asistente MIRA</strong>
+    <small>Consulta el inventario</small>
+  </span>
+  <i class="bi bi-chevron-up chat-trigger__arrow" aria-hidden="true"></i>
 </button>
 
 @if (open()) {
@@ -19,19 +23,36 @@
     aria-labelledby="mira-chat-title"
   >
     <header class="chat-panel__header">
-      <span class="chat-panel__avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
-      <div>
-        <h2 id="mira-chat-title">MIRA</h2>
-        <p>Asistente inteligente del comedor</p>
+      <span class="chat-panel__glow chat-panel__glow--one" aria-hidden="true"></span>
+      <span class="chat-panel__glow chat-panel__glow--two" aria-hidden="true"></span>
+
+      <div class="assistant-brand">
+        <span class="assistant-brand__avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
+        <div class="assistant-brand__copy">
+          <div class="assistant-brand__title-row">
+            <h2 id="mira-chat-title">MIRA</h2>
+            <span class="ai-label">IA</span>
+          </div>
+          <p><span class="status-dot" aria-hidden="true"></span> Asistente del comedor</p>
+        </div>
       </div>
+
       <button type="button" class="icon-button" aria-label="Cerrar asistente" (click)="close()">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </header>
 
-    <div class="portion-control">
-      <label for="mira-portions">Planificar para</label>
-      <div>
+    <div class="planning-bar">
+      <div class="planning-bar__label">
+        <span class="planning-bar__icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+        <span>
+          <small>Planificación actual</small>
+          <strong>Número de raciones</strong>
+        </span>
+      </div>
+
+      <label class="portion-input" for="mira-portions">
+        <span class="visually-hidden">Cantidad de porciones</span>
         <input
           id="mira-portions"
           type="number"
@@ -42,79 +63,135 @@
           aria-describedby="mira-portions-error"
         />
         <span>porciones</span>
-      </div>
+      </label>
+
       @if (!validPortions()) {
-        <small id="mira-portions-error" class="field-error">Ingresa entre 1 y 10 000.</small>
+        <small id="mira-portions-error" class="field-error">Ingresa un valor entre 1 y 10 000.</small>
       }
     </div>
 
     <div #messageList class="message-list" aria-live="polite" aria-busy="sending()">
+      <div class="conversation-date"><span>Asistente de planificación</span></div>
+
       @for (message of messages(); track $index) {
-        <article class="message" [class.message--user]="message.role === 'user'">
-          <p>{{ message.content }}</p>
+        <div class="message-row" [class.message-row--user]="message.role === 'user'">
+          @if (message.role === 'assistant') {
+            <span class="message-avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
+          }
 
-          @if (message.suggestions?.length) {
-            <div class="suggestions" aria-label="Platos evaluados">
-              @for (suggestion of message.suggestions; track suggestion.dishId) {
-                <div class="suggestion" [class.suggestion--available]="suggestion.enoughStock">
-                  <strong>{{ suggestion.dishName }}</strong>
-                  <span>Hasta {{ suggestion.possiblePortions }} porciones</span>
-                  @if (!suggestion.enoughStock && suggestion.missingSupplies.length) {
-                    <small>{{ suggestion.missingSupplies.join(' · ') }}</small>
+          <div class="message-content">
+            <span class="message-author">{{ message.role === 'assistant' ? 'MIRA' : 'Tú' }}</span>
+            <article class="message-bubble">
+              <p>{{ message.content }}</p>
+
+              @if (message.suggestions?.length) {
+                <section class="suggestions" aria-label="Platos evaluados">
+                  <div class="suggestions__heading">
+                    <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
+                    <span>Opciones analizadas</span>
+                  </div>
+
+                  @for (suggestion of message.suggestions; track suggestion.dishId) {
+                    <div class="suggestion" [class.suggestion--available]="suggestion.enoughStock">
+                      <span class="suggestion__status" aria-hidden="true">
+                        <i
+                          class="bi"
+                          [class.bi-check-lg]="suggestion.enoughStock"
+                          [class.bi-exclamation-lg]="!suggestion.enoughStock"
+                        ></i>
+                      </span>
+                      <div class="suggestion__body">
+                        <strong>{{ suggestion.dishName }}</strong>
+                        <span>Capacidad: {{ suggestion.possiblePortions }} porciones</span>
+                        @if (!suggestion.enoughStock && suggestion.missingSupplies.length) {
+                          <small>{{ suggestion.missingSupplies.join(' · ') }}</small>
+                        }
+                      </div>
+                      <span class="suggestion__badge">
+                        {{ suggestion.enoughStock ? 'Disponible' : 'Faltantes' }}
+                      </span>
+                    </div>
                   }
-                </div>
+                </section>
               }
-            </div>
-          }
 
-          @if (message.source) {
-            <span class="source-badge">
-              {{ message.source === 'GEMINI' ? 'Respuesta con IA' : 'Cálculo local' }}
-            </span>
-          }
-          @if (message.disclaimer) {
-            <small class="disclaimer">{{ message.disclaimer }}</small>
-          }
-        </article>
+              @if (message.source || message.disclaimer) {
+                <footer class="message-meta">
+                  @if (message.source) {
+                    <span class="source-badge">
+                      <i
+                        class="bi"
+                        [class.bi-stars]="message.source === 'GEMINI'"
+                        [class.bi-calculator]="message.source === 'LOCAL'"
+                        aria-hidden="true"
+                      ></i>
+                      {{ message.source === 'GEMINI' ? 'Generado con IA' : 'Cálculo local' }}
+                    </span>
+                  }
+                  @if (message.disclaimer) {
+                    <small class="disclaimer">{{ message.disclaimer }}</small>
+                  }
+                </footer>
+              }
+            </article>
+          </div>
+        </div>
+      }
+
+      @if (messages().length === 1) {
+        <section class="quick-prompts" aria-label="Preguntas sugeridas">
+          <p>Prueba con una pregunta rápida</p>
+          <div class="quick-prompts__grid">
+            <button type="button" (click)="usePrompt('¿Qué plato podemos preparar hoy?')">
+              <span aria-hidden="true"><i class="bi bi-egg-fried"></i></span>
+              <span><strong>Elegir un plato</strong><small>Según el stock disponible</small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              (click)="usePrompt('¿Qué insumos faltan para las porciones indicadas?')"
+            >
+              <span aria-hidden="true"><i class="bi bi-basket2"></i></span>
+              <span><strong>Revisar faltantes</strong><small>Para las porciones indicadas</small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
+        </section>
       }
 
       @if (sending()) {
-        <div class="typing" aria-label="MIRA está analizando el inventario">
-          <span></span><span></span><span></span>
+        <div class="message-row">
+          <span class="message-avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
+          <div class="typing" aria-label="MIRA está analizando el inventario">
+            <span></span><span></span><span></span>
+            <small>Analizando inventario</small>
+          </div>
         </div>
       }
     </div>
 
-    @if (messages().length === 1) {
-      <div class="quick-prompts" aria-label="Preguntas sugeridas">
-        <button type="button" (click)="usePrompt('¿Qué plato podemos preparar hoy?')">
-          ¿Qué podemos preparar?
-        </button>
-        <button type="button" (click)="usePrompt('¿Qué insumos faltan para las porciones indicadas?')">
-          Revisar faltantes
+    <form class="composer" (ngSubmit)="send()">
+      <div class="composer__box">
+        <label class="visually-hidden" for="mira-message">Escribe tu pregunta</label>
+        <textarea
+          id="mira-message"
+          name="message"
+          rows="1"
+          maxlength="1000"
+          placeholder="Pregúntale algo a MIRA..."
+          [(ngModel)]="draft"
+          (keydown)="onComposerKeydown($event)"
+        ></textarea>
+        <button
+          type="submit"
+          class="send-button"
+          [disabled]="!draft.trim() || sending() || !validPortions()"
+          aria-label="Enviar pregunta"
+        >
+          <i class="bi bi-arrow-up" aria-hidden="true"></i>
         </button>
       </div>
-    }
-
-    <form class="composer" (ngSubmit)="send()">
-      <label class="visually-hidden" for="mira-message">Escribe tu pregunta</label>
-      <textarea
-        id="mira-message"
-        name="message"
-        rows="1"
-        maxlength="1000"
-        placeholder="Ej.: ¿Qué plato conviene preparar?"
-        [(ngModel)]="draft"
-        (keydown)="onComposerKeydown($event)"
-      ></textarea>
-      <button
-        type="submit"
-        class="send-button"
-        [disabled]="!draft.trim() || sending() || !validPortions()"
-        aria-label="Enviar pregunta"
-      >
-        <i class="bi bi-send-fill" aria-hidden="true"></i>
-      </button>
+      <small class="composer__hint">MIRA puede equivocarse. Verifica el inventario antes de registrar.</small>
     </form>
   </section>
 }
