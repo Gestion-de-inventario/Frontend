@@ -10,6 +10,8 @@ import { ToastComponent } from '@shared/components/toast/toast.component';
 
 import { PasswordChangeModalComponent } from '@layout/components/password-change-modal/password-change-modal';
 
+import { ChatbotWidgetComponent } from '@features/chatbot/components/chatbot-widget/chatbot-widget.component';
+
 declare const bootstrap: any;
 
 @Component({
@@ -17,7 +19,14 @@ declare const bootstrap: any;
 
   standalone: true,
 
-  imports: [RouterOutlet, SidebarComponent, NavbarComponent, ToastComponent, PasswordChangeModalComponent],
+  imports: [
+    RouterOutlet,
+    SidebarComponent,
+    NavbarComponent,
+    ToastComponent,
+    PasswordChangeModalComponent,
+    ChatbotWidgetComponent,
+  ],
 
   templateUrl: './app-shell.page.html',
 

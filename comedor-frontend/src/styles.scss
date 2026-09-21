@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @use './styles/variables';
 @use './styles/accessibility';
+@use './app/features/chatbot/components/chatbot-widget/chatbot-widget.component';
 
 body {
   background: var(--color-background);

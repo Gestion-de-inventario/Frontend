@@ -123,4 +123,8 @@ export const API_ENDPOINTS = {
     GET: '/empresa-config',
     UPDATE: '/empresa-config',
   },
+
+  CHATBOT: {
+    MESSAGE: '/chatbot/messages',
+  },
 };
