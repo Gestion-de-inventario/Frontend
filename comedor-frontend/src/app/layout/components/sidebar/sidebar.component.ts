@@ -102,4 +102,33 @@ export class SidebarComponent implements AfterViewInit {
 
     return currentUrl === path || currentUrl.startsWith(`${path}/`);
   }
+
+  getManagementRoute(): string {
+    const auth = this.authState;
+
+    if (
+      auth.hasPermission('USER_LIST_ALL') ||
+      auth.hasPermission('USER_LIST_ACTIVE') ||
+      auth.hasPermission('USER_CREATE')
+    ) {
+      return '/management/users';
+    }
+
+    if (
+      auth.hasPermission('BENEFICIARY_LIST_BY_STATUS') ||
+      auth.hasPermission('BENEFICIARY_CREATE') ||
+      auth.hasPermission('BENEFICIARY_CREATE_BY_DNI')
+    ) {
+      return '/management/beneficiaries';
+    }
+
+    if (
+      auth.hasPermission('BENEFICIARY_TYPE_LIST_BY_STATUS') ||
+      auth.hasPermission('BENEFICIARY_TYPE_CREATE')
+    ) {
+      return '/management/beneficiary-types';
+    }
+
+    return '/management';
+  }
 }

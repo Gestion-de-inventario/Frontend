@@ -2,13 +2,17 @@
   @if (!canListCategory && !canCreateCategory) {
     <div class="text-center mt-5">
       <h4>No tienes permisos para el módulo de Categorías</h4>
-      <a routerLink="/dashboard" class="btn btn-primary mt-3">Volver al dashboard</a>
+      <a routerLink="/home" class="btn btn-primary mt-3">Volver al inicio</a>
     </div>
   } @else {
     <div class="row justify-content-center">
       <div class="col-12 col-lg-8">
-        @if (canCreateCategory) { <app-category-create-fragment /> }
-        @if (canListCategory) { <app-category-list-fragment /> }
+        @if (canCreateCategory) {
+          <app-category-create-fragment />
+        }
+        @if (canListCategory) {
+          <app-category-list-fragment />
+        }
       </div>
     </div>
   }
