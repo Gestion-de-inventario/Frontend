@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
 import { API_ENDPOINTS } from '@core/constants/api-endpoints';
+import { AuditsPageResponse } from '@features/transactions_modifications/interfaces/audits/audits-page.response';
 
 @Injectable({
   providedIn: 'root',
@@ -14,13 +15,22 @@ export class AuditsService {
 
   constructor(private http: HttpClient) {}
 
-  getAudits(page: number, size: number, fechaInicio?: string, fechaFin?: string): Observable<any> {
+  getAudits(
+    page: number,
+    size: number,
+    fechaInicio?: string,
+    fechaFin?: string,
+    action?: string,
+  ): Observable<any> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
 
     if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
     if (fechaFin) params = params.set('fechaFin', fechaFin);
+    if (action) params = params.set('action', action);
 
-    return this.http.get<any>(`${this.baseUrl}${API_ENDPOINTS.AUDIT.LIST_ALL}`, { params });
+    return this.http.get<any>(`${this.baseUrl}${API_ENDPOINTS.AUDIT.LIST_ALL}`, {
+      params,
+    });
   }
 
   exportPdf(fechaInicio?: string, fechaFin?: string): Observable<Blob> {

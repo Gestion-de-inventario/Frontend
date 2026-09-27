@@ -64,11 +64,27 @@
           <input
             type="date"
             class="form-control rounded-3"
+            [min]="customStartDate()"
             [ngModel]="customEndDate()"
             (ngModelChange)="customEndDate.set($event); onCustomDateChange()"
           />
         </div>
       }
+
+      <!-- Tipo de auditoría -->
+      <div class="col-md-4">
+        <label class="form-label fw-bold text-muted small"> Filtrar por tipo </label>
+
+        <select
+          class="form-select rounded-3"
+          [ngModel]="action()"
+          (ngModelChange)="action.set($event); onActionChange()"
+        >
+          <option value="">Todos</option>
+          <option [value]="AuditAction.CREACION">Creaciones</option>
+          <option [value]="AuditAction.MODIFICACION">Ediciones</option>
+        </select>
+      </div>
     </div>
 
     @if (loading()) {

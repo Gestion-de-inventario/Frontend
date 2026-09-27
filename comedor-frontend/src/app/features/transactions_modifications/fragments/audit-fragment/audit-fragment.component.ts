@@ -1,8 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuditsService } from '@features/transactions_modifications/services/modification/audits-api.service';
-import { AuditsStateService } from '@features/transactions_modifications/services/modification/audits-state.service';
+import { AuditsService } from '@features/transactions_modifications/services/audits/audits-api.service';
+import { AuditsStateService } from '@features/transactions_modifications/services/audits/audits-state.service';
 import {
   AuditAction,
   AuditsResponse,
@@ -26,6 +26,7 @@ export class AuditFragmentComponent {
   canList = this.authState.hasPermission('AUDIT_LIST_ALL');
   readonly audits = computed(() => this.auditsState.audits());
   readonly AuditAction = AuditAction;
+
   modalAudits: AuditsResponse[] = [];
 
   loading = signal<boolean>(false);
@@ -39,6 +40,8 @@ export class AuditFragmentComponent {
   filterOption = signal<string>('este_mes');
   customStartDate = signal<string>('');
   customEndDate = signal<string>('');
+
+  action = signal<string>('');
 
   constructor() {
     if (!this.canList) return;
@@ -54,6 +57,11 @@ export class AuditFragmentComponent {
       this.page.set(0);
       this.loadAudits();
     }
+  }
+
+  onActionChange(): void {
+    this.page.set(0);
+    this.loadAudits();
   }
 
   onCustomDateChange() {
@@ -137,9 +145,11 @@ export class AuditFragmentComponent {
 
   loadAudits(): void {
     this.loading.set(true);
-    const { start, end } = this.calculateDates(this.filterOption());
+    const start = this.customStartDate() || undefined;
+    const end = this.customEndDate() || undefined;
+    const action = this.action() || undefined;
 
-    this.auditsService.getAudits(this.page(), this.pageSize(), start, end).subscribe({
+    this.auditsService.getAudits(this.page(), this.pageSize(), start, end, action).subscribe({
       next: (response) => {
         this.auditsState.set(response.content);
         this.totalPages.set(response.totalPages);
