@@ -89,9 +89,9 @@ export const API_ENDPOINTS = {
     GET_BY_ID: '/roles/{id}',
   },
 
-  MODIFICATION: {
-    LIST_ALL: '/modifications',
-    EXPORT_PDF: '/modifications/export/pdf',
+  AUDIT: {
+    LIST_ALL: '/audits',
+    EXPORT_PDF: '/audits/export/pdf',
   },
 
   PERMISSION: {

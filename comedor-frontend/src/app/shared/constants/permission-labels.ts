@@ -8,7 +8,7 @@ export const PERMISSION_MODULE_LABELS: Record<string, string> = {
   USER: 'Usuarios',
   ROLE: 'Roles',
   PERMISSION: 'Permisos',
-  MODIFICATION: 'Modificaciones',
+  AUDIT: 'Auditorias',
   DISH_MENU: 'Menús',
   BENEFICIARY_TYPE: 'Tipos de beneficiario',
   ORDER: 'Órdenes de entrada',
@@ -78,8 +78,8 @@ export const PERMISSION_TITLE_LABELS: Record<string, string> = {
   // PERMISOS
   PERMISSION_LIST_ALL: 'Listar permisos',
 
-  // MODIFICACIONES
-  MODIFICATION_LIST_ALL: 'Listar modificaciones',
+  // AUDITORIAS
+  AUDIT_LIST_ALL: 'Listar auditorias',
 
   // MENÚS
   DISH_MENU_LIST_ALL: 'Listar platos',
@@ -174,8 +174,8 @@ export const PERMISSION_LABELS: Record<string, string> = {
   // PERMISOS
   PERMISSION_LIST_ALL: 'Listar',
 
-  // MODIFICACIONES
-  MODIFICATION_LIST_ALL: 'Listar',
+  // AUDITORIAS
+  AUDIT_LIST_ALL: 'Listar',
 
   // MENÚS
   DISH_MENU_LIST_ALL: 'Listar',
@@ -270,8 +270,8 @@ export const PERMISSION_MODULES: Record<string, string> = {
   // PERMISOS
   PERMISSION_LIST_ALL: 'Permisos',
 
-  // MODIFICACIONES
-  MODIFICATION_LIST_ALL: 'Modificaciones',
+  // AUDITORIAS
+  AUDIT_LIST_ALL: 'Auditorias',
 
   // MENÚS
   DISH_MENU_LIST_ALL: 'Menús',

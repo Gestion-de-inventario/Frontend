@@ -1,36 +1,36 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModificationsService } from '@features/transactions_modifications/services/modification/modifications-api.service';
-import { ModificationsStateService } from '@features/transactions_modifications/services/modification/modifications-state.service';
-import { ModificationsResponse } from '@features/transactions_modifications/interfaces/modifications/modifications.response';
+import { AuditsService } from '@features/transactions_modifications/services/modification/audits-api.service';
+import { AuditsStateService } from '@features/transactions_modifications/services/modification/audits-state.service';
+import {
+  AuditAction,
+  AuditsResponse,
+} from '@features/transactions_modifications/interfaces/audits/audits.response';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
 
-declare const bootstrap: any;
-
 @Component({
-  selector: 'app-modifications-fragment',
+  selector: 'app-audit-fragment',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './modifications-fragment.component.html',
-  styleUrls: ['./modifications-fragment.component.scss'],
+  templateUrl: './audit-fragment.component.html',
+  styleUrls: ['./audit-fragment.component.scss'],
 })
-export class ModificationsFragmentComponent {
+export class AuditFragmentComponent {
   readonly authState = inject(AuthStateService);
-  private readonly modificationsService = inject(ModificationsService);
-  private readonly modificationsState = inject(ModificationsStateService);
+  private readonly auditsService = inject(AuditsService);
+  private readonly auditsState = inject(AuditsStateService);
   private readonly toastService = inject(ToastService);
 
-  canList = this.authState.hasPermission('MODIFICATION_LIST_ALL');
-  readonly modifications = computed(() => this.modificationsState.modifications());
-  modalModifications: ModificationsResponse[] = [];
+  canList = this.authState.hasPermission('AUDIT_LIST_ALL');
+  readonly audits = computed(() => this.auditsState.audits());
+  readonly AuditAction = AuditAction;
+  modalAudits: AuditsResponse[] = [];
 
   loading = signal<boolean>(false);
   exporting = signal<boolean>(false);
 
-  modalPage = 0;
-  modalSize = 10;
   pageSize = signal(3);
   page = signal(0);
   totalPages = signal(0);
@@ -42,7 +42,7 @@ export class ModificationsFragmentComponent {
 
   constructor() {
     if (!this.canList) return;
-    this.loadModifications();
+    this.loadAudits();
   }
 
   // =========================
@@ -52,14 +52,14 @@ export class ModificationsFragmentComponent {
   onFilterChange() {
     if (this.filterOption() !== 'custom') {
       this.page.set(0);
-      this.loadModifications();
+      this.loadAudits();
     }
   }
 
   onCustomDateChange() {
     if (this.customStartDate() && this.customEndDate()) {
       this.page.set(0);
-      this.loadModifications();
+      this.loadAudits();
     }
   }
 
@@ -110,7 +110,7 @@ export class ModificationsFragmentComponent {
     this.exporting.set(true);
     const { start, end } = this.calculateDates(this.filterOption());
 
-    this.modificationsService.exportPdf(start, end).subscribe({
+    this.auditsService.exportPdf(start, end).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -135,13 +135,13 @@ export class ModificationsFragmentComponent {
   // CARGA Y PAGINACIÓN
   // =========================
 
-  loadModifications(): void {
+  loadAudits(): void {
     this.loading.set(true);
     const { start, end } = this.calculateDates(this.filterOption());
 
-    this.modificationsService.getModifications(this.page(), this.pageSize(), start, end).subscribe({
+    this.auditsService.getAudits(this.page(), this.pageSize(), start, end).subscribe({
       next: (response) => {
-        this.modificationsState.set(response.content);
+        this.auditsState.set(response.content);
         this.totalPages.set(response.totalPages);
         this.totalElements.set(response.totalElements);
         this.loading.set(false);
@@ -158,21 +158,21 @@ export class ModificationsFragmentComponent {
   nextPage(): void {
     if (this.page() + 1 < this.totalPages()) {
       this.page.update((v) => v + 1);
-      this.loadModifications();
+      this.loadAudits();
     }
   }
 
   previousPage(): void {
     if (this.page() > 0) {
       this.page.update((v) => v - 1);
-      this.loadModifications();
+      this.loadAudits();
     }
   }
 
   changePageSize(size: number): void {
     this.pageSize.set(size);
     this.page.set(0);
-    this.loadModifications();
+    this.loadAudits();
   }
 
   private formatLocalDate(date: Date): string {
@@ -183,5 +183,33 @@ export class ModificationsFragmentComponent {
       '-' +
       String(date.getDate()).padStart(2, '0')
     );
+  }
+
+  getDetailEntries(details: Record<string, unknown>): [string, unknown][] {
+    return Object.entries(details);
+  }
+
+  formatDetailValue(value: unknown): string {
+    if (value === null || value === undefined || value === '') {
+      return 'Sin valor';
+    }
+
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => {
+          if (typeof item === 'object' && item !== null) {
+            return JSON.stringify(item);
+          }
+
+          return String(item);
+        })
+        .join(', ');
+    }
+
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+
+    return String(value);
   }
 }

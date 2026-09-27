@@ -1,5 +1,5 @@
 <div class="container py-4">
-  @if (!canViewTransactions && !canViewModifications) {
+  @if (!canViewTransactions && !canViewAudits) {
     <div class="text-center mt-5">
       <h4>No tienes permisos para este módulo</h4>
       <a routerLink="/home" class="btn btn-primary mt-3">Volver al inicio</a>
@@ -20,10 +20,10 @@
           }
         </div>
       }
-      @if (canViewModifications) {
+      @if (canViewAudits) {
         <div class="col-12">
           @defer (on timer(0ms)) {
-            <app-modifications-fragment />
+            <app-audit-fragment />
           } @placeholder {
             <div class="card border-0 shadow-sm rounded-4 p-4">
               <div class="placeholder-glow">

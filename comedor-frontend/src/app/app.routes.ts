@@ -75,6 +75,7 @@ export const routes: Routes = [
       {
         path: 'profile',
         title: 'Mi perfil',
+        data: { breadcrumb: 'Perfil' },
         loadComponent: () =>
           import('@features/profile/pages/profile_principal/profile_principal').then(
             (m) => m.ProfilePrincipal,
@@ -82,8 +83,8 @@ export const routes: Routes = [
       },
       {
         path: 'transactions-modifications',
-        title: 'Transacciones y Modificaciones',
-        data: { breadcrumb: 'Transacciones y Modificaciones' },
+        title: 'Transacciones y Auditorías',
+        data: { breadcrumb: 'Transacciones y Auditorías' },
         loadComponent: () =>
           import('@features/transactions_modifications/pages/transactions-modifications_principal/transactions-modifications-principal.component').then(
             (m) => m.TransactionsModificationsPrincipalComponent,
@@ -224,10 +225,10 @@ export const routes: Routes = [
               ),
           },
           {
-            path: 'modifications',
+            path: 'audits',
             loadComponent: () =>
-              import('@features/transactions_modifications/fragments/modifications-fragment/modifications-fragment.component').then(
-                (m) => m.ModificationsFragmentComponent,
+              import('@features/transactions_modifications/fragments/audit-fragment/audit-fragment.component').then(
+                (m) => m.AuditFragmentComponent,
               ),
           },
           {

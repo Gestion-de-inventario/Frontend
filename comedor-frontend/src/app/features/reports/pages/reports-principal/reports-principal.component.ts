@@ -20,9 +20,7 @@ export class ReportsPrincipalComponent {
     this.authState.hasPermission('TRANSACTION_LIST_ALL'),
   );
 
-  readonly canViewModifications = computed(() =>
-    this.authState.hasPermission('MODIFICATION_LIST_ALL'),
-  );
+  readonly canViewAudits = computed(() => this.authState.hasPermission('AUDIT_LIST_ALL'));
 
   readonly canViewSummary = computed(() => this.authState.hasPermission('MENU_REPORT_GET_BY_DATE'));
 
@@ -41,8 +39,8 @@ export class ReportsPrincipalComponent {
       modules.push({ value: 'summary', label: 'Resumen de reportes' });
     }
 
-    if (this.canViewModifications()) {
-      modules.push({ value: 'modifications', label: 'Modificaciones' });
+    if (this.canViewAudits()) {
+      modules.push({ value: 'audits', label: 'Auditorías' });
     }
 
     return modules;
@@ -84,8 +82,8 @@ export class ReportsPrincipalComponent {
       return;
     }
 
-    if (url.includes('modifications')) {
-      this.currentModule.set('modifications');
+    if (url.includes('audits')) {
+      this.currentModule.set('audits');
       return;
     }
 

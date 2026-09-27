@@ -120,7 +120,7 @@ export class HomePrincipalComponent implements OnInit {
       description: 'Consultar información del sistema',
       icon: 'bi-bar-chart-line',
       route: '/reports/summary',
-      permissions: ['TRANSACTION_LIST_ALL', 'MODIFICATION_LIST_ALL', 'MENU_REPORT_GET_BY_DATE'],
+      permissions: ['TRANSACTION_LIST_ALL', 'AUDIT_LIST_ALL', 'MENU_REPORT_GET_BY_DATE'],
     },
     {
       title: 'Usuarios',

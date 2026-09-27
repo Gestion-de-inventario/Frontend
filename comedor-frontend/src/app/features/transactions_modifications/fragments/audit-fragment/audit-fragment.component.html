@@ -75,10 +75,8 @@
       <div class="text-center py-5">
         <div class="spinner-border text-primary"></div>
       </div>
-    } @else if (modifications().length === 0) {
-      <div class="text-center py-5 text-muted">
-        No hay modificaciones registradas en estas fechas.
-      </div>
+    } @else if (audits().length === 0) {
+      <div class="text-center py-5 text-muted">No hay auditorías registradas en estas fechas.</div>
     } @else {
       <div class="page-size-control mt-4">
         <label for="modificationPageSize" class="page-size-label"> Por página </label>
@@ -99,130 +97,189 @@
 
       <!-- Lista de modificaciones -->
       <div class="modification-list mt-3" role="list" aria-label="Historial de modificaciones">
-        @for (m of modifications(); track m.id) {
+        @for (m of audits(); track m.id) {
           <article
             class="modification-card"
+            [class.modification-card--creation]="m.action === AuditAction.CREACION"
             role="listitem"
             [attr.aria-label]="
-              'Modificación de ' +
-              m.name +
-              '. Campo ' +
-              m.editedAttribute +
-              '. Realizada por ' +
-              m.username
+              m.action === AuditAction.MODIFICACION
+                ? 'Modificación de ' +
+                  m.entityName +
+                  '. Campo ' +
+                  m.details['attribute'] +
+                  '. Realizada por ' +
+                  m.username
+                : 'Creación de ' + m.entityName + '. Realizada por ' + m.username
             "
           >
             <!-- Encabezado -->
             <header class="modification-card__header">
               <div class="modification-identity">
-                <div class="modification-icon" aria-hidden="true">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-pencil-icon lucide-pencil"
-                  >
-                    <path
-                      d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
-                    />
-                    <path d="m15 5 4 4" />
-                  </svg>
+                <!-- Icono según acción -->
+                <div
+                  class="modification-icon"
+                  [class.modification-icon--creation]="m.action === AuditAction.CREACION"
+                  aria-hidden="true"
+                >
+                  @if (m.action === AuditAction.MODIFICACION) {
+                    <!-- Lápiz -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+                      />
+                      <path d="m15 5 4 4" />
+                    </svg>
+                  } @else {
+                    <!-- Creación -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 8v8" />
+                      <path d="M8 12h8" />
+                    </svg>
+                  }
                 </div>
 
                 <div class="modification-title-container">
-                  <span class="entity-type">
-                    {{ m.editedClass }}
+                  <span
+                    class="entity-type"
+                    [class.entity-type--creation]="m.action === AuditAction.CREACION"
+                  >
+                    {{ m.entityType }}
                   </span>
 
                   <h3 class="entity-name">
-                    {{ m.name }}
+                    {{ m.entityName }}
                   </h3>
                 </div>
               </div>
 
               <time class="modification-date" [attr.datetime]="m.dateTime">
                 <i class="bi bi-clock" aria-hidden="true"></i>
-
                 {{ m.dateTime | date: 'dd/MM/yyyy, h:mm a' }}
               </time>
             </header>
 
-            <!-- Atributo modificado -->
-            <div class="modified-attribute">
-              <span class="detail-label"> Campo modificado </span>
+            <!-- ========================= -->
+            <!-- MODIFICACIÓN -->
+            <!-- ========================= -->
+            @if (m.action === AuditAction.MODIFICACION) {
+              <!-- Atributo modificado -->
+              <div class="modified-attribute">
+                <span class="detail-label"> Campo modificado </span>
 
-              <strong class="attribute-name">
-                {{ m.editedAttribute }}
-              </strong>
-            </div>
+                <strong class="attribute-name">
+                  {{ m.details['attribute'] }}
+                </strong>
+              </div>
 
-            <!-- Comparación de valores -->
-            <div class="change-comparison">
-              <section class="change-value change-value--previous" aria-label="Valor anterior">
-                <div class="change-value__header">
-                  <span class="change-icon" aria-hidden="true">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-arrow-left-icon lucide-arrow-left"
-                    >
-                      <path d="m12 19-7-7 7-7" />
-                      <path d="M19 12H5" />
-                    </svg>
-                  </span>
+              <!-- Comparación de valores -->
+              <div class="change-comparison">
+                <section class="change-value change-value--previous" aria-label="Valor anterior">
+                  <div class="change-value__header">
+                    <span class="change-icon" aria-hidden="true">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="m12 19-7-7 7-7" />
+                        <path d="M19 12H5" />
+                      </svg>
+                    </span>
 
-                  <span class="change-label"> Antes </span>
-                </div>
+                    <span class="change-label"> Antes </span>
+                  </div>
 
-                <p class="change-content">
-                  {{ m.previousValue || 'Sin valor' }}
-                </p>
-              </section>
+                  <p class="change-content">
+                    {{ m.details['previousValue'] || 'Sin valor' }}
+                  </p>
+                </section>
 
-              <section
-                class="change-value change-value--new"
-                aria-label="Valor después de la modificación"
-              >
-                <div class="change-value__header">
-                  <span class="change-icon" aria-hidden="true">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-arrow-right-icon lucide-arrow-right"
-                    >
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
-                  </span>
+                <section
+                  class="change-value change-value--new"
+                  aria-label="Valor después de la modificación"
+                >
+                  <div class="change-value__header">
+                    <span class="change-icon" aria-hidden="true">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12h14" />
+                        <path d="m12 5 7 7-7 7" />
+                      </svg>
+                    </span>
 
-                  <span class="change-label"> Después </span>
-                </div>
+                    <span class="change-label"> Después </span>
+                  </div>
 
-                <p class="change-content">
-                  {{ m.newValue || 'Sin valor' }}
-                </p>
-              </section>
-            </div>
+                  <p class="change-content">
+                    {{ m.details['newValue'] || 'Sin valor' }}
+                  </p>
+                </section>
+              </div>
+            }
+
+            <!-- ========================= -->
+            <!-- CREACIÓN -->
+            <!-- ========================= -->
+            @if (m.action === AuditAction.CREACION) {
+              <div class="modified-attribute modified-attribute--creation">
+                <span class="detail-label"> Datos registrados </span>
+
+                <strong class="attribute-name">
+                  Se creo un(a) nuevo(a) "{{ m.entityType }}"
+                </strong>
+              </div>
+
+              <div class="creation-details">
+                @for (detail of getDetailEntries(m.details); track detail[0]) {
+                  <div class="creation-detail">
+                    <span class="detail-label">
+                      {{ detail[0] }}
+                    </span>
+
+                    <strong class="creation-detail__value">
+                      {{ formatDetailValue(detail[1]) }}
+                    </strong>
+                  </div>
+                }
+              </div>
+            }
 
             <!-- Usuario responsable -->
             <footer class="modification-footer">
@@ -237,7 +294,6 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="lucide lucide-user-round-icon lucide-user-round"
                 >
                   <circle cx="12" cy="8" r="5" />
                   <path d="M20 21a8 8 0 0 0-16 0" />
@@ -245,7 +301,9 @@
               </div>
 
               <div>
-                <span class="detail-label"> Modificado por </span>
+                <span class="detail-label">
+                  {{ m.action === AuditAction.CREACION ? 'Creado por' : 'Modificado por' }}
+                </span>
 
                 <strong class="username">
                   {{ m.username }}
@@ -324,94 +382,3 @@
     }
   </div>
 </div>
-
-<!-- MODAL 
-<div class="modal fade" id="modificationsModal" tabindex="-1" data-bs-backdrop="static">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <div class="modal-header bg-light border-bottom-0 pt-4 pb-2 px-4">
-        <div class="d-flex align-items-center gap-3">
-          <div
-            class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
-            style="width: 40px; height: 40px"
-          >
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              width="20"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-              ></path>
-            </svg>
-          </div>
-          <h5 class="modal-title fw-bold text-dark mb-0">Historial de Modificaciones</h5>
-        </div>
-        <button
-          class="btn-close shadow-none"
-          data-bs-dismiss="modal"
-          (click)="closeModal()"
-        ></button>
-      </div>
-
-      <div class="modal-body px-4 py-4">
-        <div class="d-flex flex-column gap-2">
-          @for (m of modalModifications; track m.id) {
-            <div class="border rounded-3 px-3 py-3">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                  <span class="fw-semibold text-dark">{{ $index + 1 }}. {{ m.editedClass }}</span>
-                  <span class="mx-1 text-muted">·</span>
-                  <span class="text-muted small">{{ m.editedAttribute }}</span>
-                </div>
-                <small class="text-muted">{{ m.dateTime | date: 'short' }}</small>
-              </div>
-              <div class="d-flex gap-2 flex-wrap mb-2">
-                <div
-                  class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-danger bg-opacity-10"
-                >
-                  <span class="badge bg-danger fw-normal">Antes</span>
-                  <small class="text-dark">{{ m.previousValue }}</small>
-                </div>
-                <div
-                  class="d-flex align-items-center gap-2 border rounded-2 px-2 py-1 bg-success bg-opacity-10"
-                >
-                  <span class="badge bg-success fw-normal">Después</span>
-                  <small class="text-dark">{{ m.newValue }}</small>
-                </div>
-              </div>
-              <small class="text-muted"
-                ><span class="fw-medium">Usuario:</span> {{ m.username }}</small
-              >
-            </div>
-          }
-          @if (loading()) {
-            <div class="text-center py-3">
-              <div class="spinner-border text-primary"></div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <div
-        class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between align-items-center"
-      >
-        <small class="text-muted">{{ modalModifications.length }} modificaciones cargadas</small>
-        <button
-          class="btn btn-primary rounded-pill px-4 fw-medium"
-          (click)="nextPage()"
-          [disabled]="loading()"
-        >
-          @if (loading()) {
-            <span class="spinner-border spinner-border-sm"></span>
-          }
-          Cargar más
-        </button>
-      </div>
-    </div>
-  </div>
-</div> -->
