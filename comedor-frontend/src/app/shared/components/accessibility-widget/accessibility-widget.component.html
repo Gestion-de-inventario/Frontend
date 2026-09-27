@@ -44,7 +44,9 @@
   [class.a11y-trigger--active]="a11y.isModified"
   [attr.aria-expanded]="open()"
   aria-controls="panel-accesibilidad"
-  [attr.aria-label]="open() ? 'Cerrar opciones de accesibilidad' : 'Abrir opciones de accesibilidad'"
+  [attr.aria-label]="
+    open() ? 'Cerrar opciones de accesibilidad' : 'Abrir opciones de accesibilidad'
+  "
   (click)="togglePanel()"
 >
   @if (open()) {
@@ -73,7 +75,13 @@
     <header class="a11y-panel__head">
       <h2 class="a11y-panel__title">Accesibilidad</h2>
       <button type="button" class="a11y-close" aria-label="Cerrar panel" (click)="close()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
           <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
         </svg>
       </button>
@@ -247,12 +255,7 @@
     </div>
 
     <footer class="a11y-panel__foot">
-      <button
-        type="button"
-        class="a11y-reset"
-        [disabled]="!a11y.isModified"
-        (click)="a11y.reset()"
-      >
+      <button type="button" class="a11y-reset" [disabled]="!a11y.isModified" (click)="a11y.reset()">
         Restablecer todo
       </button>
       <p class="a11y-note">Tus ajustes se guardan solo en este dispositivo.</p>

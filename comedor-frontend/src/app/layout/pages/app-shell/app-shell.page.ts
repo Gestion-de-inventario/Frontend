@@ -11,6 +11,7 @@ import { ToastComponent } from '@shared/components/toast/toast.component';
 import { PasswordChangeModalComponent } from '@layout/components/password-change-modal/password-change-modal';
 
 import { ChatbotWidgetComponent } from '@features/chatbot/components/chatbot-widget/chatbot-widget.component';
+import { AccessibilityWidgetComponent } from '@shared/components/accessibility-widget/accessibility-widget.component';
 
 declare const bootstrap: any;
 
@@ -26,6 +27,7 @@ declare const bootstrap: any;
     ToastComponent,
     PasswordChangeModalComponent,
     ChatbotWidgetComponent,
+    AccessibilityWidgetComponent,
   ],
 
   templateUrl: './app-shell.page.html',
