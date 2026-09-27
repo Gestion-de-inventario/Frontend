@@ -44,15 +44,21 @@
   [class.a11y-trigger--active]="a11y.isModified"
   [attr.aria-expanded]="open()"
   aria-controls="panel-accesibilidad"
-  aria-label="Opciones de accesibilidad"
+  [attr.aria-label]="open() ? 'Cerrar opciones de accesibilidad' : 'Abrir opciones de accesibilidad'"
   (click)="togglePanel()"
 >
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <circle cx="12" cy="4" r="2" />
-    <path
-      d="M20 8.5c0 .55-.45 1-1 1l-4.5-.5v3.2l1.9 7.4a1 1 0 0 1-.72 1.22 1 1 0 0 1-1.22-.72L12.7 14.5h-1.4l-1.76 5.6a1 1 0 0 1-1.22.72 1 1 0 0 1-.72-1.22l1.9-7.4V9l-4.5.5a1 1 0 0 1 0-2L11 7h2l6-.5c.55 0 1 .45 1 1Z"
-    />
-  </svg>
+  @if (open()) {
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  } @else {
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="4" r="2" />
+      <path
+        d="M20 8.5c0 .55-.45 1-1 1l-4.5-.5v3.2l1.9 7.4a1 1 0 0 1-.72 1.22 1 1 0 0 1-1.22-.72L12.7 14.5h-1.4l-1.76 5.6a1 1 0 0 1-1.22.72 1 1 0 0 1-.72-1.22l1.9-7.4V9l-4.5.5a1 1 0 0 1 0-2L11 7h2l6-.5c.55 0 1 .45 1 1Z"
+      />
+    </svg>
+  }
 </button>
 
 @if (open()) {

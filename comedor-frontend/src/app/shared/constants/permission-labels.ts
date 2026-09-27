@@ -84,7 +84,7 @@ export const PERMISSION_TITLE_LABELS: Record<string, string> = {
   // MENÚS
   DISH_MENU_LIST_ALL: 'Listar platos',
   DISH_MENU_CREATE: 'Crear plato',
-  DISH_MENU_EDIT: 'Editar platoss',
+  DISH_MENU_EDIT: 'Editar platos',
   DISH_MENU_CHANGE_STATUS: 'Cambiar estado de plato',
 
   // ÓRDENES DE ENTRADA
