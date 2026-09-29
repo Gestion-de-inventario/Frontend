@@ -5,22 +5,26 @@ app-chatbot-widget {
 
   .chat-trigger {
     position: fixed;
-    left: max(1.25rem, env(safe-area-inset-left, 0px));
-    bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    top: calc(max(1rem, env(safe-area-inset-top, 0px)) + 64px);
+    bottom: auto;
     display: flex;
     align-items: center;
-    gap: 0.7rem;
-    min-height: 62px;
-    padding: 0.45rem 0.8rem 0.45rem 0.5rem;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    min-height: 52px;
+    padding: 4px;
     border: 1px solid rgb(255 255 255 / 14%);
-    border-radius: 18px;
+    border-radius: 50%;
     background: linear-gradient(135deg, #201b73 0%, #4037b5 100%);
     color: #fff;
     box-shadow: 0 14px 35px rgb(29 24 100 / 30%);
     cursor: pointer;
     transition:
       transform 0.2s ease,
-      box-shadow 0.2s ease;
+      box-shadow 0.2s ease,
+      opacity 0.16s ease;
 
     &:hover {
       transform: translateY(-3px);
@@ -32,14 +36,20 @@ app-chatbot-widget {
     }
   }
 
+  .chat-trigger--hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px) scale(0.92);
+  }
+
   .chat-trigger__icon {
     position: relative;
     display: grid;
     place-items: center;
-    width: 46px;
-    height: 46px;
+    width: 42px;
+    height: 42px;
     flex: 0 0 auto;
-    border-radius: 14px;
+    border-radius: 50%;
     background: linear-gradient(145deg, #ffd66b, #ffb800);
     color: #211b64;
     font-size: 1.25rem;
@@ -59,37 +69,18 @@ app-chatbot-widget {
   }
 
   .chat-trigger__copy {
-    display: flex;
-    flex-direction: column;
-    min-width: 128px;
-    text-align: left;
-    line-height: 1.2;
-
-    strong {
-      font-size: 0.83rem;
-      font-weight: 750;
-    }
-    small {
-      margin-top: 0.16rem;
-      color: rgb(255 255 255 / 72%);
-      font-size: 0.68rem;
-    }
-  }
-
-  .chat-trigger__arrow {
-    margin-left: 0.15rem;
-    color: rgb(255 255 255 / 65%);
-    font-size: 0.75rem;
+    display: none;
   }
 
   .chat-panel {
     position: fixed;
-    left: max(1.25rem, env(safe-area-inset-left, 0px));
-    bottom: calc(74px + max(1.25rem, env(safe-area-inset-bottom, 0px)));
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    bottom: auto;
     display: flex;
     flex-direction: column;
     width: min(430px, calc(100vw - 2.5rem));
-    height: min(720px, calc(100vh - 7.5rem));
+    height: min(720px, calc(100dvh - 2rem));
     overflow: hidden;
     border: 1px solid color-mix(in srgb, var(--color-primary) 13%, transparent);
     border-radius: 24px;
@@ -104,7 +95,7 @@ app-chatbot-widget {
   @keyframes mira-panel-in {
     from {
       opacity: 0;
-      transform: translateY(16px) scale(0.97);
+      transform: translateY(-16px) scale(0.97);
     }
   }
 
@@ -222,85 +213,6 @@ app-chatbot-widget {
     &:hover {
       background: rgb(255 255 255 / 17%);
     }
-  }
-
-  .planning-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-text) 9%, transparent);
-    background: var(--color-background, #fff);
-  }
-  .planning-bar__label {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    min-width: 0;
-  }
-  .planning-bar__label > span:last-child {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
-  .planning-bar__label small {
-    color: var(--color-text-secondary, #606579);
-    font-size: 0.62rem;
-  }
-  .planning-bar__label strong {
-    margin-top: 0.12rem;
-    font-size: 0.73rem;
-    font-weight: 700;
-  }
-  .planning-bar__icon {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    flex: 0 0 auto;
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--color-primary) 9%, var(--color-background));
-    color: var(--color-primary-text);
-  }
-
-  .portion-input {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-height: 38px;
-    padding: 0.25rem 0.55rem;
-    border: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
-    border-radius: 11px;
-    background: var(--color-surface, #f5f7fa);
-    cursor: text;
-  }
-  .portion-input input {
-    width: 53px;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--color-primary-text);
-    font-size: 0.9rem;
-    font-weight: 800;
-    text-align: right;
-  }
-  .portion-input > span:last-child {
-    color: var(--color-text-secondary);
-    font-size: 0.68rem;
-  }
-  .field-error {
-    position: absolute;
-    right: 1rem;
-    top: calc(100% - 2px);
-    z-index: 2;
-    padding: 0.2rem 0.4rem;
-    border-radius: 5px;
-    background: var(--color-error);
-    color: #fff;
-    font-size: 0.62rem;
   }
 
   .message-list {
@@ -679,28 +591,27 @@ app-chatbot-widget {
 
   @media (max-width: 520px) {
     .chat-trigger {
-      right: 1rem;
-      bottom: 1rem;
+      top: calc(max(0.7rem, env(safe-area-inset-top, 0px)) + 50px);
+      right: max(0.7rem, env(safe-area-inset-right, 0px));
+      bottom: auto;
       left: auto;
-      min-height: 54px;
-      border-radius: 16px;
+      width: 48px;
+      height: 48px;
+      min-height: 48px;
+      border-radius: 50%;
     }
     .chat-trigger__icon {
       width: 42px;
       height: 42px;
     }
-    .chat-trigger__copy,
-    .chat-trigger__arrow {
-      display: none;
-    }
     .chat-panel {
-      inset: auto 0 0;
+      inset: 0 0 auto;
       width: 100%;
       height: min(82vh, 720px);
       border-right: 0;
-      border-bottom: 0;
+      border-top: 0;
       border-left: 0;
-      border-radius: 24px 24px 0 0;
+      border-radius: 0 0 24px 24px;
     }
     .chat-panel__header {
       min-height: 82px;
@@ -720,7 +631,6 @@ app-chatbot-widget {
 
 html.a11y-dark app-chatbot-widget {
   .chat-panel,
-  .planning-bar,
   .composer,
   .message-bubble,
   .quick-prompts button,
@@ -728,7 +638,6 @@ html.a11y-dark app-chatbot-widget {
     background-color: #12161c;
   }
   .message-list,
-  .portion-input,
   .composer__box {
     background-color: #1a2029;
   }
@@ -754,7 +663,6 @@ html.a11y-high-contrast app-chatbot-widget {
   }
   .message-bubble,
   .quick-prompts button,
-  .portion-input,
   .composer__box {
     border: 2px solid currentColor;
   }

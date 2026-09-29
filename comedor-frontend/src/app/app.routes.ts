@@ -251,11 +251,16 @@ export const routes: Routes = [
         path: 'legales',
         title: 'Legales',
         data: { breadcrumb: 'Legales' },
-        loadComponent: () =>
-          import('@shared/pages/legales/principal/legales-principal-component').then(
-            (m) => m.LegalesPrincipalComponent,
-          ),
         children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            data: { breadcrumb: null },
+            loadComponent: () =>
+              import('@shared/pages/legales/principal/legales-principal-component').then(
+                (m) => m.LegalesPrincipalComponent,
+              ),
+          },
           {
             path: 'aviso-privacidad',
             title: 'Aviso de Privacidad',
@@ -264,6 +269,13 @@ export const routes: Routes = [
               import('@shared/pages/legales/aviso de privacidad/aviso-privacidad').then(
                 (m) => m.AvisoPrivacidad,
               ),
+          },
+          {
+            path: 'terminos-uso',
+            title: 'Términos de uso',
+            data: { breadcrumb: 'Términos de uso' },
+            loadComponent: () =>
+              import('@shared/pages/legales/terminos-uso/terminos-uso').then((m) => m.TerminosUso),
           },
         ],
       },

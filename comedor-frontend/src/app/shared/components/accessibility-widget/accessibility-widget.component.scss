@@ -22,7 +22,8 @@
 .a11y-trigger {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
-  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  bottom: auto;
 
   display: flex;
   align-items: center;
@@ -40,7 +41,14 @@
 
   transition:
     transform 0.15s ease,
-    background-color 0.15s ease;
+    background-color 0.15s ease,
+    opacity 0.16s ease;
+}
+
+.a11y-trigger--hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.92);
 }
 
 .a11y-trigger svg {
@@ -78,13 +86,14 @@
 .a11y-panel {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
-  bottom: calc(52px + max(1rem, env(safe-area-inset-bottom, 0px)) + 0.75rem);
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  bottom: auto;
 
   display: flex;
   flex-direction: column;
 
   width: min(340px, calc(100vw - 2rem));
-  max-height: min(70vh, 560px);
+  max-height: min(70vh, calc(100dvh - 2rem), 560px);
 
   background: #ffffff;
   color: #161b23;
@@ -102,7 +111,7 @@
 @keyframes a11y-panel-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(-8px);
   }
 }
 

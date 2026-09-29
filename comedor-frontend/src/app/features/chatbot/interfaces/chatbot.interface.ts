@@ -7,7 +7,7 @@ export interface ConversationMessage {
 
 export interface ChatMessageRequest {
   message: string;
-  portions: number;
+  portions?: number | null;
   history: ConversationMessage[];
 }
 

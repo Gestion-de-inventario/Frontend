@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, HostListener, inject, viewChild } from '@angular/core';
 
 import {
   AccessibilityService,
@@ -6,6 +6,7 @@ import {
   FONT_SCALES,
   Theme,
 } from '@core/accessibility/accessibility.service';
+import { FloatingToolsService } from '@shared/services/floating-tools.service';
 
 /**
  * Menú de accesibilidad.
@@ -23,8 +24,10 @@ import {
 })
 export class AccessibilityWidgetComponent {
   readonly a11y = inject(AccessibilityService);
+  private readonly floatingTools = inject(FloatingToolsService);
 
-  readonly open = signal(false);
+  readonly open = computed(() => this.floatingTools.isOpen('accessibility'));
+  readonly triggerHidden = computed(() => this.floatingTools.activeTool() !== null);
 
   private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
@@ -34,7 +37,11 @@ export class AccessibilityWidgetComponent {
   readonly themes: ReadonlyArray<{ value: Theme; label: string; hint: string }> = [
     { value: 'normal', label: 'Normal', hint: 'Colores originales de la aplicación' },
     { value: 'dark', label: 'Oscuro', hint: 'Fondo oscuro, menos brillo' },
-    { value: 'high-contrast', label: 'Alto contraste', hint: 'Máxima separación entre texto y fondo' },
+    {
+      value: 'high-contrast',
+      label: 'Alto contraste',
+      hint: 'Máxima separación entre texto y fondo',
+    },
   ];
 
   readonly filters: ReadonlyArray<{ value: ColorFilter; label: string; hint: string }> = [
@@ -45,7 +52,7 @@ export class AccessibilityWidgetComponent {
   ];
 
   togglePanel(): void {
-    this.open.update((value) => !value);
+    this.floatingTools.toggle('accessibility');
 
     if (this.open()) {
       // Se espera al renderizado para poder enfocar el primer control del panel.
@@ -58,7 +65,7 @@ export class AccessibilityWidgetComponent {
       return;
     }
 
-    this.open.set(false);
+    this.floatingTools.close('accessibility');
 
     // Al cerrar con teclado, el foco debe volver al botón que abrió el panel;
     // de lo contrario se pierde al principio del documento.
