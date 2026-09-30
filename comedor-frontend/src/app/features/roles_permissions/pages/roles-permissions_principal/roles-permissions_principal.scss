@@ -1,0 +1,56 @@
+.roles-page {
+  max-width: 1120px;
+}
+.roles-page__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.roles-page__copy { flex: 1; min-width: 0; }
+.roles-page__icon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(145deg, var(--color-primary), #6258d4);
+  border-radius: 17px;
+  box-shadow: 0 9px 22px rgba(45, 38, 146, 0.2);
+}
+.roles-page__icon svg {
+  width: 28px;
+  height: 28px;
+}
+.roles-page__header span {
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.roles-page__header h1 {
+  margin: 0.15rem 0 0.2rem;
+  color: var(--color-text);
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+.roles-page__header p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 575.98px) {
+  .roles-page__header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .roles-page__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+  .roles-page__header app-role-create-fragment { width: 100%; }
+}

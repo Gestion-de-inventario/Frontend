@@ -1,4 +1,4 @@
-<div class="container py-3">
+<div class="roles-page container py-4 py-lg-5">
   @if (!canList && !canCreate && !canAssignPermissions) {
     <div class="text-center mt-5">
       <h4>No tienes permisos para este módulo</h4>
@@ -6,9 +6,22 @@
       <a routerLink="/home" class="btn btn-primary mt-3"> Volver al inicio </a>
     </div>
   } @else {
-    @if (canCreate) {
-      <app-role-create-fragment />
-    }
+    <header class="roles-page__header">
+      <div class="roles-page__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      </div>
+      <div class="roles-page__copy">
+        <span>Administración de acceso</span>
+        <h1>Roles y permisos</h1>
+        <p>Define qué puede consultar y gestionar cada tipo de usuario.</p>
+      </div>
+      @if (canCreate) {
+        <app-role-create-fragment />
+      }
+    </header>
     @if (canList) {
       <app-role-list-fragment />
     }

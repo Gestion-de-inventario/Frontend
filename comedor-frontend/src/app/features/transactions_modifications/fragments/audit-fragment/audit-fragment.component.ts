@@ -10,6 +10,12 @@ import {
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { ToastService } from '@shared/services/toast.service';
 
+interface AuditSupply {
+  producto: string;
+  cantidad: number | string;
+  unidad?: string;
+}
+
 @Component({
   selector: 'app-audit-fragment',
   standalone: true,
@@ -199,6 +205,47 @@ export class AuditFragmentComponent {
     return Object.entries(details);
   }
 
+  formatDetailLabel(key: string): string {
+    const labels: Record<string, string> = {
+      status: 'Estado',
+      estado: 'Estado',
+      name: 'Nombre',
+      nombre: 'Nombre',
+      supplies: 'Insumos',
+      insumos: 'Insumos',
+      description: 'Descripción',
+      descripcion: 'Descripción',
+      attribute: 'Campo modificado',
+      previousValue: 'Valor anterior',
+      newValue: 'Valor nuevo',
+    };
+
+    return labels[key] ?? key.replace(/([a-z])([A-Z])/g, '$1 $2');
+  }
+
+  isSupplyList(value: unknown): boolean {
+    const parsed = this.parseStructuredValue(value);
+    return (
+      Array.isArray(parsed) &&
+      parsed.length > 0 &&
+      parsed.every(
+        (item) =>
+          typeof item === 'object' && item !== null && 'producto' in item && 'cantidad' in item,
+      )
+    );
+  }
+
+  getSupplies(value: unknown): AuditSupply[] {
+    return this.isSupplyList(value) ? (this.parseStructuredValue(value) as AuditSupply[]) : [];
+  }
+
+  formatQuantity(value: number | string): string {
+    const quantity = Number(value);
+    return Number.isFinite(quantity)
+      ? new Intl.NumberFormat('es-PE', { maximumFractionDigits: 3 }).format(quantity)
+      : String(value);
+  }
+
   formatDetailValue(value: unknown): string {
     if (value === null || value === undefined || value === '') {
       return 'Sin valor';
@@ -221,5 +268,18 @@ export class AuditFragmentComponent {
     }
 
     return String(value);
+  }
+
+  private parseStructuredValue(value: unknown): unknown {
+    if (typeof value !== 'string') return value;
+
+    const trimmed = value.trim();
+    if (!trimmed.startsWith('[') && !trimmed.startsWith('{')) return value;
+
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return value;
+    }
   }
 }

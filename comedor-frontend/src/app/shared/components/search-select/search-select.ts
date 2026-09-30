@@ -38,14 +38,15 @@ export class SearchSelectComponent<T> {
   open = signal(false);
 
   get filteredItems(): T[] {
-    const term = this.search().toLowerCase();
+    const term = this.normalize(this.search().trim());
 
     if (!term) {
-      return this.items.slice(0, 3);
+      return this.items.slice(0, 6);
     }
 
-    return this.items.filter((item) => this.displayFn(item).toLowerCase().includes(term));
-    //.slice(0, 4);
+    return this.items
+      .filter((item) => this.normalize(this.displayFn(item)).includes(term))
+      .slice(0, 10);
   }
 
   @HostListener('document:click', ['$event'])
@@ -59,5 +60,12 @@ export class SearchSelectComponent<T> {
     this.selected.emit(item);
     this.search.set('');
     this.open.set(false);
+  }
+
+  private normalize(value: string): string {
+    return value
+      .toLocaleLowerCase('es')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 }

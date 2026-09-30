@@ -43,6 +43,10 @@ export class ReportsPrincipalComponent {
       modules.push({ value: 'audits', label: 'Auditorías' });
     }
 
+    if (this.canExport()) {
+      modules.push({ value: 'export', label: 'Exportar reportes' });
+    }
+
     return modules;
   });
 

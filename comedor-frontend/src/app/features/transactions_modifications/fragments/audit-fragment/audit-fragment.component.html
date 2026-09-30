@@ -233,9 +233,22 @@
                     <span class="change-label"> Antes </span>
                   </div>
 
-                  <p class="change-content">
-                    {{ m.details['previousValue'] || 'Sin valor' }}
-                  </p>
+                  @if (isSupplyList(m.details['previousValue'])) {
+                    <div class="supply-list supply-list--change">
+                      @for (supply of getSupplies(m.details['previousValue']); track $index) {
+                        <div class="supply-row">
+                          <span>{{ supply.producto }}</span>
+                          <strong
+                            >{{ formatQuantity(supply.cantidad) }} {{ supply.unidad || '' }}</strong
+                          >
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="change-content">
+                      {{ formatDetailValue(m.details['previousValue']) }}
+                    </p>
+                  }
                 </section>
 
                 <section
@@ -263,9 +276,20 @@
                     <span class="change-label"> Después </span>
                   </div>
 
-                  <p class="change-content">
-                    {{ m.details['newValue'] || 'Sin valor' }}
-                  </p>
+                  @if (isSupplyList(m.details['newValue'])) {
+                    <div class="supply-list supply-list--change">
+                      @for (supply of getSupplies(m.details['newValue']); track $index) {
+                        <div class="supply-row">
+                          <span>{{ supply.producto }}</span>
+                          <strong
+                            >{{ formatQuantity(supply.cantidad) }} {{ supply.unidad || '' }}</strong
+                          >
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="change-content">{{ formatDetailValue(m.details['newValue']) }}</p>
+                  }
                 </section>
               </div>
             }
@@ -284,14 +308,30 @@
 
               <div class="creation-details">
                 @for (detail of getDetailEntries(m.details); track detail[0]) {
-                  <div class="creation-detail">
+                  <div
+                    class="creation-detail"
+                    [class.creation-detail--wide]="isSupplyList(detail[1])"
+                  >
                     <span class="detail-label">
-                      {{ detail[0] }}
+                      {{ formatDetailLabel(detail[0]) }}
                     </span>
 
-                    <strong class="creation-detail__value">
-                      {{ formatDetailValue(detail[1]) }}
-                    </strong>
+                    @if (isSupplyList(detail[1])) {
+                      <div class="supply-list">
+                        @for (supply of getSupplies(detail[1]); track $index) {
+                          <div class="supply-row">
+                            <span>{{ supply.producto }}</span>
+                            <strong>
+                              {{ formatQuantity(supply.cantidad) }} {{ supply.unidad || '' }}
+                            </strong>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <strong class="creation-detail__value">
+                        {{ formatDetailValue(detail[1]) }}
+                      </strong>
+                    }
                   </div>
                 }
               </div>

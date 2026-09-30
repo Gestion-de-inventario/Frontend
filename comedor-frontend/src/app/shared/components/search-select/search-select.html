@@ -1,22 +1,36 @@
 <div class="position-relative">
   <input
-    class="form-control"
+    class="form-control search-select-input"
     [value]="search()"
     [placeholder]="placeholder"
+    autocomplete="off"
+    role="combobox"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="open()"
     (input)="search.set($any($event.target).value)"
     (focus)="open.set(true)"
   />
 
   @if (open()) {
-    <div class="list-group position-absolute w-100 shadow-sm" style="z-index: 1000">
+    <div class="list-group search-select-results position-absolute w-100 shadow-sm" role="listbox">
       @for (item of filteredItems; track $index) {
-        <button type="button" class="list-group-item list-group-item-action" (click)="select(item)">
+        <button
+          type="button"
+          class="list-group-item list-group-item-action"
+          role="option"
+          (click)="select(item)"
+        >
           @if (itemTemplate) {
             <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }" />
           } @else {
             {{ displayFn(item) }}
           }
         </button>
+      } @empty {
+        <div class="search-select-empty">
+          <strong>Sin resultados</strong>
+          <small>Prueba con otro nombre.</small>
+        </div>
       }
     </div>
   }

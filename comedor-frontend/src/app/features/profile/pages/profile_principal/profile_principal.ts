@@ -51,17 +51,32 @@ export class ProfilePrincipal implements OnInit {
   logoReading = signal(false);
 
   readonly editForm = new FormGroup({
-    name: new FormControl('', { 
+    name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50),Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]
-     }),
-    lastname: new FormControl('', { 
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
+    }),
+    lastname: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2), Validators.maxLength(50), Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)]
-     }),
+      validators: [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/),
+      ],
+    }),
     dni: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8), Validators.maxLength(8), Validators.pattern(/^[0-9]+$/)],
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8),
+        Validators.pattern(/^[0-9]+$/),
+      ],
     }),
   });
 
@@ -89,9 +104,7 @@ export class ProfilePrincipal implements OnInit {
   });
 
   ngOnInit(): void {
-    if (this.authState.hasPermission('EMPRESA_CONFIG_EDIT')) {
-      this.loadEmpresaConfig();
-    }
+    this.loadEmpresaConfig();
   }
 
   openEditModal(): void {
@@ -190,7 +203,7 @@ export class ProfilePrincipal implements OnInit {
         }
       },
       error: () => {
-        this.toastService.show('Error al cargar la configuración de la empresa', 'danger');
+        // El perfil puede utilizarse aunque la institución todavía no tenga configuración.
       },
     });
   }

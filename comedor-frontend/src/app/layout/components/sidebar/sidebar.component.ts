@@ -1,7 +1,16 @@
-import { Component, inject, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  inject,
+  AfterViewInit,
+  ElementRef,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStateService } from '@core/auth/services/auth-state.service';
 import { TourModalComponent } from '../tour-modal/tour-modal.component';
+import { EmpresaConfigService } from '@features/profile/services/empresa-config.service';
 
 declare const bootstrap: any;
 
@@ -12,13 +21,24 @@ declare const bootstrap: any;
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements AfterViewInit {
+export class SidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('sidebarElement') sidebarElement!: ElementRef;
   @ViewChild(TourModalComponent) tourModal!: TourModalComponent;
 
   private touchStartX = 0;
   readonly authState = inject(AuthStateService);
   private readonly router = inject(Router);
+  private readonly empresaConfigService = inject(EmpresaConfigService);
+  readonly empresaLogo = this.empresaConfigService.logoDataUrl;
+  readonly openGroup = signal<string | null>(this.getGroupForPath(this.router.url));
+
+  ngOnInit(): void {
+    this.empresaConfigService.obtener().subscribe({
+      error: () => {
+        // El logo es decorativo: el menú debe seguir funcionando si no está configurado.
+      },
+    });
+  }
 
   ngAfterViewInit(): void {
     const element = this.sidebarElement.nativeElement;
@@ -55,9 +75,32 @@ export class SidebarComponent implements AfterViewInit {
   }
 
   navigateAndClose(path: string): void {
+    const group = this.getGroupForPath(path);
+    if (group) this.openGroup.set(group);
+
     this.router.navigate([path]).then(() => {
       this.closeOffcanvas();
     });
+  }
+
+  toggleGroup(group: string): void {
+    this.openGroup.update((current) => (current === group ? null : group));
+  }
+
+  isGroupOpen(group: string): boolean {
+    return this.openGroup() === group;
+  }
+
+  isGroupActive(path: string): boolean {
+    return this.router.url.split('?')[0].startsWith(path);
+  }
+
+  private getGroupForPath(path: string): string | null {
+    if (path.startsWith('/management')) return 'users';
+    if (path.startsWith('/inventory')) return 'inventory';
+    if (path.startsWith('/roles')) return 'roles';
+    if (path.startsWith('/reports')) return 'reports';
+    return null;
   }
 
   private closeOffcanvas(): void {

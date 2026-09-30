@@ -6,15 +6,27 @@
   aria-labelledby="appSidebarLabel"
 >
   <div class="offcanvas-header pb-2 pt-4 px-4 d-flex align-items-center justify-content-between">
-    <div class="d-flex align-items-center gap-2">
-      <div class="brand-square">🍲</div>
-      <h5 class="offcanvas-title fw-bold text-dark mb-0" id="appSidebarLabel">ComedorApp</h5>
+    <div class="sidebar-brand">
+      <div class="brand-square" aria-hidden="true">
+        @if (empresaLogo()) {
+          <img [src]="empresaLogo()" alt="" />
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 10h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9Z" />
+            <path d="M2 10h20M8 6a2 2 0 1 1 4 0v4M14 4a2 2 0 0 1 2 2v4" />
+          </svg>
+        }
+      </div>
+      <div class="brand-copy">
+        <h5 class="offcanvas-title" id="appSidebarLabel">ComedorApp</h5>
+        <small>Gestión del comedor</small>
+      </div>
     </div>
     <button
       type="button"
       class="btn-close shadow-none"
       data-bs-dismiss="offcanvas"
-      aria-label="Close"
+      aria-label="Cerrar menú"
     ></button>
   </div>
 
@@ -43,9 +55,9 @@
     } -->
 
   <div class="offcanvas-body d-flex flex-column px-3 pt-3 gap-1">
-    <div class="px-2 mb-3">
+    <div class="px-1 mb-3">
       <a
-        class="perfil-card d-flex align-items-center gap-3 p-3 rounded-4 text-decoration-none shadow-sm"
+        class="perfil-card d-flex align-items-center gap-3 p-3 text-decoration-none"
         (click)="navigateAndClose('/profile')"
       >
         <div
@@ -80,11 +92,7 @@
       </a>
     </div>
 
-    <small
-      class="text-muted fw-bold px-3 mb-2 mt-2 text-uppercase"
-      style="font-size: 0.7rem; letter-spacing: 1px"
-      >Módulos</small
-    >
+    <small class="sidebar-section-label">Operación diaria</small>
     <a
       class="sidebar-link"
       [class.active]="isActiveRoute('/home')"
@@ -227,6 +235,8 @@
       </a>
     }
 
+    <small class="sidebar-section-label sidebar-section-label--spaced">Administración</small>
+
     @if (
       authState.hasPermission('USER_LIST_ALL') ||
       authState.hasPermission('USER_LIST_ACTIVE') ||
@@ -237,22 +247,65 @@
       authState.hasPermission('BENEFICIARY_TYPE_LIST_BY_STATUS') ||
       authState.hasPermission('BENEFICIARY_TYPE_CREATE')
     ) {
-      <a
-        id="tour-usuarios"
-        class="sidebar-link"
-        [class.active]="isActiveRoute('/management')"
-        (click)="navigateAndClose(getManagementRoute())"
-      >
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-
-        Usuarios
-      </a>
+      <div class="sidebar-group" [class.active-group]="isGroupActive('/management')">
+        <button
+          id="tour-usuarios"
+          type="button"
+          class="sidebar-group__title"
+          [attr.aria-expanded]="isGroupOpen('users')"
+          (click)="toggleGroup('users')"
+        >
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path
+              d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87"
+            />
+          </svg>
+          <span>Usuarios</span>
+          <svg
+            class="group-chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+        <div class="sidebar-group__links" [class.open]="isGroupOpen('users')">
+          @if (
+            authState.hasPermission('USER_LIST_ALL') ||
+            authState.hasPermission('USER_LIST_ACTIVE') ||
+            authState.hasPermission('USER_CREATE')
+          ) {
+            <a
+              [class.active]="isActiveRoute('/management/users')"
+              (click)="navigateAndClose('/management/users')"
+              >Usuarios del sistema</a
+            >
+          }
+          @if (
+            authState.hasPermission('BENEFICIARY_LIST_BY_STATUS') ||
+            authState.hasPermission('BENEFICIARY_CREATE') ||
+            authState.hasPermission('BENEFICIARY_CREATE_BY_DNI')
+          ) {
+            <a
+              [class.active]="isActiveRoute('/management/beneficiaries')"
+              (click)="navigateAndClose('/management/beneficiaries')"
+              >Beneficiarios</a
+            >
+          }
+          @if (
+            authState.hasPermission('BENEFICIARY_TYPE_LIST_BY_STATUS') ||
+            authState.hasPermission('BENEFICIARY_TYPE_CREATE')
+          ) {
+            <a
+              [class.active]="isActiveRoute('/management/beneficiary-types')"
+              (click)="navigateAndClose('/management/beneficiary-types')"
+              >Tipos de beneficiario</a
+            >
+          }
+        </div>
+      </div>
     }
 
     @if (
@@ -261,39 +314,91 @@
       authState.hasPermission('CATEGORY_LIST_BY_STATUS') ||
       authState.hasPermission('TAG_LIST_BY_STATUS')
     ) {
-      <a
-        id="tour-inventario"
-        class="sidebar-link"
-        [class.active]="isActiveRoute('/inventory')"
-        (click)="navigateAndClose('/inventory')"
-      >
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          ></path>
-        </svg>
-        Inventario
-      </a>
+      <div class="sidebar-group" [class.active-group]="isGroupActive('/inventory')">
+        <button
+          id="tour-inventario"
+          type="button"
+          class="sidebar-group__title"
+          [attr.aria-expanded]="isGroupOpen('inventory')"
+          (click)="toggleGroup('inventory')"
+        >
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="m21 8-9-5-9 5 9 5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5" />
+          </svg>
+          <span>Inventario</span>
+          <svg
+            class="group-chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+        <div class="sidebar-group__links" [class.open]="isGroupOpen('inventory')">
+          @if (authState.hasPermission('PRODUCT_LIST_BY_STATUS')) {
+            <a
+              [class.active]="isActiveRoute('/inventory/products')"
+              (click)="navigateAndClose('/inventory/products')"
+              >Productos</a
+            >
+          }
+          @if (authState.hasPermission('DISH_MENU_LIST_ALL')) {
+            <a
+              [class.active]="isActiveRoute('/inventory/dishes')"
+              (click)="navigateAndClose('/inventory/dishes')"
+              >Platos</a
+            >
+          }
+          @if (authState.hasPermission('CATEGORY_LIST_BY_STATUS')) {
+            <a
+              [class.active]="isActiveRoute('/inventory/categories')"
+              (click)="navigateAndClose('/inventory/categories')"
+              >Categorías</a
+            >
+          }
+          @if (authState.hasPermission('TAG_LIST_BY_STATUS')) {
+            <a
+              [class.active]="isActiveRoute('/inventory/tags')"
+              (click)="navigateAndClose('/inventory/tags')"
+              >Etiquetas</a
+            >
+          }
+        </div>
+      </div>
     }
 
     @if (authState.hasPermission('ROLE_LIST_BY_STATUS')) {
-      <a
-        id="tour-roles"
-        class="sidebar-link"
-        [class.active]="isActiveRoute('/roles')"
-        (click)="navigateAndClose('/roles')"
-      >
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-          ></path>
-        </svg>
-        Roles
-      </a>
+      <div class="sidebar-group" [class.active-group]="isGroupActive('/roles')">
+        <button
+          id="tour-roles"
+          type="button"
+          class="sidebar-group__title"
+          [attr.aria-expanded]="isGroupOpen('roles')"
+          (click)="toggleGroup('roles')"
+        >
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+          <span>Roles</span>
+          <svg
+            class="group-chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+        <div class="sidebar-group__links" [class.open]="isGroupOpen('roles')">
+          <a [class.active]="isActiveRoute('/roles')" (click)="navigateAndClose('/roles')"
+            >Roles y permisos</a
+          >
+        </div>
+      </div>
     }
 
     @if (
@@ -302,29 +407,63 @@
       authState.hasPermission('MENU_REPORT_GET_BY_DATE') ||
       authState.hasPermission('MENU_REPORT_EXPORT')
     ) {
-      <a
-        id="tour-reportes"
-        class="sidebar-link"
-        [class.active]="isActiveRoute('/reports')"
-        (click)="navigateAndClose('/reports')"
-      >
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          ></path>
-        </svg>
-        Auditoria y Reportes
-      </a>
+      <div class="sidebar-group" [class.active-group]="isGroupActive('/reports')">
+        <button
+          id="tour-reportes"
+          type="button"
+          class="sidebar-group__title"
+          [attr.aria-expanded]="isGroupOpen('reports')"
+          (click)="toggleGroup('reports')"
+        >
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 19V9M10 19V5M16 19v-7M22 19V3" />
+          </svg>
+          <span>Auditoría y reportes</span>
+          <svg
+            class="group-chevron"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+        <div class="sidebar-group__links" [class.open]="isGroupOpen('reports')">
+          @if (authState.hasPermission('TRANSACTION_LIST_ALL')) {
+            <a
+              [class.active]="isActiveRoute('/reports/transactions')"
+              (click)="navigateAndClose('/reports/transactions')"
+              >Transacciones</a
+            >
+          }
+          @if (authState.hasPermission('AUDIT_LIST_ALL')) {
+            <a
+              [class.active]="isActiveRoute('/reports/audits')"
+              (click)="navigateAndClose('/reports/audits')"
+              >Auditorías</a
+            >
+          }
+          @if (authState.hasPermission('MENU_REPORT_GET_BY_DATE')) {
+            <a
+              [class.active]="isActiveRoute('/reports/summary')"
+              (click)="navigateAndClose('/reports/summary')"
+              >Resumen diario</a
+            >
+          }
+          @if (authState.hasPermission('MENU_REPORT_EXPORT')) {
+            <a
+              [class.active]="isActiveRoute('/reports/export')"
+              (click)="navigateAndClose('/reports/export')"
+              >Exportar reportes</a
+            >
+          }
+        </div>
+      </div>
     }
 
-    <div class="mt-auto p-3 border-top d-flex flex-column gap-2">
-      <button
-        id="tour-help-btn"
-        class="btn btn-outline-primary rounded-pill w-100 d-flex align-items-center justify-content-center gap-2 fw-medium"
-        (click)="iniciarTour()"
-      >
+    <div class="sidebar-footer mt-auto">
+      <button id="tour-help-btn" class="sidebar-utility" (click)="iniciarTour()">
         <svg fill="none" stroke="currentcolor" stroke-width="2" viewBox="0 0 24 24" width="18">
           <path
             stroke-linecap="round"
@@ -332,13 +471,22 @@
             d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
           ></path>
         </svg>
-        ¿Cómo funciona la app?
+        <span>Guía de uso</span>
       </button>
 
-      <button
-        class="logout-btn btn w-100 d-flex align-items-center justify-content-center gap-2"
-        (click)="logout()"
+      <a
+        class="sidebar-utility"
+        [class.active]="isActiveRoute('/legales')"
+        (click)="navigateAndClose('/legales')"
       >
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path d="M9 12h6M12 9v6" />
+        </svg>
+        <span>Privacidad y términos</span>
+      </a>
+
+      <button class="logout-btn" (click)="logout()">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20">
           <path
             stroke-linecap="round"
@@ -348,12 +496,6 @@
         </svg>
         Cerrar sesión
       </button>
-      <a
-        (click)="navigateAndClose('/legales')"
-        class="sidebar-link text-center small"
-        [class.active]="isActiveRoute('/legales')"
-        >Legales</a
-      >
     </div>
   </div>
 </div>
