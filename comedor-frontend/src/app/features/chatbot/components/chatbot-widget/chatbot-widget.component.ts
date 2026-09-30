@@ -1,11 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import {
-  ChatMessageResponse,
-  ChatRole,
-  DishSuggestion,
-} from '../../interfaces/chatbot.interface';
+  Component,
+  computed,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FloatingToolsService } from '@shared/services/floating-tools.service';
+import { ChatMessageResponse, ChatRole, DishSuggestion } from '../../interfaces/chatbot.interface';
 import { ChatbotApiService } from '../../services/chatbot-api.service';
 
 interface UiMessage {
@@ -24,27 +29,28 @@ interface UiMessage {
 })
 export class ChatbotWidgetComponent {
   private readonly chatbotApi = inject(ChatbotApiService);
+  private readonly floatingTools = inject(FloatingToolsService);
   private readonly messageList = viewChild<ElementRef<HTMLElement>>('messageList');
 
-  readonly open = signal(false);
+  readonly open = computed(() => this.floatingTools.isOpen('chatbot'));
+  readonly triggerHidden = computed(() => this.floatingTools.activeTool() !== null);
   readonly sending = signal(false);
   readonly messages = signal<UiMessage[]>([
     {
       role: 'assistant',
       content:
-        'Hola, soy MIRA. Puedo recomendar platos según el inventario y calcular si alcanzan los insumos.',
+        'Hola, soy MIRA. Puedo consultar stock, alertas y recojos, recomendar platos y orientarte sobre el uso del sistema.',
     },
   ]);
 
   draft = '';
-  portions = 50;
 
   toggle(): void {
-    this.open.update((value) => !value);
+    this.floatingTools.toggle('chatbot');
   }
 
   close(): void {
-    this.open.set(false);
+    this.floatingTools.close('chatbot');
   }
 
   usePrompt(prompt: string): void {
@@ -54,7 +60,7 @@ export class ChatbotWidgetComponent {
 
   send(): void {
     const message = this.draft.trim();
-    if (!message || this.sending() || !this.validPortions()) return;
+    if (!message || this.sending()) return;
 
     const previousMessages = this.messages();
     this.messages.update((items) => [...items, { role: 'user', content: message }]);
@@ -65,10 +71,10 @@ export class ChatbotWidgetComponent {
     this.chatbotApi
       .sendMessage({
         message,
-        portions: Number(this.portions),
+        portions: null,
         history: previousMessages
           .slice(-10)
-          .map(({ role, content }) => ({ role, content })),
+          .map(({ role, content }) => ({ role, content: content.slice(0, 1000) })),
       })
       .subscribe({
         next: (response) => this.addResponse(response),
@@ -78,7 +84,7 @@ export class ChatbotWidgetComponent {
             {
               role: 'assistant',
               content:
-                'No pude consultar el inventario en este momento. Inténtalo de nuevo en unos segundos.',
+                'No pude consultar el sistema en este momento. Inténtalo de nuevo en unos segundos.',
             },
           ]);
           this.sending.set(false);
@@ -92,11 +98,6 @@ export class ChatbotWidgetComponent {
       event.preventDefault();
       this.send();
     }
-  }
-
-  validPortions(): boolean {
-    const value = Number(this.portions);
-    return Number.isInteger(value) && value >= 1 && value <= 10000;
   }
 
   @HostListener('document:keydown.escape')

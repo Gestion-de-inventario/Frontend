@@ -1,0 +1,2 @@
+textUser-agent: *
+Disallow: /

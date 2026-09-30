@@ -1,17 +1,15 @@
 <button
   type="button"
   class="chat-trigger"
+  [class.chat-trigger--hidden]="triggerHidden()"
   [attr.aria-expanded]="open()"
   aria-controls="mira-chat-panel"
   aria-label="Abrir asistente de menú"
+  title="Abrir asistente MIRA"
   (click)="toggle()"
 >
   <span class="chat-trigger__icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
-  <span class="chat-trigger__copy">
-    <strong>Asistente MIRA</strong>
-    <small>Consulta el inventario</small>
-  </span>
-  <i class="bi bi-chevron-up chat-trigger__arrow" aria-hidden="true"></i>
+  <span class="chat-trigger__copy">Asistente MIRA</span>
 </button>
 
 @if (open()) {
@@ -41,34 +39,6 @@
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
     </header>
-
-    <div class="planning-bar">
-      <div class="planning-bar__label">
-        <span class="planning-bar__icon" aria-hidden="true"><i class="bi bi-people"></i></span>
-        <span>
-          <small>Planificación actual</small>
-          <strong>Número de raciones</strong>
-        </span>
-      </div>
-
-      <label class="portion-input" for="mira-portions">
-        <span class="visually-hidden">Cantidad de porciones</span>
-        <input
-          id="mira-portions"
-          type="number"
-          min="1"
-          max="10000"
-          step="1"
-          [(ngModel)]="portions"
-          aria-describedby="mira-portions-error"
-        />
-        <span>porciones</span>
-      </label>
-
-      @if (!validPortions()) {
-        <small id="mira-portions-error" class="field-error">Ingresa un valor entre 1 y 10 000.</small>
-      }
-    </div>
 
     <div #messageList class="message-list" aria-live="polite" aria-busy="sending()">
       <div class="conversation-date"><span>Asistente de planificación</span></div>
@@ -125,7 +95,7 @@
                         [class.bi-calculator]="message.source === 'LOCAL'"
                         aria-hidden="true"
                       ></i>
-                      {{ message.source === 'GEMINI' ? 'Generado con IA' : 'Cálculo local' }}
+                      {{ message.source === 'GEMINI' ? 'Generado con IA' : 'Datos del sistema' }}
                     </span>
                   }
                   @if (message.disclaimer) {
@@ -140,19 +110,52 @@
 
       @if (messages().length === 1) {
         <section class="quick-prompts" aria-label="Preguntas sugeridas">
-          <p>Prueba con una pregunta rápida</p>
+          <p>Prueba con una consulta rápida</p>
           <div class="quick-prompts__grid">
             <button type="button" (click)="usePrompt('¿Qué plato podemos preparar hoy?')">
               <span aria-hidden="true"><i class="bi bi-egg-fried"></i></span>
               <span><strong>Elegir un plato</strong><small>Según el stock disponible</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
+            <button type="button" (click)="usePrompt('Muéstrame el inventario disponible')">
+              <span aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+              <span><strong>Consultar stock</strong><small>Productos registrados</small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+            <button type="button" (click)="usePrompt('¿Cuáles son los productos con stock bajo?')">
+              <span aria-hidden="true"><i class="bi bi-basket2"></i></span>
+              <span
+                ><strong>Revisar stock bajo</strong><small>Según el límite configurado</small></span
+              >
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
             <button
               type="button"
-              (click)="usePrompt('¿Qué insumos faltan para las porciones indicadas?')"
+              (click)="usePrompt('¿Cuántos recojos de menú hay registrados hoy?')"
             >
-              <span aria-hidden="true"><i class="bi bi-basket2"></i></span>
-              <span><strong>Revisar faltantes</strong><small>Para las porciones indicadas</small></span>
+              <span aria-hidden="true"><i class="bi bi-check2-square"></i></span>
+              <span><strong>Contar recojos</strong><small>Registros y menús de hoy</small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              (click)="usePrompt('¿Qué beneficiarios tienen recojo registrado hoy?')"
+            >
+              <span aria-hidden="true"><i class="bi bi-people"></i></span>
+              <span><strong>Ver beneficiarios</strong><small>Con recojo registrado</small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              (click)="usePrompt('¿Qué funcionalidades del sistema puedo usar?')"
+            >
+              <span aria-hidden="true"><i class="bi bi-grid"></i></span>
+              <span><strong>Conocer funciones</strong><small>Según mis permisos</small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+            <button type="button" (click)="usePrompt('¿Cómo registro un recojo de menú?')">
+              <span aria-hidden="true"><i class="bi bi-signpost-split"></i></span>
+              <span><strong>Ver procedimiento</strong><small>Pasos dentro del sistema</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
           </div>
@@ -178,20 +181,22 @@
           name="message"
           rows="1"
           maxlength="1000"
-          placeholder="Pregúntale algo a MIRA..."
+          placeholder="Consulta stock, recojos o cómo usar el sistema..."
           [(ngModel)]="draft"
           (keydown)="onComposerKeydown($event)"
         ></textarea>
         <button
           type="submit"
           class="send-button"
-          [disabled]="!draft.trim() || sending() || !validPortions()"
+          [disabled]="!draft.trim() || sending()"
           aria-label="Enviar pregunta"
         >
           <i class="bi bi-arrow-up" aria-hidden="true"></i>
         </button>
       </div>
-      <small class="composer__hint">MIRA puede equivocarse. Verifica el inventario antes de registrar.</small>
+      <small class="composer__hint"
+        >MIRA consulta datos en modo lectura; confirma las operaciones en cada módulo.</small
+      >
     </form>
   </section>
 }

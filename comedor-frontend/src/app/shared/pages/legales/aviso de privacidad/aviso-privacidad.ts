@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-aviso-privacidad',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './aviso-privacidad.html',
   styleUrl: './aviso-privacidad.scss',
 })

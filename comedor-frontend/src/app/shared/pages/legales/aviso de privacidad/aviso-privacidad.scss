@@ -12,6 +12,39 @@
   margin: 0 auto;
 }
 
+.privacy-back {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  color: #2d2692;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.privacy-highlight {
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(16, 128, 96, 0.2);
+  border-radius: 0.9rem;
+  background: rgba(16, 185, 129, 0.07);
+
+  strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--color-text);
+  }
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+}
+
 /* =========================================================
    HEADER
    ========================================================= */
@@ -137,6 +170,31 @@
 
 .privacy-section li:last-child {
   margin-bottom: 0;
+}
+
+.privacy-section strong {
+  color: var(--color-text);
+}
+
+.privacy-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+
+  a {
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.65rem;
+    color: #2d2692;
+    background: rgba(45, 38, 146, 0.07);
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-decoration: none;
+
+    &:hover {
+      background: rgba(45, 38, 146, 0.12);
+    }
+  }
 }
 
 /* =========================================================

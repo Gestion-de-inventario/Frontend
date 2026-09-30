@@ -41,9 +41,11 @@
   #trigger
   type="button"
   class="a11y-trigger"
+  [class.a11y-trigger--hidden]="triggerHidden()"
   [class.a11y-trigger--active]="a11y.isModified"
   [attr.aria-expanded]="open()"
   aria-controls="panel-accesibilidad"
+  title="Opciones de accesibilidad"
   [attr.aria-label]="
     open() ? 'Cerrar opciones de accesibilidad' : 'Abrir opciones de accesibilidad'
   "
