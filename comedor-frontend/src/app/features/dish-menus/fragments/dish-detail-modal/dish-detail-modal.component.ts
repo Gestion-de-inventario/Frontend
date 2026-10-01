@@ -13,11 +13,12 @@ import { DishApiService } from '@features/dish-menus/services/dish-api.service';
 import { DishStateService } from '@features/dish-menus/services/dish-state.service';
 import { ProductApiService } from '@features/products/services/product-api.service';
 import { ProductResponse } from '@features/products/interfaces/product.response';
+import { SearchSelectComponent } from '@shared/components/search-select/search-select';
 
 @Component({
   selector: 'app-dish-detail-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SearchSelectComponent],
   templateUrl: './dish-detail-modal.component.html',
 })
 export class DishDetailModalComponent {
@@ -32,6 +33,7 @@ export class DishDetailModalComponent {
   mode: 'view' | 'edit' = 'view';
   loading = signal<boolean>(false);
   products: ProductResponse[] = [];
+  readonly productLabel = (product: ProductResponse) => `${product.name} (${product.unit})`;
   editSupplies: { productId: number | null; quantityNeeded: number | null }[] = [];
 
   submitted = signal(false);
@@ -74,11 +76,24 @@ export class DishDetailModalComponent {
   }
 
   addEditSupply(): void {
-    this.editSupplies.push({ productId: this.products[0]?.id, quantityNeeded: 0 });
+    this.editSupplies.push({ productId: null, quantityNeeded: null });
   }
 
   removeEditSupply(index: number): void {
     this.editSupplies.splice(index, 1);
+  }
+
+  selectEditSupplyProduct(index: number, product: ProductResponse): void {
+    this.editSupplies[index].productId = product.id;
+    this.markSupplyTouched(index, 'product');
+  }
+
+  clearEditSupplyProduct(index: number): void {
+    this.editSupplies[index].productId = null;
+  }
+
+  getSelectedProduct(productId: number | null): ProductResponse | undefined {
+    return this.products.find((product) => product.id === productId);
   }
 
   goBack(): void {

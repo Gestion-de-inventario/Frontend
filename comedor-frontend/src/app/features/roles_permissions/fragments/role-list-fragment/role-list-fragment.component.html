@@ -1,17 +1,30 @@
-<div class="container-fluid px-2 py-2">
-  <div class="bg-white rounded-4 shadow-sm p-3 mb-3 border-0">
-    <h5 class="fw-bold text-dark mb-3">Roles registrados</h5>
+<div class="role-list">
+  <div class="role-toolbar">
+    <div class="role-toolbar__heading">
+      <div>
+        <span>Directorio</span>
+        <h2>Roles registrados</h2>
+      </div>
+      <span class="role-count">{{ roles().length }} visibles</span>
+    </div>
 
-    <div class="row">
-      <input
-        class="my-3 form-control form-control-lg rounded-3 border-0 bg-light shadow-none flex-grow-1"
-        placeholder="Buscar rol..."
-        (input)="onSearch($event)"
-      />
+    <div class="role-filters">
+      <div class="search-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input
+          class="form-control"
+          placeholder="Buscar por nombre del rol..."
+          aria-label="Buscar rol"
+          (input)="onSearch($event)"
+        />
+      </div>
 
       <select
-        class="form-select form-select-lg rounded-3 border-0 bg-light shadow-none flex-shrink-0"
-        style="min-width: 140px"
+        class="form-select status-filter"
+        aria-label="Filtrar por estado"
         (change)="onStatusChange($event)"
       >
         <option value="TODOS">Todos</option>
@@ -21,10 +34,10 @@
     </div>
   </div>
 
-  <div class="d-flex flex-column gap-2">
+  <div class="role-grid">
     @if (loading()) {
       @for (i of [1, 2, 3, 4]; track i) {
-        <div class="card rounded-4 border-0 shadow-sm p-3 placeholder-glow mb-1">
+        <div class="role-card role-card--loading placeholder-glow">
           <div class="d-flex justify-content-between align-items-center gap-3">
             <div class="d-flex align-items-center gap-3 flex-grow-1">
               <div
@@ -39,55 +52,46 @@
       }
     } @else {
       @for (role of roles(); track role.role_id) {
-        <div
-          class="card border border-light shadow-sm rounded-4 p-3 mb-1"
-          style="cursor: pointer"
-          (click)="openRole(role)"
-        >
-          <div class="d-flex justify-content-between align-items-center gap-3">
-            <div class="d-flex align-items-center gap-3 overflow-hidden">
-              <div
-                class="bg-primary bg-opacity-10 text-primary rounded d-flex align-items-center justify-content-center flex-shrink-0"
-                style="width: 40px; height: 40px"
+        <button type="button" class="role-card" (click)="openRole(role)">
+          <div class="role-card__top">
+            <div class="role-card__icon">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
               >
-                <svg
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                  ></path>
-                </svg>
-              </div>
-
-              <h6 class="fw-bold text-dark mb-0 text-truncate">{{ role.name }}</h6>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                ></path>
+              </svg>
             </div>
-
-            <div class="flex-shrink-0">
-              <span
-                class="badge rounded-pill px-2 py-1 border"
-                [class]="
-                  role.status === 'ACTIVO'
-                    ? 'bg-success bg-opacity-10 text-success border-success border-opacity-25'
-                    : 'bg-danger bg-opacity-10 text-danger border-danger border-opacity-25'
-                "
-              >
-                {{ role.status }}
-              </span>
+            <span
+              class="role-card__status"
+              [class.role-card__status--active]="role.status === 'ACTIVO'"
+              [class.role-card__status--inactive]="role.status !== 'ACTIVO'"
+            >
+              <span></span>{{ role.status }}
+            </span>
+          </div>
+          <div class="role-card__content">
+            <small>Rol del sistema</small>
+            <h3>{{ role.name }}</h3>
+            <div class="role-card__meta">
+              <span>{{ role.permissions.length }} permisos</span>
+              <span class="role-card__action">Ver detalle <span>→</span></span>
             </div>
           </div>
-        </div>
+        </button>
       } @empty {
-        <div class="text-center py-5 mt-4">
+        <div class="role-empty">
           <i class="bi bi-shield-lock fs-1 text-muted opacity-50 d-block mb-2"></i>
           <h6 class="text-dark fw-bold mb-1">No se encontraron roles</h6>
-          <p class="text-muted small">Prueba buscando con otros términos.</p>
+          <p>Prueba buscando con otro nombre o cambia el filtro de estado.</p>
         </div>
       }
     }

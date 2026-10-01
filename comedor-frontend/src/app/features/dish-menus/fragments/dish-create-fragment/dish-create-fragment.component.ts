@@ -12,13 +12,14 @@ import { DishStateService } from '@features/dish-menus/services/dish-state.servi
 import { ProductApiService } from '@features/products/services/product-api.service';
 import { ToastService } from '@shared/services/toast.service';
 import { ProductResponse } from '@features/products/interfaces/product.response';
+import { SearchSelectComponent } from '@shared/components/search-select/search-select';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-dish-create-fragment',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SearchSelectComponent],
   templateUrl: './dish-create-fragment.component.html',
 })
 export class DishCreateFragmentComponent {
@@ -28,6 +29,7 @@ export class DishCreateFragmentComponent {
   private readonly toastService = inject(ToastService);
 
   products: ProductResponse[] = [];
+  readonly productLabel = (product: ProductResponse) => `${product.name} (${product.unit})`;
   loading = signal<boolean>(false);
   supplies: { productId: number | null; quantityNeeded: number | null }[] = [];
 
@@ -60,6 +62,19 @@ export class DishCreateFragmentComponent {
 
   removeSupply(index: number): void {
     this.supplies.splice(index, 1);
+  }
+
+  selectSupplyProduct(index: number, product: ProductResponse): void {
+    this.supplies[index].productId = product.id;
+    this.markSupplyTouched(index, 'product');
+  }
+
+  clearSupplyProduct(index: number): void {
+    this.supplies[index].productId = null;
+  }
+
+  getSelectedProduct(productId: number | null): ProductResponse | undefined {
+    return this.products.find((product) => product.id === productId);
   }
 
   openModal(): void {

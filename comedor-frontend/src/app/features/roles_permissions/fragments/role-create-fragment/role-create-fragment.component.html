@@ -1,12 +1,9 @@
-<div class="mb-3">
-  <button
-    class="btn btn-primary rounded-pill px-4 fw-medium d-flex align-items-center gap-2"
-    (click)="openModal()"
-  >
+<div class="create-role-action">
+  <button class="create-role-trigger" (click)="openModal()">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
     </svg>
-    Nuevo Rol
+    Crear nuevo rol
   </button>
 </div>
 
@@ -167,7 +164,7 @@
           Cancelar
         </button>
         <button
-          class="btn btn-primary rounded-pill px-4 fw-medium"
+          class="btn btn-outline rounded-pill px-4 fw-medium"
           [disabled]="form.invalid || loading()"
           (click)="create()"
         >

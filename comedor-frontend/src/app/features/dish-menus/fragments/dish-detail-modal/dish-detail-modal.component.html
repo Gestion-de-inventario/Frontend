@@ -121,19 +121,28 @@
                 <div class="d-flex flex-column gap-2">
                   @for (supply of editSupplies; track $index) {
                     <div class="d-flex gap-2 align-items-center border rounded-3 p-2">
-                      <select
-                        class="form-select form-select-sm"
-                        [(ngModel)]="supply.productId"
-                        [ngModelOptions]="{ standalone: true }"
-                      >
-                        <option [ngValue]="null" disabled>Seleccione un insumo</option>
-
-                        @for (product of products; track product.id) {
-                          <option [value]="product.id">
-                            {{ product.name }} ({{ product.unit }})
-                          </option>
-                        }
-                      </select>
+                      @if (getSelectedProduct(supply.productId); as selectedProduct) {
+                        <div class="form-control form-control-sm d-flex align-items-center gap-2">
+                          <span class="flex-grow-1 text-truncate">{{
+                            productLabel(selectedProduct)
+                          }}</span>
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary py-0"
+                            (click)="clearEditSupplyProduct($index)"
+                          >
+                            Cambiar
+                          </button>
+                        </div>
+                      } @else {
+                        <app-search-select
+                          class="flex-grow-1"
+                          [items]="products"
+                          placeholder="Buscar insumo..."
+                          [displayFn]="productLabel"
+                          (selected)="selectEditSupplyProduct($index, $event)"
+                        />
+                      }
                       <input
                         type="number"
                         min="0.01"

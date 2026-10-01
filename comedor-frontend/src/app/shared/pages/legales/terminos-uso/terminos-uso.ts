@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-terminos-uso',
@@ -7,4 +7,10 @@ import { RouterLink } from '@angular/router';
   templateUrl: './terminos-uso.html',
   styleUrl: './terminos-uso.scss',
 })
-export class TerminosUso {}
+export class TerminosUso {
+  private readonly router = inject(Router);
+
+  goBack(): void {
+    this.router.navigate(['/legales']);
+  }
+}

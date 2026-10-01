@@ -1,3 +1,205 @@
+.role-modal {
+  overflow: hidden;
+  color: var(--color-text);
+  border: 0;
+  border-radius: 20px;
+}
+
+.role-modal__header {
+  padding: 1.2rem 1.5rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid rgba(45, 38, 146, 0.09);
+
+  .modal-title {
+    margin: 0.12rem 0 0;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+}
+
+.role-modal__eyebrow {
+  color: var(--color-primary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.role-modal__body {
+  padding: 1.5rem;
+  background: var(--color-background);
+}
+
+.role-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem;
+  background: var(--color-surface);
+  border: 1px solid rgba(45, 38, 146, 0.1);
+  border-radius: 16px;
+}
+
+.role-summary__icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(145deg, var(--color-primary), #6258d4);
+  border-radius: 15px;
+}
+.role-summary__icon svg {
+  width: 27px;
+  height: 27px;
+}
+.role-summary__label {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.role-summary__content h3 {
+  margin: 0.2rem 0 0.45rem;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.role-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.role-status > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.role-status--active {
+  color: #12663f;
+  background: #eafaf1;
+  border: 1px solid #bdebd0;
+}
+.role-status--active > span {
+  background: #22c55e;
+}
+.role-status--inactive {
+  color: #991b1b;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+}
+.role-status--inactive > span {
+  background: #ef4444;
+}
+.permission-total {
+  min-width: 110px;
+  padding: 0.8rem 1rem;
+  text-align: center;
+  background: rgba(45, 38, 146, 0.06);
+  border-radius: 13px;
+}
+.permission-total strong,
+.permission-total span {
+  display: block;
+}
+.permission-total strong {
+  color: var(--color-primary);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+.permission-total span {
+  margin-top: 0.3rem;
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+}
+
+.permissions-section {
+  margin-top: 1.4rem;
+}
+.permissions-section__heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+.permissions-section__heading h3 {
+  margin: 0.15rem 0 0;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+.permissions-section__heading > small {
+  max-width: 330px;
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  text-align: right;
+}
+.permission-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+.permission-group {
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid rgba(45, 38, 146, 0.1);
+  border-radius: 14px;
+}
+.permission-group header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  color: var(--color-text);
+  background: rgba(45, 38, 146, 0.045);
+  border-bottom: 1px solid rgba(45, 38, 146, 0.08);
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+.permission-group header strong {
+  min-width: 25px;
+  padding: 0.15rem 0.4rem;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-align: center;
+}
+.permission-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.85rem;
+}
+.permissions-empty {
+  padding: 1.2rem;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px dashed rgba(45, 38, 146, 0.2);
+  border-radius: 14px;
+  text-align: center;
+}
+.role-modal__footer {
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--color-surface);
+  border-top: 1px solid rgba(45, 38, 146, 0.09);
+}
+.role-modal__footer .btn {
+  min-height: 42px;
+  padding-inline: 1rem;
+  border-radius: 11px;
+  font-weight: 700;
+}
+
 .permission-item {
   min-width: 0;
   overflow: hidden;
@@ -40,6 +242,12 @@
 }
 
 .permission-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  font-size: 0.76rem;
   font-weight: 600;
   border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 
@@ -66,5 +274,94 @@
   &--5 {
     color: #6b3d00;
     background: #fff4dd;
+  }
+
+  svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .role-modal__header,
+  .role-modal__body,
+  .role-modal__footer {
+    padding: 1rem;
+  }
+  .role-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .permission-total {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .permission-total span {
+    margin: 0;
+  }
+  .permissions-section__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .permissions-section__heading > small {
+    text-align: left;
+  }
+  .permission-groups {
+    grid-template-columns: 1fr;
+  }
+  .role-modal__footer .btn {
+    width: 100%;
+  }
+}
+
+.btn-outline {
+  background: var(--color-background);
+
+  border: 1px solid var(--color-primary);
+
+  color: var(--color-primary-text);
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: var(--color-background);
+
+  color: var(--color-background);
+}
+
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  &:hover {
+    background: var(--color-primary);
+    color: var(--color-background);
+    border-color: var(--color-primary);
+  }
+}
+
+.btn-outline-success {
+  color: #12663f;
+  background: #eafaf1;
+  border: 1px solid #12663f;
+  &:hover {
+    background: #12663f;
+    color: #eafaf1;
+    border-color: #12663f;
+  }
+}
+
+.btn-outline-danger {
+  color: #991b1b;
+  background: #fff1f2;
+  border: 1px solid #991b1b;
+  &:hover {
+    background: #991b1b;
+    color: #fff1f2;
+    border-color: #991b1b;
   }
 }

@@ -91,23 +91,27 @@
                         <div>
                           <label class="form-label small text-muted mb-1 d-block">Producto</label>
 
-                          <select
-                            class="form-select"
-                            [(ngModel)]="supply.productId"
-                            [ngModelOptions]="{ standalone: true }"
-                            [class.is-invalid]="
-                              shouldShowSupplyError($index, 'product') && !supply.productId
-                            "
-                            (blur)="markSupplyTouched($index, 'product')"
-                          >
-                            <option [ngValue]="null" disabled>Seleccione un insumo</option>
-
-                            @for (product of products; track product.id) {
-                              <option [ngValue]="product.id">
-                                {{ product.name }} ({{ product.unit }})
-                              </option>
-                            }
-                          </select>
+                          @if (getSelectedProduct(supply.productId); as selectedProduct) {
+                            <div class="form-control d-flex align-items-center gap-2">
+                              <span class="flex-grow-1 text-truncate">{{
+                                productLabel(selectedProduct)
+                              }}</span>
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                (click)="clearSupplyProduct($index)"
+                              >
+                                Cambiar
+                              </button>
+                            </div>
+                          } @else {
+                            <app-search-select
+                              [items]="products"
+                              placeholder="Escribe para buscar un insumo..."
+                              [displayFn]="productLabel"
+                              (selected)="selectSupplyProduct($index, $event)"
+                            />
+                          }
 
                           @if (shouldShowSupplyError($index, 'product') && !supply.productId) {
                             <div class="invalid-feedback small fw-medium">

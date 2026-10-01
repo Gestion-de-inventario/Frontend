@@ -1,12 +1,12 @@
 <div class="modal fade" id="roleDetailModal" tabindex="-1">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content role-modal">
       @if (role(); as role) {
         <!-- ===================================== -->
         <!-- HEADER -->
         <!-- ===================================== -->
 
-        <div class="modal-header">
+        <div class="modal-header role-modal__header">
           <div class="d-flex align-items-center gap-2">
             <!-- BACK -->
 
@@ -14,19 +14,22 @@
               <button class="btn btn-sm btn-outline-secondary" (click)="goBack()">←</button>
             }
 
-            <h5 class="modal-title">
-              @if (mode === 'view') {
-                Detalle del rol
-              }
+            <div>
+              <span class="role-modal__eyebrow">Administración de acceso</span>
+              <h5 class="modal-title">
+                @if (mode === 'view') {
+                  Detalle del rol
+                }
 
-              @if (mode === 'edit') {
-                Editar rol
-              }
+                @if (mode === 'edit') {
+                  Editar rol
+                }
 
-              @if (mode === 'permissions') {
-                Gestionar permisos
-              }
-            </h5>
+                @if (mode === 'permissions') {
+                  Gestionar permisos
+                }
+              </h5>
+            </div>
           </div>
 
           <!-- CLOSE -->
@@ -43,64 +46,83 @@
         <!-- BODY -->
         <!-- ===================================== -->
 
-        <div class="modal-body">
+        <div class="modal-body role-modal__body">
           <!-- =============================== -->
           <!-- VIEW MODE -->
           <!-- =============================== -->
 
           @if (mode === 'view') {
-            <!-- NAME -->
-
-            <div class="mb-3">
-              <strong> Nombre: </strong>
-
-              <div>
-                {{ role.name }}
+            <section class="role-summary">
+              <div class="role-summary__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
               </div>
-            </div>
-
-            <!-- STATUS -->
-
-            <div class="mb-3">
-              <strong> Estado: </strong>
-
-              <div>
-                <span class="badge" [class]="role.status === 'ACTIVO' ? 'bg-success' : 'bg-danger'">
-                  {{ role.status }}
+              <div class="role-summary__content">
+                <span class="role-summary__label">Nombre del rol</span>
+                <h3>{{ role.name }}</h3>
+                <span
+                  class="role-status"
+                  [class.role-status--active]="role.status === 'ACTIVO'"
+                  [class.role-status--inactive]="role.status !== 'ACTIVO'"
+                >
+                  <span></span>{{ role.status }}
                 </span>
               </div>
-            </div>
-
-            <!-- PERMISSIONS -->
-
-            <div>
-              <strong>Permisos:</strong>
-
-              <div class="mt-2">
-                @for (
-                  group of getPermissionGroups(role.permissions);
-                  track group.module;
-                  let i = $index
-                ) {
-                  <div class="mb-3">
-                    <div class="fw-semibold mb-1">
-                      {{ group.module }}
-                    </div>
-
-                    <div class="d-flex flex-wrap gap-2">
-                      @for (permission of group.permissions; track permission) {
-                        <span
-                          class="badge permission-badge"
-                          [class]="'permission-badge--' + getPermissionColor(i)"
-                        >
-                          {{ getPermissionActionLabel(permission) }}
-                        </span>
-                      }
-                    </div>
-                  </div>
-                }
+              <div class="permission-total">
+                <strong>{{ role.permissions.length }}</strong>
+                <span>permisos asignados</span>
               </div>
-            </div>
+            </section>
+
+            <section class="permissions-section">
+              <div class="permissions-section__heading">
+                <div>
+                  <span class="role-summary__label">Accesos habilitados</span>
+                  <h3>Permisos por módulo</h3>
+                </div>
+                <small>Cada permiso determina las acciones disponibles para este rol.</small>
+              </div>
+
+              @if (role.permissions.length === 0) {
+                <div class="permissions-empty">Este rol todavía no tiene permisos asignados.</div>
+              } @else {
+                <div class="permission-groups">
+                  @for (
+                    group of getPermissionGroups(role.permissions);
+                    track group.module;
+                    let i = $index
+                  ) {
+                    <article class="permission-group">
+                      <header>
+                        <span>{{ group.module }}</span>
+                        <strong>{{ group.permissions.length }}</strong>
+                      </header>
+
+                      <div class="permission-list">
+                        @for (permission of group.permissions; track permission) {
+                          <span
+                            class="permission-badge"
+                            [class]="'permission-badge--' + getPermissionColor(i)"
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                            >
+                              <path d="m5 12 4 4L19 6" />
+                            </svg>
+                            {{ getPermissionActionLabel(permission) }}
+                          </span>
+                        }
+                      </div>
+                    </article>
+                  }
+                </div>
+              }
+            </section>
           }
 
           <!-- =============================== -->
@@ -227,17 +249,17 @@
         <!-- FOOTER -->
         <!-- ===================================== -->
 
-        <div class="modal-footer">
+        <div class="modal-footer role-modal__footer">
           <!-- VIEW MODE -->
 
           @if (mode === 'view' && authState.hasPermission('ROLE_EDIT')) {
-            <button class="btn btn-primary" (click)="openEdit()">Editar</button>
+            <button class="btn btn-outline-primary" (click)="openEdit()">Editar</button>
           }
 
           @if (mode === 'view' && authState.hasPermission('ROLE_CHANGE_STATUS')) {
             @if (role.status === 'ACTIVO') {
               <button
-                class="btn btn-warning"
+                class="btn btn-outline-danger"
                 [disabled]="loading()"
                 (click)="changeStatus('DESACTIVAR')"
               >
@@ -249,7 +271,7 @@
               </button>
             } @else {
               <button
-                class="btn btn-success"
+                class="btn btn-outline-success"
                 [disabled]="loading()"
                 (click)="changeStatus('ACTIVAR')"
               >
@@ -263,7 +285,7 @@
           }
 
           @if (mode === 'view' && authState.hasPermission('ROLE_ASSIGN_PERMISSIONS')) {
-            <button class="btn btn-primary" (click)="openAssignPermissions()">
+            <button class="btn btn-outline-primary" (click)="openAssignPermissions()">
               Gestionar permisos
             </button>
           }
@@ -289,7 +311,7 @@
           <!-- PERMISSIONS MODE -->
           @if (mode === 'permissions') {
             <button
-              class="btn btn-success d-flex align-items-center gap-2"
+              class="btn btn-outline-success d-flex align-items-center gap-2"
               [disabled]="loading()"
               (click)="savePermissions()"
             >

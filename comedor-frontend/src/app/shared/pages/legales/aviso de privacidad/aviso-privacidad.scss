@@ -287,3 +287,52 @@
     font-size: 0.84rem;
   }
 }
+
+.privacy-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(45, 38, 146, 0.18);
+  border-radius: 12px;
+
+  color: #2d2692;
+  background: var(--color-surface);
+
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.privacy-back:hover {
+  background: rgba(45, 38, 146, 0.07);
+  border-color: rgba(45, 38, 146, 0.35);
+}
+
+.privacy-back:active {
+  transform: translateX(-2px);
+}
+
+.privacy-back:focus-visible {
+  outline: 3px solid #5146d8;
+  outline-offset: 3px;
+}
+
+.privacy-back svg {
+  flex-shrink: 0;
+  transition: transform 180ms ease;
+}
+
+.privacy-back:hover svg {
+  transform: translateX(-3px);
+}
