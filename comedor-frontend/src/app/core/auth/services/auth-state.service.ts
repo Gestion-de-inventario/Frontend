@@ -9,6 +9,7 @@ import { TokenService } from './token.service';
 import { AuthRequest } from '../interfaces/auth-request.interface';
 
 import { AuthResponse } from '../interfaces/auth-response.interface';
+import { ProfileStateService } from '@features/profile/services/profile-state.service.js';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,8 @@ export class AuthStateService {
   private readonly authApi = inject(AuthService);
 
   private readonly tokenService = inject(TokenService);
+
+  private readonly profileService = inject(ProfileStateService);
 
   private readonly _session = signal<AuthResponse | null>(null);
 
@@ -47,6 +50,7 @@ export class AuthStateService {
       tap(() => {
         this.tokenService.removeToken();
         this._session.set(null);
+        this.profileService.clear();
       }),
       map(() => void 0),
     );
@@ -101,6 +105,4 @@ export class AuthStateService {
     const current = this._session();
     if (current) this._session.set({ ...current, ...partial });
   }
-
-  
 }

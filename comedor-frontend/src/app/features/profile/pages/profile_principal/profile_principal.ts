@@ -15,6 +15,7 @@ import { EditProfileRequest } from '@features/profile/interfaces/edit-profile.re
 import { ChangePasswordRequest } from '@features/profile/interfaces/change-password.request';
 import { EmpresaConfigService } from '@features/profile/services/empresa-config.service';
 import { finalize } from 'rxjs';
+import { ProfileService } from '@features/profile/services/profile-api.service';
 
 declare const bootstrap: any;
 
@@ -36,6 +37,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 export class ProfilePrincipal implements OnInit {
   readonly authState = inject(AuthStateService);
   private readonly userService = inject(UserService);
+  private readonly profileService = inject(ProfileService);
   private readonly toastService = inject(ToastService);
   private readonly empresaConfigService = inject(EmpresaConfigService); // Inyectamos el servicio
 
@@ -49,6 +51,8 @@ export class ProfilePrincipal implements OnInit {
   logoPreview = signal<string | null>(null);
   selectedLogoFile = signal<File | null>(null);
   logoReading = signal(false);
+
+  phone = signal<string | null>(null);
 
   readonly editForm = new FormGroup({
     name: new FormControl('', {
@@ -78,6 +82,15 @@ export class ProfilePrincipal implements OnInit {
         Validators.pattern(/^[0-9]+$/),
       ],
     }),
+    phone: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(9),
+        Validators.maxLength(9),
+        Validators.pattern(/^9[0-9]+$/),
+      ],
+    }),
   });
 
   readonly passwordForm = new FormGroup(
@@ -105,6 +118,11 @@ export class ProfilePrincipal implements OnInit {
 
   ngOnInit(): void {
     this.loadEmpresaConfig();
+    this.profileService.getPhone().subscribe({
+      next: (phone) => {
+        this.phone.set(phone);
+      },
+    });
   }
 
   openEditModal(): void {
@@ -113,6 +131,7 @@ export class ProfilePrincipal implements OnInit {
       name: session?.name ?? '',
       lastname: session?.lastname ?? '',
       dni: session?.dni ?? '',
+      phone: this.phone() ?? '',
     });
     const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
     modal.show();
@@ -132,6 +151,7 @@ export class ProfilePrincipal implements OnInit {
       name: raw.name || undefined,
       lastname: raw.lastname || undefined,
       dni: raw.dni || undefined,
+      phone: raw.phone || undefined,
     };
 
     this.userService.editMyProfile(request).subscribe({
@@ -149,6 +169,21 @@ export class ProfilePrincipal implements OnInit {
       },
       complete: () => {
         this.loadingEdit.set(false);
+        this.reloadData();
+      },
+    });
+  }
+
+  reloadData() {
+    this.profileService.updatePhone().subscribe({
+      next: (phone) => {
+        this.phone.set(phone);
+      },
+    });
+
+    this.authState.refreshSession().subscribe({
+      next: () => {
+        this.toastService.show('Datos actualizados correctamente', 'success');
       },
     });
   }
@@ -299,6 +334,21 @@ export class ProfilePrincipal implements OnInit {
     const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
     if (cleaned !== input.value) {
       this.editForm.controls[controlName].setValue(cleaned, { emitEvent: false });
+    }
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    let cleaned = input.value.replace(/[^0-9]/g, '').slice(0, 9);
+
+    if (cleaned && cleaned[0] !== '9') {
+      cleaned = cleaned.slice(1);
+    }
+
+    if (cleaned !== input.value) {
+      input.value = cleaned;
+      this.editForm.controls.phone.setValue(cleaned, { emitEvent: false });
     }
   }
 }

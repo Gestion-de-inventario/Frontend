@@ -4,6 +4,7 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
     ME: '/auth/me',
+    PHONE: 'auth/phone',
   },
 
   BENEFICIARY: {

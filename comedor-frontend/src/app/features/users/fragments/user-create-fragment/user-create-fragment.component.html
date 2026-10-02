@@ -160,7 +160,7 @@
             }
           </div>
 
-          <div class="col-12 mt-2">
+          <div class="col-12 col-md-6 mt-2">
             <label class="form-label fw-bold text-muted small text-uppercase mb-1"
               >Rol asignado <span class="text-danger">*</span></label
             >
@@ -180,6 +180,28 @@
             </small>
             @if (form.controls.role_id.touched && form.controls.role_id.invalid) {
               <div class="invalid-feedback small fw-medium">Debe seleccionar un rol</div>
+            }
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-semibold text-dark small">Teléfono</label>
+            <input
+              type="text"
+              inputmode="numeric"
+              class="form-control"
+              formControlName="phone"
+              maxlength="9"
+              (input)="onPhoneInput($event)"
+              [class.is-invalid]="form.controls.phone.touched && form.controls.phone.invalid"
+            />
+            @if (form.controls.phone.touched && form.controls.phone.hasError('required')) {
+              <small class="text-danger"> Este campo es obligatorio </small>
+            }
+
+            @if (form.controls.phone.touched && form.controls.phone.hasError('pattern')) {
+              <small class="text-danger"> El teléfono debe comenzar con 9 </small>
+            }
+            @if (form.controls.phone.touched && form.controls.phone.invalid) {
+              <small class="text-danger">El Teléfono debe tener 9 dígitos</small>
             }
           </div>
         </form>
