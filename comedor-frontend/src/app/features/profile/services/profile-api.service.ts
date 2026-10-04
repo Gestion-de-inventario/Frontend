@@ -24,7 +24,7 @@ export class ProfileService {
     }
 
     return this.http
-      .get<string>(`${this.apiUrl}/${API_ENDPOINTS.AUTH.PHONE}`, {
+      .get<string>(`${this.apiUrl}${API_ENDPOINTS.AUTH.PHONE}`, {
         withCredentials: true,
       })
       .pipe(
@@ -36,7 +36,7 @@ export class ProfileService {
 
   updatePhone(): Observable<string> {
     return this.http
-      .get<string>(`${this.apiUrl}/${API_ENDPOINTS.AUTH.PHONE}`, {
+      .get<string>(`${this.apiUrl}${API_ENDPOINTS.AUTH.PHONE}`, {
         withCredentials: true,
       })
       .pipe(
