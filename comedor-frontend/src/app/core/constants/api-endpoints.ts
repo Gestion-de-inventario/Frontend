@@ -4,6 +4,10 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
     ME: '/auth/me',
+    PHONE: '/auth/phone',
+    FORGOT_PASSWORD_REQUEST: '/auth/forgot-password',
+    VALIDATE_RESET_TOKEN: '/auth/password-reset/validate',
+    RESET_PASSWORD_CONFIRM: '/auth/password-reset/confirm',
   },
 
   BENEFICIARY: {

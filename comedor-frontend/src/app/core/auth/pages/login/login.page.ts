@@ -43,12 +43,6 @@ export class LoginPage {
     this.showPassword.update((value) => !value);
   }
 
-  clearForm(): void {
-    this.form.reset();
-    this.loginError.set(null);
-    this.usernameInput?.nativeElement.focus();
-  }
-
   login(): void {
     this.loginError.set(null);
 
@@ -89,5 +83,9 @@ export class LoginPage {
     if (this.form.controls.password.invalid) {
       this.passwordInput?.nativeElement.focus();
     }
+  }
+
+  goToForgotPassword(): void {
+    this.router.navigate(['/forgot-password']);
   }
 }

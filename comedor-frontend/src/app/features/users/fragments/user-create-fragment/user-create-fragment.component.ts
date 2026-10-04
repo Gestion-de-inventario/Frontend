@@ -83,6 +83,16 @@ export class UserCreateFragmentComponent {
     role_id: new FormControl<number | null>(null, {
       validators: [Validators.required],
     }),
+
+    phone: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(9),
+        Validators.maxLength(9),
+        Validators.pattern(/^9[0-9]+$/),
+      ],
+    }),
   });
 
   constructor() {
@@ -122,6 +132,7 @@ export class UserCreateFragmentComponent {
           dni: '',
           password: '',
           role_id: null,
+          phone: '',
         });
 
         bootstrap.Modal.getInstance(document.getElementById('createUserModal')!)?.hide();
@@ -150,6 +161,21 @@ export class UserCreateFragmentComponent {
     const cleaned = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
     if (cleaned !== input.value) {
       this.form.controls[controlName].setValue(cleaned, { emitEvent: false });
+    }
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    let cleaned = input.value.replace(/[^0-9]/g, '').slice(0, 9);
+
+    if (cleaned && cleaned[0] !== '9') {
+      cleaned = cleaned.slice(1);
+    }
+
+    if (cleaned !== input.value) {
+      input.value = cleaned;
+      this.form.controls.phone.setValue(cleaned, { emitEvent: false });
     }
   }
 }

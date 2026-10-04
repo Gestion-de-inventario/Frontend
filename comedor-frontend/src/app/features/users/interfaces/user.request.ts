@@ -3,4 +3,5 @@ export interface UserRequest {
   lastname: string;
   dni: string;
   role_id: number | null;
+  phone: string;
 }

@@ -11,6 +11,22 @@ export const routes: Routes = [
     loadComponent: () => import('@core/auth/pages/login/login.page').then((m) => m.LoginPage),
   },
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./core/auth/pages/forgot-password/forgot-password.page').then(
+        (m) => m.ForgotPasswordPage,
+      ),
+    canActivate: [guestGuard],
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./core/auth/pages/reset-password/reset-password.page').then(
+        (m) => m.ResetPasswordPage,
+      ),
+    canActivate: [guestGuard],
+  },
+  {
     path: '',
     component: AppShellPage,
     canActivate: [appReadyGuard, authGuard],

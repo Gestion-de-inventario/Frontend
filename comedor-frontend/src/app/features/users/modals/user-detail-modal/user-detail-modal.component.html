@@ -88,7 +88,7 @@
             <div class="d-flex justify-content-between align-items-start mb-4 pb-3 border-bottom">
               <div>
                 <h3 class="fw-bold text-dark mb-1">{{ user.name }} {{ user.lastname }}</h3>
-                <span class="text-muted small">@{{ user.dni }} · {{ user.role }}</span>
+                <span class="text-muted small">dni: {{ user.dni }} · {{ user.role }}</span>
               </div>
               <span
                 class="chip"
@@ -101,23 +101,23 @@
             </div>
 
             <div class="row g-4">
-              <div class="col-6 col-md-3">
-                <small class="text-muted d-block mb-1">Username</small>
-                <span class="fs-6 fw-bold text-dark">{{ user.dni }}</span>
-              </div>
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-6">
                 <small class="text-muted d-block mb-1">DNI</small>
                 <span class="fs-6 fw-bold text-dark">{{ user.dni }}</span>
               </div>
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-6">
                 <small class="text-muted d-block mb-1">Nombre</small>
                 <span class="fs-6 fw-bold text-dark">{{ user.name }}</span>
               </div>
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-6">
                 <small class="text-muted d-block mb-1">Apellido</small>
                 <span class="fs-6 fw-bold text-dark">{{ user.lastname }}</span>
               </div>
-              <div class="col-6 col-md-3">
+              <div class="col-6 col-md-6">
+                <small class="text-muted d-block mb-1">Teléfono</small>
+                <span class="fs-6 fw-bold text-dark">{{ user.phone }}</span>
+              </div>
+              <div class="col-6 col-md-6">
                 <small class="text-muted d-block mb-1">Rol</small>
                 <span
                   class="badge bg-primary bg-opacity-10 text-primary border fw-normal px-2 py-1"
@@ -171,7 +171,7 @@
                   <small class="text-danger">Este campo es obligatorio</small>
                 }
               </div>
-              <div class="col-12">
+              <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold text-dark small">Rol</label>
                 <select class="form-select custom-input" formControlName="role_id">
                   <option [value]="0" disabled>Seleccione un rol</option>
@@ -179,6 +179,29 @@
                     <option [value]="role.role_id">{{ role.name }}</option>
                   }
                 </select>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold text-dark small">Teléfono</label>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  class="form-control"
+                  formControlName="phone"
+                  maxlength="9"
+                  (input)="onPhoneInput($event)"
+                  [class.is-invalid]="form.controls.phone.touched && form.controls.phone.invalid"
+                />
+                @if (form.controls.phone.touched && form.controls.phone.hasError('required')) {
+                  <small class="text-danger"> Este campo es obligatorio </small>
+                }
+
+                @if (form.controls.phone.touched && form.controls.phone.hasError('pattern')) {
+                  <small class="text-danger"> El teléfono debe comenzar con 9 </small>
+                }
+                @if (form.controls.phone.touched && form.controls.phone.invalid) {
+                  <small class="text-danger">El Teléfono debe tener 9 dígitos</small>
+                }
               </div>
             </form>
           } @else if (mode === 'change-password') {

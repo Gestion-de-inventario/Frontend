@@ -178,21 +178,13 @@
                     Ingresar al Sistema
                   }
                 </app-button>
-                <button
-                  type="button"
-                  class="btn btn-link btn-sm"
-                  (click)="clearForm()"
-                  [disabled]="isLoading()"
-                >
-                  Limpiar campos
-                </button>
               </div>
             </form>
-            <div class="text-center mt-4">
-              <p class="small text-muted mb-0">
-                ¿Tienes problemas para ingresar? Comunícate con el administrador del comedor para
-                recuperar o actualizar tus credenciales.
-              </p>
+            <div class="text-center mt-2">
+              <p class="small text-muted mb-0">¿Tienes problemas para ingresar?</p>
+              <button type="button" class="btn btn-link btn-sm" (click)="goToForgotPassword()">
+                Recuperar contraseña
+              </button>
             </div>
           </div>
         </div>

@@ -6,4 +6,5 @@ export interface UserResponse {
   name: string;
   lastname: string;
   dni: string;
+  phone: string;
 }
