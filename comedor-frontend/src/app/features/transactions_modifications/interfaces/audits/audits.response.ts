@@ -16,4 +16,5 @@ export interface AuditsResponse {
 export enum AuditAction {
   CREACION = 'CREACION',
   MODIFICACION = 'MODIFICACION',
+  EXPORTACION = 'EXPORTACION',
 }

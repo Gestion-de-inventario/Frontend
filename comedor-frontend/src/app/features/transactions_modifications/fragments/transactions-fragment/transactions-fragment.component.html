@@ -145,7 +145,7 @@
               [class.is-invalid]="isCustomDateRangeInvalid()"
               [ngModel]="customEndDate()"
               (ngModelChange)="customEndDate.set($event); onCustomDateChange()"
-              [min]="minDate()"
+              [min]="customStartDate() || minDate()"
               [max]="maxDate()"
             />
           </div>
