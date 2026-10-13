@@ -49,8 +49,14 @@
               <path d="m9 12 2 2 4-4" />
             </svg>
           </span>
+
           <div>
-            <small>Teléfono</small><strong>{{ phone() }}</strong>
+            <small>Teléfono</small>
+            @if (phone()) {
+              <strong>{{ maskPhone(phone()) }}</strong>
+            } @else {
+              <strong>Sin número de teléfono</strong>
+            }
           </div>
         </div>
         <div class="detail-item">
