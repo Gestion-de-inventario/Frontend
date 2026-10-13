@@ -14,7 +14,7 @@ import { MenuReportStateService } from '@features/menu-report/services/menu-repo
 import { ToastService } from '@shared/services/toast.service';
 import { EditMenuReportRequest } from '@features/menu-report/interfaces/menu-report.request';
 import { SearchSelectComponent } from '@shared/components/search-select/search-select';
-import { UserResponse } from '@features/users/interfaces/user.response';
+import { UserMinimalResponse } from '@features/users/interfaces/user.minimal.response';
 import { forkJoin } from 'rxjs';
 import { UserService } from '@features/users/services/user-api.service';
 
@@ -70,8 +70,8 @@ export class ListMenuReportFragmentComponent {
   endDate = signal('');
 
   dishMenus = signal<DishMenuResponse[]>([]);
-  allCooks = signal<UserResponse[]>([]);
-  selectedCooks = signal<UserResponse[]>([]);
+  allCooks = signal<UserMinimalResponse[]>([]);
+  selectedCooks = signal<UserMinimalResponse[]>([]);
 
   private loadEditData(report: MenuReportResponse): void {
     this.informationLoading.set(true);
@@ -344,7 +344,7 @@ export class ListMenuReportFragmentComponent {
     this.router.navigate(['/beneficiaries-control', 'manage', report.id]);
   }
 
-  getReportCooks(report: MenuReportResponse): UserResponse[] {
+  getReportCooks(report: MenuReportResponse): UserMinimalResponse[] {
     const cookIds = new Set(report.cooks ?? []);
 
     return this.allCooks().filter((cook) => cookIds.has(cook.user_id));

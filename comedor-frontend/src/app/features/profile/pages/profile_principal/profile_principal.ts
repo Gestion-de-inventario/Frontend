@@ -351,4 +351,17 @@ export class ProfilePrincipal implements OnInit {
       this.editForm.controls.phone.setValue(cleaned, { emitEvent: false });
     }
   }
+
+  maskPhone(phone: string | number | null | undefined): string {
+    if (phone === null || phone === undefined) return '';
+
+    const cleaned = String(phone).trim();
+    if (!cleaned) return '';
+    if (cleaned.length < 4) return '*****';
+
+    const firstDigit = cleaned.slice(0, 1);
+    const lastThreeDigits = cleaned.slice(-3);
+
+    return `${firstDigit}*****${lastThreeDigits}`;
+  }
 }

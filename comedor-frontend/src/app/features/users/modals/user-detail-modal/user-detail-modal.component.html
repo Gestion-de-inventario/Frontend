@@ -115,7 +115,11 @@
               </div>
               <div class="col-6 col-md-6">
                 <small class="text-muted d-block mb-1">Teléfono</small>
-                <span class="fs-6 fw-bold text-dark">{{ user.phone }}</span>
+                @if (user.phone) {
+                  <span class="fs-6 fw-bold text-dark">{{ user.phone }}</span>
+                } @else {
+                  <span class="fs-6 fw-bold text-dark">Sin número de teléfono</span>
+                }
               </div>
               <div class="col-6 col-md-6">
                 <small class="text-muted d-block mb-1">Rol</small>
