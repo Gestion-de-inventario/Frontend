@@ -4,7 +4,7 @@
   [class.chat-trigger--hidden]="triggerHidden()"
   [attr.aria-expanded]="open()"
   aria-controls="mira-chat-panel"
-  aria-label="Abrir asistente de menú"
+  aria-label="Abrir asistente MIRA"
   title="Abrir asistente MIRA"
   (click)="toggle()"
 >
@@ -29,21 +29,31 @@
         <div class="assistant-brand__copy">
           <div class="assistant-brand__title-row">
             <h2 id="mira-chat-title">MIRA</h2>
-            <span class="ai-label">IA</span>
           </div>
           <p><span class="status-dot" aria-hidden="true"></span> Asistente del comedor</p>
         </div>
       </div>
 
-      <button type="button" class="icon-button" aria-label="Cerrar asistente" (click)="close()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
-      </button>
+      <div class="chat-panel__actions">
+        @if (!isFresh()) {
+          <button
+            type="button"
+            class="icon-button"
+            aria-label="Empezar una conversación nueva"
+            title="Empezar de nuevo"
+            (click)="newConversation()"
+          >
+            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+          </button>
+        }
+        <button type="button" class="icon-button" aria-label="Cerrar asistente" (click)="close()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
     </header>
 
-    <div #messageList class="message-list" aria-live="polite" aria-busy="sending()">
-      <div class="conversation-date"><span>Asistente de planificación</span></div>
-
-      @for (message of messages(); track $index) {
+    <div #messageList class="message-list" aria-live="polite" [attr.aria-busy]="sending()">
+      @for (message of messages(); track $index; let index = $index) {
         <div class="message-row" [class.message-row--user]="message.role === 'user'">
           @if (message.role === 'assistant') {
             <span class="message-avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
@@ -51,14 +61,45 @@
 
           <div class="message-content">
             <span class="message-author">{{ message.role === 'assistant' ? 'MIRA' : 'Tú' }}</span>
-            <article class="message-bubble">
-              <p>{{ message.content }}</p>
+            <article class="message-bubble" [class.message-bubble--error]="message.retry">
+              <p [innerHTML]="message.html"></p>
+
+              @if (message.table?.rows?.length) {
+                <div class="data-table" role="region" aria-label="Datos de la respuesta" tabindex="0">
+                  <table>
+                    <thead>
+                      <tr>
+                        @for (column of message.table!.columns; track $index) {
+                          <th scope="col">{{ column }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (row of message.table!.rows; track $index) {
+                        <tr>
+                          @for (cell of row; track $index) {
+                            <td
+                              [class.cell--bad]="cell === 'Agotado' || cell === 'Bajo' || cell === 'Pendiente'"
+                              [class.cell--good]="cell === 'Bien' || cell === 'Recibido'"
+                            >
+                              {{ cell }}
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                  @if (message.table!.footer) {
+                    <small class="data-table__footer">{{ message.table!.footer }}</small>
+                  }
+                </div>
+              }
 
               @if (message.suggestions?.length) {
                 <section class="suggestions" aria-label="Platos evaluados">
                   <div class="suggestions__heading">
                     <i class="bi bi-clipboard2-check" aria-hidden="true"></i>
-                    <span>Opciones analizadas</span>
+                    <span>Platos analizados</span>
                   </div>
 
                   @for (suggestion of message.suggestions; track suggestion.dishId) {
@@ -72,90 +113,86 @@
                       </span>
                       <div class="suggestion__body">
                         <strong>{{ suggestion.dishName }}</strong>
-                        <span>Capacidad: {{ suggestion.possiblePortions }} porciones</span>
+                        <span>Alcanza para {{ suggestion.possiblePortions }} porciones</span>
                         @if (!suggestion.enoughStock && suggestion.missingSupplies.length) {
-                          <small>{{ suggestion.missingSupplies.join(' · ') }}</small>
+                          <small>Falta: {{ suggestion.missingSupplies.join(' · ') }}</small>
                         }
                       </div>
                       <span class="suggestion__badge">
-                        {{ suggestion.enoughStock ? 'Disponible' : 'Faltantes' }}
+                        {{ suggestion.enoughStock ? 'Alcanza' : 'No alcanza' }}
                       </span>
                     </div>
                   }
                 </section>
               }
 
-              @if (message.source || message.disclaimer) {
+              @if (message.retry) {
+                <button type="button" class="retry-button" (click)="retry(message.retry)" [disabled]="sending()">
+                  <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Reintentar
+                </button>
+              }
+
+              @if (message.sources?.length || message.source === 'GEMINI' || message.disclaimer) {
                 <footer class="message-meta">
-                  @if (message.source) {
-                    <span class="source-badge">
-                      <i
-                        class="bi"
-                        [class.bi-stars]="message.source === 'GEMINI'"
-                        [class.bi-calculator]="message.source === 'LOCAL'"
-                        aria-hidden="true"
-                      ></i>
-                      {{ message.source === 'GEMINI' ? 'Generado con IA' : 'Datos del sistema' }}
-                    </span>
-                  }
+                  <div class="message-meta__chips">
+                    @for (source of message.sources; track source) {
+                      <span class="source-badge">
+                        <i class="bi bi-database-check" aria-hidden="true"></i> {{ source }}
+                      </span>
+                    }
+                    @if (message.source === 'GEMINI') {
+                      <span class="source-badge source-badge--ai">
+                        <i class="bi bi-stars" aria-hidden="true"></i> Redactado con IA
+                      </span>
+                    }
+                  </div>
                   @if (message.disclaimer) {
                     <small class="disclaimer">{{ message.disclaimer }}</small>
                   }
                 </footer>
               }
             </article>
+
+            @if (index === lastAssistantIndex() && message.quickReplies?.length && !sending()) {
+              <div class="quick-replies" aria-label="Respuestas sugeridas">
+                @for (reply of message.quickReplies; track reply.message) {
+                  <button type="button" class="quick-reply" (click)="usePrompt(reply.message)">
+                    {{ reply.label }}
+                  </button>
+                }
+              </div>
+            }
           </div>
         </div>
       }
 
-      @if (messages().length === 1) {
-        <section class="quick-prompts" aria-label="Preguntas sugeridas">
-          <p>Prueba con una consulta rápida</p>
+      @if (isFresh()) {
+        <section class="quick-prompts" aria-label="Preguntas frecuentes">
+          <p>Toca una pregunta o escribe la tuya</p>
           <div class="quick-prompts__grid">
-            <button type="button" (click)="usePrompt('¿Qué plato podemos preparar hoy?')">
+            <button type="button" (click)="usePrompt('¿Qué plato puedo preparar hoy?')">
               <span aria-hidden="true"><i class="bi bi-egg-fried"></i></span>
-              <span><strong>Elegir un plato</strong><small>Según el stock disponible</small></span>
+              <span><strong>¿Qué cocino hoy?</strong><small>Según lo que hay en el almacén</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
-            <button type="button" (click)="usePrompt('Muéstrame el inventario disponible')">
-              <span aria-hidden="true"><i class="bi bi-box-seam"></i></span>
-              <span><strong>Consultar stock</strong><small>Productos registrados</small></span>
-              <i class="bi bi-chevron-right" aria-hidden="true"></i>
-            </button>
-            <button type="button" (click)="usePrompt('¿Cuáles son los productos con stock bajo?')">
+            <button type="button" (click)="usePrompt('¿Qué productos se están acabando?')">
               <span aria-hidden="true"><i class="bi bi-basket2"></i></span>
-              <span
-                ><strong>Revisar stock bajo</strong><small>Según el límite configurado</small></span
-              >
+              <span><strong>¿Qué se está acabando?</strong><small>Lo que conviene comprar</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
-            <button
-              type="button"
-              (click)="usePrompt('¿Cuántos recojos de menú hay registrados hoy?')"
-            >
-              <span aria-hidden="true"><i class="bi bi-check2-square"></i></span>
-              <span><strong>Contar recojos</strong><small>Registros y menús de hoy</small></span>
+            <button type="button" (click)="usePrompt('Ver todo el inventario')">
+              <span aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+              <span><strong>Ver el inventario</strong><small>Todos los productos y su stock</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
-            <button
-              type="button"
-              (click)="usePrompt('¿Qué beneficiarios tienen recojo registrado hoy?')"
-            >
+            <button type="button" (click)="usePrompt('¿Cuántos recogieron hoy?')">
               <span aria-hidden="true"><i class="bi bi-people"></i></span>
-              <span><strong>Ver beneficiarios</strong><small>Con recojo registrado</small></span>
+              <span><strong>Recojos de hoy</strong><small>Cuántos y quiénes recogieron</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
-            <button
-              type="button"
-              (click)="usePrompt('¿Qué funcionalidades del sistema puedo usar?')"
-            >
-              <span aria-hidden="true"><i class="bi bi-grid"></i></span>
-              <span><strong>Conocer funciones</strong><small>Según mis permisos</small></span>
-              <i class="bi bi-chevron-right" aria-hidden="true"></i>
-            </button>
-            <button type="button" (click)="usePrompt('¿Cómo registro un recojo de menú?')">
+            <button type="button" (click)="usePrompt('¿Cómo registro un recojo?')">
               <span aria-hidden="true"><i class="bi bi-signpost-split"></i></span>
-              <span><strong>Ver procedimiento</strong><small>Pasos dentro del sistema</small></span>
+              <span><strong>¿Cómo se hace?</strong><small>Pasos para usar el sistema</small></span>
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
           </div>
@@ -165,26 +202,51 @@
       @if (sending()) {
         <div class="message-row">
           <span class="message-avatar" aria-hidden="true"><i class="bi bi-stars"></i></span>
-          <div class="typing" aria-label="MIRA está analizando el inventario">
+          <div class="typing" aria-label="MIRA está buscando la información">
             <span></span><span></span><span></span>
-            <small>Analizando inventario</small>
+            <small>Buscando la información…</small>
           </div>
         </div>
       }
     </div>
 
     <form class="composer" (ngSubmit)="send()">
-      <div class="composer__box">
+      @if (speech.listening()) {
+        <div class="voice-banner" role="status">
+          <span class="voice-banner__pulse" aria-hidden="true"></span>
+          Te escucho… habla con calma. Toca el micrófono para terminar.
+        </div>
+      } @else if (voiceNotice()) {
+        <div class="voice-banner voice-banner--notice" role="alert">
+          <i class="bi bi-mic-mute" aria-hidden="true"></i> {{ voiceNotice() }}
+        </div>
+      }
+      <div class="composer__box" [class.composer__box--listening]="speech.listening()">
         <label class="visually-hidden" for="mira-message">Escribe tu pregunta</label>
         <textarea
+          #composerInput
           id="mira-message"
           name="message"
           rows="1"
           maxlength="1000"
-          placeholder="Consulta stock, recojos o cómo usar el sistema..."
+          [placeholder]="speech.supported ? 'Escribe aquí o toca el 🎤' : 'Escribe tu pregunta…'"
           [(ngModel)]="draft"
           (keydown)="onComposerKeydown($event)"
         ></textarea>
+        @if (speech.supported) {
+          <button
+            type="button"
+            class="mic-button"
+            [class.mic-button--active]="speech.listening()"
+            [attr.aria-pressed]="speech.listening()"
+            [attr.aria-label]="speech.listening() ? 'Dejar de escuchar' : 'Hablar en vez de escribir'"
+            [title]="speech.listening() ? 'Dejar de escuchar' : 'Hablar'"
+            [disabled]="sending()"
+            (click)="toggleVoice()"
+          >
+            <i class="bi" [class.bi-mic-fill]="!speech.listening()" [class.bi-stop-fill]="speech.listening()" aria-hidden="true"></i>
+          </button>
+        }
         <button
           type="submit"
           class="send-button"
@@ -194,9 +256,7 @@
           <i class="bi bi-arrow-up" aria-hidden="true"></i>
         </button>
       </div>
-      <small class="composer__hint"
-        >MIRA consulta datos en modo lectura; confirma las operaciones en cada módulo.</small
-      >
+      <small class="composer__hint">MIRA solo consulta información; no cambia ningún dato del sistema.</small>
     </form>
   </section>
 }
