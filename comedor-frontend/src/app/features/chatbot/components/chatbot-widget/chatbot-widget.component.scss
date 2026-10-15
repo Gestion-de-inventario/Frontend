@@ -266,6 +266,13 @@ app-chatbot-widget {
     color: #ffd05a;
     font-size: 0.72rem;
     box-shadow: 0 3px 8px rgb(45 38 146 / 20%);
+    /* a la altura de la burbuja, aunque debajo haya botones de respuesta */
+    align-self: flex-start;
+    margin-top: 1.05rem;
+  }
+  .message-row:has(.typing) .message-avatar {
+    align-self: center;
+    margin-top: 0;
   }
   .message-content {
     display: flex;
@@ -301,8 +308,16 @@ app-chatbot-widget {
   .message-bubble > p {
     margin: 0;
     white-space: pre-line;
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+  .message-bubble > p :is(strong, b) {
+    font-weight: 750;
+  }
+  .message-bubble--error {
+    border-color: color-mix(in srgb, var(--color-danger, #c62828) 30%, transparent);
+    background: color-mix(in srgb, var(--color-danger, #c62828) 6%, var(--color-background));
   }
 
   .suggestions {
@@ -406,12 +421,21 @@ app-chatbot-widget {
     border-radius: 999px;
     background: color-mix(in srgb, var(--color-primary) 9%, transparent);
     color: var(--color-primary-text);
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     font-weight: 750;
+  }
+  .source-badge--ai {
+    background: color-mix(in srgb, #ffb800 16%, transparent);
+    color: #7a5600;
+  }
+  .message-meta__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
   }
   .disclaimer {
     color: var(--color-text-secondary);
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     line-height: 1.35;
   }
 
@@ -421,7 +445,7 @@ app-chatbot-widget {
   .quick-prompts > p {
     margin: 0 0 0.45rem;
     color: var(--color-text-secondary);
-    font-size: 0.65rem;
+    font-size: 0.74rem;
     font-weight: 650;
   }
   .quick-prompts__grid {
@@ -466,12 +490,12 @@ app-chatbot-widget {
     min-width: 0;
   }
   .quick-prompts strong {
-    font-size: 0.7rem;
+    font-size: 0.82rem;
   }
   .quick-prompts small {
     margin-top: 0.1rem;
     color: var(--color-text-secondary);
-    font-size: 0.61rem;
+    font-size: 0.72rem;
   }
   .quick-prompts button > i {
     color: color-mix(in srgb, var(--color-text) 35%, transparent);
@@ -504,7 +528,7 @@ app-chatbot-widget {
   .typing small {
     margin-left: 0.3rem;
     color: var(--color-text-secondary);
-    font-size: 0.6rem;
+    font-size: 0.74rem;
   }
   @keyframes mira-pulse {
     to {
@@ -545,7 +569,7 @@ app-chatbot-widget {
     background: transparent;
     color: var(--color-text);
     font: inherit;
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     line-height: 1.4;
   }
   .composer textarea::placeholder {
@@ -578,8 +602,175 @@ app-chatbot-widget {
     display: block;
     margin-top: 0.42rem;
     color: var(--color-text-secondary);
-    font-size: 0.57rem;
+    font-size: 0.68rem;
     text-align: center;
+  }
+
+  .chat-panel__actions {
+    position: relative;
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  /* Tabla de datos dentro de la respuesta */
+  .data-table {
+    margin-top: 0.7rem;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+    border-radius: 12px;
+  }
+  .data-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  .data-table th {
+    position: sticky;
+    top: 0;
+    padding: 0.45rem 0.6rem;
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-background));
+    color: var(--color-primary-text);
+    font-size: 0.72rem;
+    font-weight: 750;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 0.42rem 0.6rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-text) 7%, transparent);
+    white-space: nowrap;
+  }
+  .data-table tbody tr:nth-child(even) td {
+    background: color-mix(in srgb, var(--color-text) 2.5%, transparent);
+  }
+  .data-table .cell--bad {
+    color: var(--color-danger, #b3261e);
+    font-weight: 700;
+  }
+  .data-table .cell--good {
+    color: #176b49;
+    font-weight: 700;
+  }
+  .data-table__footer {
+    display: block;
+    padding: 0.4rem 0.6rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-text) 7%, transparent);
+    color: var(--color-text-secondary);
+    font-size: 0.7rem;
+  }
+
+  /* Botones de respuesta rápida, debajo del último mensaje */
+  .quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.55rem;
+  }
+  .quick-reply {
+    padding: 0.45rem 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    border-radius: 999px;
+    background: var(--color-background);
+    color: var(--color-primary-text);
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 0.16s ease,
+      transform 0.16s ease;
+  }
+  .quick-reply:hover {
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-background));
+    transform: translateY(-1px);
+  }
+  .retry-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+    padding: 0.4rem 0.75rem;
+    border: 0;
+    border-radius: 10px;
+    background: var(--color-danger, #c62828);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .retry-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Micrófono */
+  .mic-button {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+    border-radius: 11px;
+    background: var(--color-background);
+    color: var(--color-primary-text);
+    cursor: pointer;
+    font-size: 1.05rem;
+    transition:
+      background-color 0.16s ease,
+      transform 0.16s ease;
+  }
+  .mic-button:not(:disabled):hover {
+    transform: scale(1.05);
+  }
+  .mic-button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .mic-button--active {
+    border-color: transparent;
+    background: #d93025;
+    color: #fff;
+    animation: mira-mic 1.2s ease-in-out infinite;
+  }
+  .composer__box--listening {
+    border-color: color-mix(in srgb, #d93025 55%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, #d93025 12%, transparent);
+  }
+  .voice-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 10px;
+    background: color-mix(in srgb, #d93025 9%, var(--color-background));
+    color: #9c1f17;
+    font-size: 0.8rem;
+    font-weight: 650;
+  }
+  .voice-banner--notice {
+    background: var(--color-warning-soft, #fff8e1);
+    color: var(--color-warning-text, #6b4e00);
+  }
+  .voice-banner__pulse {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: #d93025;
+    animation: mira-mic 1.2s ease-in-out infinite;
+  }
+  @keyframes mira-mic {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(217 48 37 / 45%);
+    }
+    50% {
+      box-shadow: 0 0 0 7px rgb(217 48 37 / 0%);
+    }
   }
 
   button:focus-visible,
@@ -643,6 +834,16 @@ html.a11y-dark app-chatbot-widget {
   }
   .suggestion--available {
     background: #173529;
+  }
+  .quick-reply,
+  .mic-button {
+    background-color: #12161c;
+  }
+  .data-table th {
+    background-color: #1f2633;
+  }
+  .data-table .cell--good {
+    color: #7fe0b0;
   }
   .suggestion--available .suggestion__status,
   .suggestion--available .suggestion__badge {
